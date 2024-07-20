@@ -5,8 +5,32 @@ internal class AfflictionManager : MonoBehaviour
 {
     public List<CustomAffliction> m_Afflictions = [];
 
-    public void Start() { }
+    public static AfflictionManager GetAfflictionManagerInstance() => GameManager.Instance().m_ConditionSystems.GetComponent<AfflictionManager>();
+    
+    public int GetCustomAfflictionCount() => m_Afflictions.Count();
 
+    // We should probably change this to an enum or something?
+    
+    /// <summary>
+    /// Returns the colour based on the affliction.
+    /// </summary>
+    /// <param name="afflictionType">Choose from the following strings - "Buff", "Risk", "Bad"</param>
+    /// <returns></returns>
+    public static Color AfflictionColour(string afflictionType)
+    {
+        return afflictionType switch
+        {
+            "Buff" => InterfaceManager.m_FirstAidBuffColor,
+            "Risk" => InterfaceManager.m_FirstAidRiskColor,
+            "Bad" => InterfaceManager.m_FirstAidRedColor
+        };
+    }
+    
+    //so mod authors can check if the player has at least one CustomAffliction of their own type
+    public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(obj => typeName.IsAssignableFrom(obj.GetType()));
+
+    public void Start() { }
+    
     public void Update()
     {
         //where the magic happens
@@ -25,16 +49,5 @@ internal class AfflictionManager : MonoBehaviour
                 InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
             }
         }
-    }
-
-    //so mod authors can check if the player has at least one CustomAffliction of their own type
-    public bool HasAfflictionOfType(Type typeName)
-    {
-        return m_Afflictions.Any(obj => typeName.IsAssignableFrom(obj.GetType()));
-    }
-
-    public int GetCustomAfflictionCount()
-    {
-        return m_Afflictions.Count();
     }
 }

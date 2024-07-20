@@ -1,4 +1,6 @@
-﻿namespace AfflictionComponent.Patches;
+﻿using AfflictionComponent.Afflictions;
+
+namespace AfflictionComponent.Patches;
 
 internal static class StatusBarPatches
 {
@@ -8,7 +10,12 @@ internal static class StatusBarPatches
         private static void Postfix(StatusBar __instance, ref bool __result)
         {
             if (__instance.m_StatusBarType != StatusBar.StatusBarType.Condition) return;
-            // Add logic here to determine whether the custom affliction is a debuff and if it's active.
+            var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
+            foreach (var customAffliction in customAfflictions)
+            {
+                if (!customAffliction.HasAfflictionRisk() || !customAffliction.HasAffliction()) return;
+                __result = true;
+            }
         }
     }
     

@@ -1,6 +1,6 @@
 ﻿namespace AfflictionComponent.Patches;
 
-internal static class UIPatches
+internal static class PanelAfflictionPatches
 {
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
     private static class SetupCustomAfflictionOnScrollList
