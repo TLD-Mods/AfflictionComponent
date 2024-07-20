@@ -1,4 +1,3 @@
-
 using AfflictionComponent.Afflictions;
 
 namespace AfflictionComponent;

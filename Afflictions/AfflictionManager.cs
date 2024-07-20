@@ -5,10 +5,7 @@ internal class AfflictionManager : MonoBehaviour
 {
     public List<CustomAffliction> m_Afflictions = [];
 
-    public void Start()
-    {
-
-    }
+    public void Start() { }
 
     public void Update()
     {

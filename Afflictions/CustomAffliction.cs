@@ -1,6 +1,6 @@
 ﻿namespace AfflictionComponent.Afflictions;
 
-internal class CustomAffliction
+public class CustomAffliction
 {
     public string m_Cause;
     public AfflictionBodyArea m_Location;
