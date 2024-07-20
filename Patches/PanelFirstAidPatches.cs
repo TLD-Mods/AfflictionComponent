@@ -1,4 +1,4 @@
-﻿using AfflictionComponent.Afflictions;
+﻿using AfflictionComponent.Components;
 
 namespace AfflictionComponent.Patches;
 
@@ -22,8 +22,12 @@ internal static class PanelFirstAidPatches
     {
         private static void Postfix(Panel_FirstAid __instance, ref bool __result)
         {
-            // We need to add logic to determine if the current affliction is 'bad'.
-            // Hinterland are doing this by checking affliction that AREN'T 'Risk' or 'Beneficial'.
+            var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
+            foreach (var customAffliction in customAfflictions)
+            {
+                if (!customAffliction.HasAffliction() && customAffliction.m_Buff) return;
+                __result = true;
+            }
         }
     }
     

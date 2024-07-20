@@ -1,4 +1,4 @@
-﻿namespace AfflictionComponent.Afflictions;
+﻿namespace AfflictionComponent.Components;
 
 public class CustomAffliction
 {
@@ -54,12 +54,11 @@ public class CustomAffliction
     //for specific events that need to occur on update
     public virtual void OnUpdate()
     {
-        // These are just placeholders for the actual logic, again we also need to determine if it's a 'bad' affliction or not.
         if (HasAfflictionRisk())
         {
             PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionName, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
         }
-        if (HasAffliction())
+        if (HasAffliction() && !m_Buff)
         {
             PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionName, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
         }

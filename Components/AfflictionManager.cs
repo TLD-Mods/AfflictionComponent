@@ -1,4 +1,4 @@
-﻿namespace AfflictionComponent.Afflictions;
+﻿namespace AfflictionComponent.Components;
 
 [RegisterTypeInIl2Cpp(false)]
 internal class AfflictionManager : MonoBehaviour

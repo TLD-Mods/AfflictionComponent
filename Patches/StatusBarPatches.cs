@@ -1,4 +1,4 @@
-﻿using AfflictionComponent.Afflictions;
+﻿using AfflictionComponent.Components;
 
 namespace AfflictionComponent.Patches;
 
