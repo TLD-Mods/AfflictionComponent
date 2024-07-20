@@ -35,13 +35,15 @@ public class CustomAffliction
         if (m_Permanent) m_Duration = float.PositiveInfinity;
     }
 
+    // These get called over and over again so the logic will have to change.
+    // Also, something this shows up and other times it doesn't. Will have to investigate more.
     public virtual void CheckForAffliction()
     {
         if (HasAfflictionRisk())
         {
             PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
         }
-        if (HasAffliction() && !m_Buff)
+        else if (HasAffliction() && !m_Buff)
         {
             PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
         }

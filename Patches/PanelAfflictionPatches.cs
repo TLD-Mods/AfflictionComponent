@@ -1,5 +1,6 @@
 ﻿namespace AfflictionComponent.Patches;
 
+// This hasn't been tested, I have no idea if it works or not.
 internal static class PanelAfflictionPatches
 {
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
