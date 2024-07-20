@@ -9,7 +9,7 @@ internal static class GameManagerPatches
     {
         private static void Postfix(GameManager __instance)
         {
-            _ = __instance.m_ConditionSystems.GetComponent<AfflictionManager>() ?? __instance.m_ConditionSystems.AddComponent<AfflictionManager>();
+            _ = __instance.m_FirstAidSystems.GetComponent<AfflictionManager>() ?? __instance.m_FirstAidSystems.AddComponent<AfflictionManager>();
         }
     }
 }

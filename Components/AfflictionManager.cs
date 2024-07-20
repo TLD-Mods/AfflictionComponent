@@ -5,7 +5,7 @@ internal class AfflictionManager : MonoBehaviour
 {
     public List<CustomAffliction> m_Afflictions = [];
 
-    public static AfflictionManager GetAfflictionManagerInstance() => GameManager.Instance().m_ConditionSystems.GetComponent<AfflictionManager>();
+    public static AfflictionManager GetAfflictionManagerInstance() => GameManager.Instance().m_FirstAidSystems.GetComponent<AfflictionManager>();
     
     public int GetCustomAfflictionCount() => m_Afflictions.Count();
 

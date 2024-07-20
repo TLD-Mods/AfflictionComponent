@@ -5,7 +5,7 @@ public class CustomAffliction
     public string m_Cause;
     public AfflictionBodyArea m_Location;
     public string m_SpriteName;
-    public string m_AfflictionName;
+    public string m_AfflictionKey;
 
     public bool m_Active;
     public bool m_Risk;
@@ -18,11 +18,12 @@ public class CustomAffliction
     
     public GearItem[] m_RemedyItems;
 
-    public CustomAffliction(string cause, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, GearItem[] remedyItems)
+    public CustomAffliction(string cause, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, GearItem[] remedyItems)
     {
         m_Cause = cause;
         m_Location = location;
         m_SpriteName = spriteName;
+        m_AfflictionKey = afflictionName;
         m_Risk = risk;
         m_Buff = buff;
         m_Duration = duration;
@@ -34,12 +35,24 @@ public class CustomAffliction
         if (m_Permanent) m_Duration = float.PositiveInfinity;
     }
 
+    public virtual void CheckForAffliction()
+    {
+        if (HasAfflictionRisk())
+        {
+            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
+        }
+        if (HasAffliction() && !m_Buff)
+        {
+            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
+        }
+    }
+    
     public void Cure()
     {
         //find component and remove from list there
         
         // Invoking the UI element on right side of the players HUD.
-        PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionName, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.AfflictionColour("Buff"));
+        PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.AfflictionColour("Buff"));
     }
     
     public string GetSpriteName() => m_SpriteName;
@@ -47,21 +60,30 @@ public class CustomAffliction
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);
 
     public bool HasAffliction() => m_Active;
-
-    // Developers will be able to override this for their custom logic to determine if they has the affliction risk or not.
-    public virtual bool HasAfflictionRisk() => false;
+    
+    public bool HasAfflictionRisk() => m_Risk;
     
     //for specific events that need to occur on update
     public virtual void OnUpdate()
     {
-        if (HasAfflictionRisk())
+        if (GameManager.m_IsPaused)
         {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionName, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
+            return;
         }
-        if (HasAffliction() && !m_Buff)
+        if (GameManager.s_IsGameplaySuspended)
         {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionName, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
+            return;
         }
+        if (GameManager.GetPlayerManagerComponent().m_God)
+        {
+            return;
+        }
+        if (m_Active)
+        {
+            UpdateAffliction();
+            return;
+        }
+        CheckForAffliction();
     }
 
     public void Start()
@@ -70,5 +92,10 @@ public class CustomAffliction
 
         //find component and add to list there
         //invoke UI element on right side of screen
+    }
+
+    public virtual void UpdateAffliction()
+    {
+        
     }
 }

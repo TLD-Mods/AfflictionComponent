@@ -25,8 +25,7 @@ internal static class PanelFirstAidPatches
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
             foreach (var customAffliction in customAfflictions)
             {
-                if (!customAffliction.HasAffliction() && customAffliction.m_Buff) return;
-                __result = true;
+                __result = customAffliction.HasAffliction() && !customAffliction.m_Buff;
             }
         }
     }
