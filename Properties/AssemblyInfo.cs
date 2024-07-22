@@ -1,4 +1,4 @@
-﻿using BuildInfo = AfflictionComponent.BuildInfo;
+﻿using BuildInfo = AfflictionComponent.Properties.BuildInfo;
 
 [assembly: AssemblyTitle(BuildInfo.Name)]
 [assembly: AssemblyDescription(BuildInfo.Description)]
@@ -8,10 +8,11 @@
 [assembly: AssemblyTrademark(BuildInfo.Trademark)]
 [assembly: AssemblyCulture(BuildInfo.Culture)]
 
-[assembly: AssemblyVersion(BuildInfo.Version)]
+[assembly: AssemblyVersion(BuildInfo.AssemblyVersion)]
+[assembly: AssemblyInformationalVersion(BuildInfo.Version)]
 [assembly: AssemblyFileVersion(BuildInfo.Version)]
 
-[assembly: MelonInfo(typeof(AfflictionComponent.Main), BuildInfo.GUIName, BuildInfo.Version, BuildInfo.Author, BuildInfo.DownloadLink)]
+[assembly: MelonInfo(typeof(AfflictionComponent.Mod), BuildInfo.GUIName, BuildInfo.Version, BuildInfo.Author, BuildInfo.DownloadLink)]
 [assembly: MelonGame("Hinterland", "TheLongDark")]
 
 [assembly: VerifyLoaderVersion(BuildInfo.MelonLoaderVersion, true)]
