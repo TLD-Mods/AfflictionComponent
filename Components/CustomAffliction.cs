@@ -19,10 +19,10 @@ public abstract class CustomAffliction
     public Tuple<string, int>[] m_RemedyItems;
 
     public bool m_BloodLoss; //the affliction causes blood loss, might not use, intended to override the vanilla Blood Loss affliction
-
+    
     public CustomAffliction(string cause, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int>[] remedyItems)
     {
-        this.m_Cause = cause;
+        this.m_Cause = cause; // We don't neccessarily need to add 'this.', it's redundant - but we can keep it if you'd like.
         this.m_Location = location;
         this.m_SpriteName = spriteName;
         this.m_AfflictionKey = afflictionName;
@@ -35,20 +35,6 @@ public abstract class CustomAffliction
 
         if (this.m_Buff && this.m_Risk) this.m_Risk = false; //buff takes precedence
         if (this.m_Permanent) this.m_Duration = float.PositiveInfinity;
-    }
-
-    // These get called over and over again so the logic will have to change.
-    // Also, something this shows up and other times it doesn't. Will have to investigate more.
-    public virtual void CheckForAffliction() //what is the point of this even?
-    {
-        if (HasAfflictionRisk())
-        {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
-        }
-        else if (!m_Buff)
-        {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
-        }
     }
     
     public void Cure()
@@ -81,7 +67,7 @@ public abstract class CustomAffliction
 
         m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
 
-        AfflictionManager.GetAfflictionManagerInstance().Add(this); //am I allowed to do this?
+        AfflictionManager.GetAfflictionManagerInstance().Add(this); //am I allowed to do this? // You should be? Not quite sure ¯\_(ツ)_/¯
 
         //invoke UI element on right side of screen
         if (HasAfflictionRisk())

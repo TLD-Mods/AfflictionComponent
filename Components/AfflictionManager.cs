@@ -5,6 +5,11 @@ internal class AfflictionManager : MonoBehaviour
 {
     public List<CustomAffliction> m_Afflictions = [];
 
+    public List<CustomAffliction> GetAfflictionsByBodyArea(AfflictionBodyArea bodyArea)
+    {
+        return m_Afflictions.Where(a => a.m_Location == bodyArea).ToList();
+    }
+    
     public static AfflictionManager GetAfflictionManagerInstance() => Mod.afflictionManager;
     
     public int GetCustomAfflictionCount() => m_Afflictions.Count();
