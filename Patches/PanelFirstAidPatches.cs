@@ -25,7 +25,7 @@ internal static class PanelFirstAidPatches
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
             foreach (var customAffliction in customAfflictions)
             {
-                __result = customAffliction.HasAffliction() && !customAffliction.m_Buff;
+                __result = !customAffliction.m_Buff;
             }
         }
     }
@@ -76,4 +76,5 @@ internal static class PanelFirstAidPatches
     {
         private static void Postfix() { }
     }
+
 }

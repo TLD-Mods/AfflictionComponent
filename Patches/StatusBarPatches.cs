@@ -14,7 +14,7 @@ internal static class StatusBarPatches
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
             foreach (var customAffliction in customAfflictions)
             {
-                __result = customAffliction.HasAfflictionRisk() || customAffliction.HasAffliction();
+                __result = customAffliction.HasAfflictionRisk();
             }
         }
     }

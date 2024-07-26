@@ -5,7 +5,7 @@ internal class AfflictionManager : MonoBehaviour
 {
     public List<CustomAffliction> m_Afflictions = [];
 
-    public static AfflictionManager GetAfflictionManagerInstance() => GameManager.Instance().m_FirstAidSystems.GetComponent<AfflictionManager>();
+    public static AfflictionManager GetAfflictionManagerInstance() => Mod.afflictionManager;
     
     public int GetCustomAfflictionCount() => m_Afflictions.Count();
 
@@ -33,6 +33,11 @@ internal class AfflictionManager : MonoBehaviour
     
     public void Update()
     {
+        if (GameManager.m_IsPaused || GameManager.s_IsGameplaySuspended)
+        {
+            return;
+        }
+
         //where the magic happens
 
         float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
@@ -50,4 +55,15 @@ internal class AfflictionManager : MonoBehaviour
             }
         }
     }
+
+    public void Add(CustomAffliction ca)
+    {
+        m_Afflictions.Add(ca);
+    }
+
+    public void Remove(CustomAffliction ca)
+    {
+        m_Afflictions.Remove(ca);
+    }
+
 }

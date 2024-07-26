@@ -1,49 +1,51 @@
 ﻿namespace AfflictionComponent.Components;
 
-public class CustomAffliction
+public abstract class CustomAffliction
 {
     public string m_Cause;
     public AfflictionBodyArea m_Location;
     public string m_SpriteName;
     public string m_AfflictionKey;
 
-    public bool m_Active;
     public bool m_Risk;
     public bool m_Buff;
 
-    public float m_Duration; //in hours
     public float m_EndTime;
+
+    public float m_Duration; //in hours
     public bool m_Permanent;
     public bool m_InstantHeal;
     
-    public GearItem[] m_RemedyItems;
+    public Tuple<string, int>[] m_RemedyItems;
 
-    public CustomAffliction(string cause, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, GearItem[] remedyItems)
+    public bool m_BloodLoss; //the affliction causes blood loss, might not use, intended to override the vanilla Blood Loss affliction
+
+    public CustomAffliction(string cause, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int>[] remedyItems)
     {
-        m_Cause = cause;
-        m_Location = location;
-        m_SpriteName = spriteName;
-        m_AfflictionKey = afflictionName;
-        m_Risk = risk;
-        m_Buff = buff;
-        m_Duration = duration;
-        m_Permanent = permanent;
-        m_InstantHeal = instantHeal;
-        m_RemedyItems = remedyItems;
+        this.m_Cause = cause;
+        this.m_Location = location;
+        this.m_SpriteName = spriteName;
+        this.m_AfflictionKey = afflictionName;
+        this.m_Risk = risk;
+        this.m_Buff = buff;
+        this.m_Duration = duration;
+        this.m_Permanent = permanent;
+        this.m_InstantHeal = instantHeal;
+        this.m_RemedyItems = remedyItems;
 
-        if (m_Buff && m_Risk) m_Risk = false; //buff takes precedence
-        if (m_Permanent) m_Duration = float.PositiveInfinity;
+        if (this.m_Buff && this.m_Risk) this.m_Risk = false; //buff takes precedence
+        if (this.m_Permanent) this.m_Duration = float.PositiveInfinity;
     }
 
     // These get called over and over again so the logic will have to change.
     // Also, something this shows up and other times it doesn't. Will have to investigate more.
-    public virtual void CheckForAffliction()
+    public virtual void CheckForAffliction() //what is the point of this even?
     {
         if (HasAfflictionRisk())
         {
             PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
         }
-        else if (HasAffliction() && !m_Buff)
+        else if (!m_Buff)
         {
             PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
         }
@@ -51,53 +53,45 @@ public class CustomAffliction
     
     public void Cure()
     {
-        //find component and remove from list there
-        
+        AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         // Invoking the UI element on right side of the players HUD.
         PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.AfflictionColour("Buff"));
     }
     
     public string GetSpriteName() => m_SpriteName;
-    
-    public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);
-
-    public bool HasAffliction() => m_Active;
-    
+    public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);    
     public bool HasAfflictionRisk() => m_Risk;
-    
-    //for specific events that need to occur on update
-    public virtual void OnUpdate()
+
+    public bool IsBuff() => m_Buff;
+
+    public string GetAfflictionType()
     {
-        if (GameManager.m_IsPaused)
-        {
-            return;
-        }
-        if (GameManager.s_IsGameplaySuspended)
-        {
-            return;
-        }
+        if(HasAfflictionRisk()) return "Risk";
+        else return IsBuff() ? "Buff" : "Bad";
+    }
+
+    //for specific events that need to occur on update
+    public abstract void OnUpdate();
+    public void Start()
+    {
         if (GameManager.GetPlayerManagerComponent().m_God)
         {
             return;
         }
-        if (m_Active)
-        {
-            UpdateAffliction();
-            return;
-        }
-        CheckForAffliction();
-    }
 
-    public void Start()
-    {
         m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
 
-        //find component and add to list there
-        //invoke UI element on right side of screen
-    }
+        AfflictionManager.GetAfflictionManagerInstance().Add(this); //am I allowed to do this?
 
-    public virtual void UpdateAffliction()
-    {
-        
+        //invoke UI element on right side of screen
+        if (HasAfflictionRisk())
+        {
+            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
+        }
+        else if (!m_Buff)
+        {
+            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
+        }
+
     }
 }

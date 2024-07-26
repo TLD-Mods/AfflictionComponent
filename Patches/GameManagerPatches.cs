@@ -4,6 +4,7 @@ namespace AfflictionComponent.Patches;
 
 internal static class GameManagerPatches
 {
+    /**
     [HarmonyPatch(nameof(GameManager), nameof(GameManager.InstantiateSystems))]
     private static class AddAfflictionManager
     {
@@ -11,5 +12,5 @@ internal static class GameManagerPatches
         {
             _ = __instance.m_FirstAidSystems.GetComponent<AfflictionManager>() ?? __instance.m_FirstAidSystems.AddComponent<AfflictionManager>();
         }
-    }
+    }**/
 }
