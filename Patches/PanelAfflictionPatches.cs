@@ -5,7 +5,6 @@ namespace AfflictionComponent.Patches;
 // This hasn't been tested, I have no idea if it works or not.
 internal static class PanelAfflictionPatches
 {
-
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
     private static class SetupCustomAfflictionOnScrollList
     {
@@ -75,16 +74,12 @@ internal static class PanelAfflictionPatches
                     }
                 }
             }
-
-           
         }
     }
 
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.RefreshVisuals))]
-
     public static class RefreshVisualOverride
     {
-
         public static bool Prefix() { return false; }
 
         public static void Postfix(Panel_Affliction __instance)
@@ -104,17 +99,13 @@ internal static class PanelAfflictionPatches
             Utils.SetActive(__instance.m_ButtonRightGamepad, flag && __instance.m_ScrollList.GetTweenTargetIndex() < __instance.m_ScrollList.m_ScrollObjects.Count - 1);
             __instance.m_MouseButtonTreatWounds.SetLocID(__instance.m_TreatWoundsLocalizationId);
             __instance.UpdateButtonLegend();
-
-
         }
-
     }
 
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateCoverFlowColor))]
 
     public static class UpdateCoverFlowCoverOverride
     {
-
         public static bool Prefix() { return false; }
 
         public static void Postfix(Panel_Affliction __instance, ref int index, ref bool isSelected)
@@ -139,11 +130,6 @@ internal static class PanelAfflictionPatches
 
                 __instance.m_CoverflowAfflictions[index].m_SpriteEffect.color = colorBasedOnAffliction;
             }
-
-
         }
-
     }
-
-
 }

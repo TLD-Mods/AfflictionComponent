@@ -76,5 +76,4 @@ internal static class PanelFirstAidPatches
     {
         private static void Postfix() { }
     }
-
 }

@@ -29,7 +29,53 @@ internal class AfflictionManager : MonoBehaviour
     //so mod authors can check if the player has at least one CustomAffliction of their own type
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(obj => typeName.IsAssignableFrom(obj.GetType()));
 
-    public void Start() { }
+    public void Start()
+    {
+        var customAfflictionTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => type.IsSubclassOf(typeof(CustomAffliction)) && !type.IsAbstract);
+
+        foreach (var afflictionType in customAfflictionTypes)
+        {
+            try
+            {
+                var constructor = afflictionType.GetConstructor([
+                    typeof(string), typeof(AfflictionBodyArea), typeof(string), 
+                    typeof(string), typeof(bool), typeof(bool), typeof(float), 
+                    typeof(bool), typeof(bool), typeof(GearItem[])
+                ]);
+
+                if (constructor != null)
+                {
+                    var affliction = (CustomAffliction)constructor.Invoke([
+                        "Default Cause", 
+                        AfflictionBodyArea.Chest, 
+                        "default_sprite",
+                        "Default name",
+                        false, // risk
+                        false, // buff
+                        24f,   // duration
+                        false, // permanent
+                        false, // instantHeal
+                        Array.Empty<GearItem>() // remedyItems
+                    ]);
+
+                    m_Afflictions.Add(affliction);
+                    MelonLogger.Msg($"Added affliction of type {afflictionType.Name}");
+                }
+                else
+                {
+                    MelonLogger.Warning($"Could not find appropriate constructor for affliction type {afflictionType.Name}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Error creating affliction of type {afflictionType.Name}: {ex.Message}");
+            }
+        }
+
+        MelonLogger.Msg($"Initialized {m_Afflictions.Count} custom afflictions");
+    }
     
     public void Update()
     {
@@ -65,5 +111,4 @@ internal class AfflictionManager : MonoBehaviour
     {
         m_Afflictions.Remove(ca);
     }
-
 }

@@ -19,7 +19,7 @@ internal sealed class Mod : MelonMod
         if (sceneName.ToLowerInvariant().Contains("boot") || sceneName.ToLowerInvariant().Contains("empty")) return;
         if (sceneName.ToLowerInvariant().Contains("menu"))
         {
-            GameObject.Destroy(GameObject.Find("AfflictionManager"));
+            UnityEngine.Object.Destroy(GameObject.Find("AfflictionManager"));
             afflictionManager = null;
             return;
         }
@@ -30,7 +30,7 @@ internal sealed class Mod : MelonMod
             {
                 GameObject AfflictionManager = new() { name = "AfflictionManager", layer = vp_Layer.Default };
                 UnityEngine.Object.Instantiate(AfflictionManager, GameManager.GetVpFPSPlayer().transform);
-                GameObject.DontDestroyOnLoad(AfflictionManager);
+                UnityEngine.Object.DontDestroyOnLoad(AfflictionManager);
                 afflictionManager = AfflictionManager.AddComponent<AfflictionManager>();
             }
         }
@@ -38,13 +38,10 @@ internal sealed class Mod : MelonMod
 
     public override void OnUpdate()
     {
-        if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Keypad7))
+        if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-
             TestAffliction test = new TestAffliction("TEST", AfflictionBodyArea.Head, "ico_injury_majorBruising", "Test Affliction", false, false, 1, false, false, [Tuple.Create("GEAR_Bandage", 1)]);
             test.Start();
         }
-       
-        
     }
 }
