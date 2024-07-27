@@ -41,43 +41,33 @@ public abstract class CustomAffliction
     {
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         // Invoking the UI element on right side of the players HUD.
-        PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.AfflictionColour("Buff"));
+        PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
+    }
+    
+    public string GetAfflictionType()
+    {
+        if (HasAfflictionRisk()) return "Risk";
+        return IsBuff() ? "Buff" : "Bad";
     }
     
     public string GetSpriteName() => m_SpriteName;
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);    
     public bool HasAfflictionRisk() => m_Risk;
-
-    public bool IsBuff() => m_Buff;
-
-    public string GetAfflictionType()
-    {
-        if(HasAfflictionRisk()) return "Risk";
-        else return IsBuff() ? "Buff" : "Bad";
-    }
-
-    //for specific events that need to occur on update
-    public abstract void OnUpdate();
+    private bool IsBuff() => m_Buff;
+    
     public void Start()
     {
-        if (GameManager.GetPlayerManagerComponent().m_God)
-        {
-            return;
-        }
+        if (GameManager.GetPlayerManagerComponent().m_God) return; // Not quite sure if we need this here anymore as I'm curing all the afflictions when the player is in godmode.
 
         m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
 
         AfflictionManager.GetAfflictionManagerInstance().Add(this); //am I allowed to do this? // You should be? Not quite sure ¯\_(ツ)_/¯
 
         //invoke UI element on right side of screen
-        if (HasAfflictionRisk())
-        {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Risk"));
-        }
-        else if (!m_Buff)
-        {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.AfflictionColour("Bad"));
-        }
-
+        if (HasAfflictionRisk()) PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour("Risk"));
+        else if (!m_Buff) PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour("Bad"));
     }
+    
+    //for specific events that need to occur on update
+    public abstract void OnUpdate();
 }

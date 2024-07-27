@@ -30,7 +30,7 @@ internal static class PanelFirstAidPatches
         }
     }
     
-    // This hasn't been tested with buffs, so it'll probably hide the paperdoll if there is a buff lol
+    // This hasn't been tested with buffs, risks, multiple afflictions at once or with vanilla afflictions, so it'll probably hide the paperdoll if there is a buff lol
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshPaperDoll))]
     private static class RefreshPaperDollCustomAffliction
     {
@@ -61,7 +61,7 @@ internal static class PanelFirstAidPatches
             
                 var affliction = afflictions[0];
                 bodyIcon.spriteName = __instance.m_BodyIconSpriteNameAffliction;
-                bodyIcon.color = AfflictionManager.AfflictionColour(affliction.GetAfflictionType());
+                bodyIcon.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
             
                 foreach (var childSprite in bodyIcon.gameObject.GetComponentsInChildren<UISprite>())
                 {
@@ -74,8 +74,14 @@ internal static class PanelFirstAidPatches
     }
     
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshScrollList))]
-    private static class AddCustomAfflictionsToScrollList
+    private static class RefreshScrollListPatch
     {
-        private static void Postfix() { }
+        private static void Postfix(Panel_FirstAid __instance) { }
+    }
+    
+    [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshRightPage))]
+    private static class RefreshRightPagePatch
+    {
+        private static void Postfix(Panel_FirstAid __instance) { }
     }
 }

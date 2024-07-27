@@ -121,7 +121,7 @@ internal static class PanelAfflictionPatches
 
                 if (index > __instance.m_Afflictions.Count)
                 {
-                    colorBasedOnAffliction = AfflictionManager.AfflictionColour(am.m_Afflictions[index - __instance.m_Afflictions.Count].GetAfflictionType());
+                    colorBasedOnAffliction = AfflictionManager.GetAfflictionColour(am.m_Afflictions[index - __instance.m_Afflictions.Count].GetAfflictionType());
                 }
                 else
                 {
