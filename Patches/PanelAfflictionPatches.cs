@@ -1,4 +1,5 @@
 ﻿using AfflictionComponent.Components;
+using ComplexLogger;
 
 namespace AfflictionComponent.Patches;
 
@@ -55,9 +56,8 @@ internal static class PanelAfflictionPatches
                 }
             }   
 
-            if(AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() > 0)
+            if (AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() > 0)
             {
-
                 int finalCounter = vanillaAfflictionCount <= moddedAfflictionCount ? combinedCount - 1 : combinedCount;
   
                 for (int j = vanillaAfflictionCount; j < finalCounter; j++)
@@ -103,33 +103,32 @@ internal static class PanelAfflictionPatches
     }
 
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateCoverFlowColor))]
-
     public static class UpdateCoverFlowCoverOverride
     {
         public static bool Prefix() { return false; }
 
         public static void Postfix(Panel_Affliction __instance, ref int index, ref bool isSelected)
         {
+            AfflictionManager am = AfflictionManager.GetAfflictionManagerInstance();
+            Color colorBasedOnAffliction;
 
-            Mod.Logger.Log("Coverflow colour shit", ComplexLogger.FlaggedLoggingLevel.Debug);
-
-            if (__instance.m_AfflictionButtonColorReferences)
+            if (index >= __instance.m_Afflictions.Count)
             {
-
-                AfflictionManager am = AfflictionManager.GetAfflictionManagerInstance();
-                Color colorBasedOnAffliction = new();
-
-                if (index > __instance.m_Afflictions.Count)
+                int customAfflictionIndex = index - __instance.m_Afflictions.Count;
+                if (customAfflictionIndex < 0 || customAfflictionIndex >= am.m_Afflictions.Count)
                 {
-                    colorBasedOnAffliction = AfflictionManager.GetAfflictionColour(am.m_Afflictions[index - __instance.m_Afflictions.Count].GetAfflictionType());
+                    // This handles the index out of range error.
+                    Mod.Logger.Log($"Invalid custom affliction index: {customAfflictionIndex}. Custom afflictions count: {am.m_Afflictions.Count}", ComplexLogger.FlaggedLoggingLevel.Warning);
+                    return;
                 }
-                else
-                {
-                    colorBasedOnAffliction = __instance.m_AfflictionButtonColorReferences.GetColorBasedOnAffliction(__instance.m_Afflictions[index].m_AfflictionType, isSelected);
-                }
-
-                __instance.m_CoverflowAfflictions[index].m_SpriteEffect.color = colorBasedOnAffliction;
+                colorBasedOnAffliction = AfflictionManager.GetAfflictionColour(am.m_Afflictions[customAfflictionIndex].GetAfflictionType());
             }
+            else
+            {
+                colorBasedOnAffliction = __instance.m_AfflictionButtonColorReferences.GetColorBasedOnAffliction(__instance.m_Afflictions[index].m_AfflictionType, isSelected);
+            }
+
+            __instance.m_CoverflowAfflictions[index].m_SpriteEffect.color = colorBasedOnAffliction;
         }
     }
 }
