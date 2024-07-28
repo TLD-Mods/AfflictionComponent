@@ -9,7 +9,7 @@ internal static class PanelAfflictionPatches
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
     private static class SetupCustomAfflictionOnScrollList
     {
-        private static bool Prefix() { return false; }
+        private static bool Prefix() => false;
         
         private static void Postfix(ref Il2CppSystem.Collections.Generic.List<Affliction> afflictionList, Panel_Affliction __instance)
         {
@@ -25,10 +25,6 @@ internal static class PanelAfflictionPatches
             Mod.Logger.Log($"Modded afflictions count: {moddedAfflictionCount}", ComplexLogger.FlaggedLoggingLevel.Debug);
 
             int combinedCount = vanillaAfflictionCount + moddedAfflictionCount;
-            Mod.Logger.Log($"Combined afflictions count: {combinedCount}", ComplexLogger.FlaggedLoggingLevel.Debug);
-
-            Mod.Logger.Log("Starting...", ComplexLogger.FlaggedLoggingLevel.Debug);
-
             __instance.m_CoverflowAfflictions.Clear();
             __instance.m_ScrollList.CleanUp();
             __instance.m_ScrollList.CreateList(combinedCount);
@@ -80,7 +76,7 @@ internal static class PanelAfflictionPatches
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.RefreshVisuals))]
     public static class RefreshVisualOverride
     {
-        public static bool Prefix() { return false; }
+        public static bool Prefix() => false;
 
         public static void Postfix(Panel_Affliction __instance)
         {
@@ -92,11 +88,10 @@ internal static class PanelAfflictionPatches
                 __instance.UpdateCoverFlowColor(i, isSelected);
             }
             __instance.UpdateSelectedAffliction(tweenTargetIndex);
-            bool flag = __instance.m_Afflictions.Count + AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() > 1;
-            Utils.SetActive(__instance.m_ButtonLeft, flag && __instance.m_ScrollList.GetTweenTargetIndex() > 0);
-            Utils.SetActive(__instance.m_ButtonLeftGamepad, flag && __instance.m_ScrollList.GetTweenTargetIndex() > 0);
-            Utils.SetActive(__instance.m_ButtonRight, flag && __instance.m_ScrollList.GetTweenTargetIndex() < __instance.m_ScrollList.m_ScrollObjects.Count - 1);
-            Utils.SetActive(__instance.m_ButtonRightGamepad, flag && __instance.m_ScrollList.GetTweenTargetIndex() < __instance.m_ScrollList.m_ScrollObjects.Count - 1);
+            Utils.SetActive(__instance.m_ButtonLeft, __instance.m_ScrollList.GetTweenTargetIndex() > 0);
+            Utils.SetActive(__instance.m_ButtonLeftGamepad, __instance.m_ScrollList.GetTweenTargetIndex() > 0);
+            Utils.SetActive(__instance.m_ButtonRight, __instance.m_ScrollList.GetTweenTargetIndex() < __instance.m_ScrollList.m_ScrollObjects.Count - 1);
+            Utils.SetActive(__instance.m_ButtonRightGamepad, __instance.m_ScrollList.GetTweenTargetIndex() < __instance.m_ScrollList.m_ScrollObjects.Count - 1);
             __instance.m_MouseButtonTreatWounds.SetLocID(__instance.m_TreatWoundsLocalizationId);
             __instance.UpdateButtonLegend();
         }
@@ -105,7 +100,7 @@ internal static class PanelAfflictionPatches
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateCoverFlowColor))]
     public static class UpdateCoverFlowCoverOverride
     {
-        public static bool Prefix() { return false; }
+        public static bool Prefix() => false;
 
         public static void Postfix(Panel_Affliction __instance, ref int index, ref bool isSelected)
         {
@@ -115,9 +110,8 @@ internal static class PanelAfflictionPatches
             if (index >= __instance.m_Afflictions.Count)
             {
                 int customAfflictionIndex = index - __instance.m_Afflictions.Count;
-                if (customAfflictionIndex < 0 || customAfflictionIndex >= am.m_Afflictions.Count)
+                if (customAfflictionIndex < 0 || customAfflictionIndex >= am.m_Afflictions.Count) // This handles the index out of range error.
                 {
-                    // This handles the index out of range error.
                     Mod.Logger.Log($"Invalid custom affliction index: {customAfflictionIndex}. Custom afflictions count: {am.m_Afflictions.Count}", ComplexLogger.FlaggedLoggingLevel.Warning);
                     return;
                 }
