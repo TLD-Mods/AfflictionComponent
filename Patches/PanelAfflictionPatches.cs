@@ -13,7 +13,6 @@ internal static class PanelAfflictionPatches
         
         private static void Postfix(ref Il2CppSystem.Collections.Generic.List<Affliction> afflictionList, Panel_Affliction __instance)
         {
-
             if (afflictionList == null && AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() == 0) return;
 
             Mod.Logger.Log("Calling SetupScrollList", ComplexLogger.FlaggedLoggingLevel.Debug);
@@ -73,12 +72,14 @@ internal static class PanelAfflictionPatches
         }
     }
 
+    // This part: ---__instance.m_MouseButtonTreatWounds.SetLocID(__instance.m_TreatWoundsLocalizationId);---
+    // Probably don't account for custom afflictions - we will need to investigate that more.
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.RefreshVisuals))]
-    public static class RefreshVisualOverride
+    private static class RefreshVisualOverride
     {
-        public static bool Prefix() => false;
+        private static bool Prefix() => false;
 
-        public static void Postfix(Panel_Affliction __instance)
+        private static void Postfix(Panel_Affliction __instance)
         {
 
             int tweenTargetIndex = __instance.m_ScrollList.GetTweenTargetIndex();
@@ -98,11 +99,11 @@ internal static class PanelAfflictionPatches
     }
 
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateCoverFlowColor))]
-    public static class UpdateCoverFlowCoverOverride
+    private static class UpdateCoverFlowCoverOverride
     {
-        public static bool Prefix() => false;
+        private static bool Prefix() => false;
 
-        public static void Postfix(Panel_Affliction __instance, ref int index, ref bool isSelected)
+        private static void Postfix(Panel_Affliction __instance, ref int index, ref bool isSelected)
         {
             AfflictionManager am = AfflictionManager.GetAfflictionManagerInstance();
             Color colorBasedOnAffliction;
@@ -123,6 +124,61 @@ internal static class PanelAfflictionPatches
             }
 
             __instance.m_CoverflowAfflictions[index].m_SpriteEffect.color = colorBasedOnAffliction;
+        }
+    }
+    
+    [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateSelectedAffliction), [typeof(Affliction)])]
+    private static class UpdateSelectedAfflictionOverride
+    {
+        private static bool Prefix(Panel_Affliction __instance, Affliction affliction)
+        {
+            __instance.m_Label.text = Affliction.LocalizedNameFromAfflictionType(affliction.m_AfflictionType, affliction.m_Id);
+            __instance.m_LabelCause.text = affliction.m_Cause;
+            __instance.m_LabelLocation.text = Panel_Affliction.LocalizedNameFromAfflictionLocation(affliction.m_Location);
+            if (__instance.m_AfflictionButtonColorReferences)
+            {
+                Color colorBasedOnAffliction = __instance.m_AfflictionButtonColorReferences.GetColorBasedOnAffliction(affliction.m_AfflictionType, true);
+                __instance.m_LabelCause.color = colorBasedOnAffliction;
+                __instance.m_LabelLocation.color = colorBasedOnAffliction;
+            }
+            
+            return false;
+        }
+    }
+    
+    [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateSelectedAffliction), [typeof(int)])]
+    private static class UpdateSelectedAfflictionOverrideInt
+    {
+        private static bool Prefix(Panel_Affliction __instance, int selectedAfflictionIndex)
+        {
+            int vanillaAfflictionCount = __instance.m_Afflictions?.Count ?? 0;
+            int totalAfflictions = vanillaAfflictionCount + AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount();
+
+            if (selectedAfflictionIndex >= 0 && selectedAfflictionIndex < totalAfflictions)
+            {
+                if (selectedAfflictionIndex < vanillaAfflictionCount)
+                {
+                    __instance.UpdateSelectedAffliction(__instance.m_Afflictions?[selectedAfflictionIndex]);
+                }
+                else
+                {
+                    UpdateSelectedCustomAffliction(AfflictionManager.GetAfflictionManagerInstance().m_Afflictions[selectedAfflictionIndex - vanillaAfflictionCount], __instance);
+                }
+            }
+            
+            return false;
+        }
+
+        private static void UpdateSelectedCustomAffliction(CustomAffliction customAffliction, Panel_Affliction panelAffliction)
+        {
+            panelAffliction.m_Label.text = customAffliction.m_AfflictionKey;
+            panelAffliction.m_LabelCause.text = customAffliction.m_Cause;
+            panelAffliction.m_LabelLocation.text = Panel_Affliction.LocalizedNameFromAfflictionLocation(customAffliction.m_Location);
+
+            if (!panelAffliction.m_AfflictionButtonColorReferences) return;
+            Color colorBasedOnAffliction = AfflictionManager.GetAfflictionColour(customAffliction.GetAfflictionType());
+            panelAffliction.m_LabelCause.color = colorBasedOnAffliction;
+            panelAffliction.m_LabelLocation.color = colorBasedOnAffliction;
         }
     }
 }
