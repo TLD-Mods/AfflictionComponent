@@ -1,4 +1,6 @@
-﻿namespace AfflictionComponent.Patches;
+﻿using AfflictionComponent.Components;
+
+namespace AfflictionComponent.Patches;
 
 internal static class PlayerManagerPatches
 {
@@ -17,7 +19,7 @@ internal static class PlayerManagerPatches
             Panel_Affliction.AfflictionExclusions afflictionExclusions = Panel_Affliction.AfflictionExclusions.MajorWristSprain | Panel_Affliction.AfflictionExclusions.MustBeTreatable;
             Il2CppSystem.Collections.Generic.List<Affliction> list = new();
             Panel_Affliction.GetAllBadAfflictions(afflictionExclusions, list);
-            if (list.Count == 0)
+            if (list.Count == 0 && AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() == 0)
             {
                 __instance.TreatAfflictionWithFirstAid(gi.m_FirstAidItem, Affliction.InvalidAffliction);
                 return false;

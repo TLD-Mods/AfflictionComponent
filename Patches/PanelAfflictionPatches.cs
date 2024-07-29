@@ -13,10 +13,10 @@ internal static class PanelAfflictionPatches
         
         private static void Postfix(ref Il2CppSystem.Collections.Generic.List<Affliction> afflictionList, Panel_Affliction __instance)
         {
+            Mod.Logger.Log("Calling SetupScrollList", ComplexLogger.FlaggedLoggingLevel.Debug);
+
             if (afflictionList == null && AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() == 0) return;
 
-            Mod.Logger.Log("Calling SetupScrollList", ComplexLogger.FlaggedLoggingLevel.Debug);
-          
             int vanillaAfflictionCount = afflictionList != null ? afflictionList.Count : 0;
             int moddedAfflictionCount = Mod.afflictionManager.GetCustomAfflictionCount();
 
@@ -181,4 +181,5 @@ internal static class PanelAfflictionPatches
             panelAffliction.m_LabelLocation.color = colorBasedOnAffliction;
         }
     }
+
 }
