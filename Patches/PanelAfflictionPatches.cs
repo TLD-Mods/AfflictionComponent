@@ -6,6 +6,8 @@ namespace AfflictionComponent.Patches;
 // This hasn't been tested, I have no idea if it works or not.
 internal static class PanelAfflictionPatches
 {
+    public static CustomAffliction selectedCustomAffliction;
+
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
     private static class SetupCustomAfflictionOnScrollList
     {
@@ -13,15 +15,10 @@ internal static class PanelAfflictionPatches
         
         private static void Postfix(ref Il2CppSystem.Collections.Generic.List<Affliction> afflictionList, Panel_Affliction __instance)
         {
-            Mod.Logger.Log("Calling SetupScrollList", ComplexLogger.FlaggedLoggingLevel.Debug);
-
             if (afflictionList == null && AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() == 0) return;
 
             int vanillaAfflictionCount = afflictionList != null ? afflictionList.Count : 0;
             int moddedAfflictionCount = Mod.afflictionManager.GetCustomAfflictionCount();
-
-            Mod.Logger.Log($"Vanilla afflictions count: {vanillaAfflictionCount}", ComplexLogger.FlaggedLoggingLevel.Debug);
-            Mod.Logger.Log($"Modded afflictions count: {moddedAfflictionCount}", ComplexLogger.FlaggedLoggingLevel.Debug);
 
             int combinedCount = vanillaAfflictionCount + moddedAfflictionCount;
             __instance.m_CoverflowAfflictions.Clear();
@@ -34,7 +31,7 @@ internal static class PanelAfflictionPatches
 
                 for (int i = 0; i < __instance.m_Afflictions.Count; i++)
                 {
-                    Mod.Logger.Log($"Vanilla affliction index: {i}", ComplexLogger.FlaggedLoggingLevel.Debug);
+                    //Mod.Logger.Log($"Vanilla affliction index: {i}", ComplexLogger.FlaggedLoggingLevel.Debug);
                     AfflictionCoverflow componentInChildren = Utils.GetComponentInChildren<AfflictionCoverflow>(__instance.m_ScrollList.m_ScrollObjects[i]);
                     if (!(componentInChildren == null))
                     {
@@ -57,8 +54,8 @@ internal static class PanelAfflictionPatches
   
                 for (int j = vanillaAfflictionCount; j < finalCounter; j++)
                 {
-                    Mod.Logger.Log($"Custom affliction index: {j}", ComplexLogger.FlaggedLoggingLevel.Debug);
-                    Mod.Logger.Log($"Final counter: {finalCounter}", ComplexLogger.FlaggedLoggingLevel.Debug);
+                    //Mod.Logger.Log($"Custom affliction index: {j}", ComplexLogger.FlaggedLoggingLevel.Debug);
+                    //Mod.Logger.Log($"Final counter: {finalCounter}", ComplexLogger.FlaggedLoggingLevel.Debug);
 
                     AfflictionCoverflow componentInChildren = Utils.GetComponentInChildren<AfflictionCoverflow>(__instance.m_ScrollList.m_ScrollObjects[j]);
                     if (componentInChildren != null)
@@ -182,4 +179,36 @@ internal static class PanelAfflictionPatches
         }
     }
 
+    [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.TreatWound))]
+
+    private static class TreatWoundOverride
+    {
+        public static bool Prefix() => false;
+
+        public static void Postfix(Panel_Affliction __instance)
+        {
+
+            selectedCustomAffliction = null;
+
+            Affliction afflictionSelected;
+            if (!__instance.TryGetSelectedAffliction(out afflictionSelected))
+            {
+                int tweenTargetIndex = __instance.m_ScrollList.GetTweenTargetIndex();
+                int totalCount = AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() + __instance.m_Afflictions.Count;
+
+                if (tweenTargetIndex >= 0 && tweenTargetIndex < totalCount)
+                {
+                    selectedCustomAffliction = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions[tweenTargetIndex - __instance.m_Afflictions.Count];
+                    if (selectedCustomAffliction == null) return;
+                    Mod.Logger.Log("Found custom affliction to heal", FlaggedLoggingLevel.Debug);
+                }
+                else return;
+            }
+
+            GameManager.GetPlayerManagerComponent().TreatAfflictionWithFirstAid(__instance.m_FirstAidItem, afflictionSelected);
+            __instance.Enable(false, null, null);
+
+        }
+
+    }
 }

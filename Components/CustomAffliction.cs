@@ -50,11 +50,27 @@ public abstract class CustomAffliction
         return IsBuff() ? "Buff" : "Bad";
     }
     
+    public bool RequiresRemedy(FirstAidItem fai)
+    {
+        if(m_RemedyItems.Length == 0) return false;
+
+        string gi = fai.m_GearItem.name;
+        var elements = m_RemedyItems.Where(i => i.Item1 == gi).ToList();
+
+        return elements.Count > 0 ? true : false;
+    }
+
+    public void ApplyRemedy(FirstAidItem fai)
+    {
+
+        if (m_InstantHeal) Cure();
+
+        Mod.Logger.Log("Applying remedy...", ComplexLogger.FlaggedLoggingLevel.Debug);
+    }
     public string GetSpriteName() => m_SpriteName;
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);    
     public bool HasAfflictionRisk() => m_Risk;
     private bool IsBuff() => m_Buff;
-    
     public void Start()
     {
         if (GameManager.GetPlayerManagerComponent().m_God) return; // Not quite sure if we need this here anymore as I'm curing all the afflictions when the player is in godmode.
