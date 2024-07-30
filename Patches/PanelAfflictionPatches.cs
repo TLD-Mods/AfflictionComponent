@@ -191,7 +191,7 @@ internal static class PanelAfflictionPatches
             selectedCustomAffliction = null;
 
             Affliction afflictionSelected;
-            if (!__instance.TryGetSelectedAffliction(out afflictionSelected))
+            if (!TryGetVanillaAffliction(out afflictionSelected, __instance))
             {
                 int tweenTargetIndex = __instance.m_ScrollList.GetTweenTargetIndex();
                 int totalCount = AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() + __instance.m_Afflictions.Count;
@@ -207,6 +207,20 @@ internal static class PanelAfflictionPatches
 
             GameManager.GetPlayerManagerComponent().TreatAfflictionWithFirstAid(__instance.m_FirstAidItem, afflictionSelected);
             __instance.Enable(false, null, null);
+
+        }
+
+        private static bool TryGetVanillaAffliction(out Affliction affliction, Panel_Affliction __instance)
+        {
+
+            int tweenTargetIndex = __instance.m_ScrollList.GetTweenTargetIndex();
+            if (tweenTargetIndex >= 0 && tweenTargetIndex < __instance.m_Afflictions.Count)
+            {
+                affliction = __instance.m_Afflictions[tweenTargetIndex];
+                return true;
+            }
+            affliction = Affliction.InvalidAffliction;
+            return false;
 
         }
 

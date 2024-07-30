@@ -34,17 +34,10 @@ internal static class PlayerManagerPatches
 
     private static class OnFirstAidCompleteOverride
     {
-
         public static bool Prefix(PlayerManager __instance, ref bool success, ref bool playerCancel, ref float progress)
         {
-
-            Mod.Logger.Log($"Affliction selected valid: {__instance.m_AfflictionSelected.m_IsValid}", ComplexLogger.FlaggedLoggingLevel.Debug);
-            Mod.Logger.Log($"Affliction selected location: {__instance.m_AfflictionSelected.m_Location.ToString()}", ComplexLogger.FlaggedLoggingLevel.Debug);
-
             if (PanelAfflictionPatches.selectedCustomAffliction != null)
             {
-                Mod.Logger.Log("CUSTOM affliction selected", ComplexLogger.FlaggedLoggingLevel.Debug);
-
                 CustomAffliction selected = PanelAfflictionPatches.selectedCustomAffliction;
 
                 if (!success)
@@ -89,7 +82,6 @@ internal static class PlayerManagerPatches
                 return false;
             }
             else {
-                Mod.Logger.Log("Vanilla method being called!", ComplexLogger.FlaggedLoggingLevel.Debug);
                 return true;
             } 
         }
