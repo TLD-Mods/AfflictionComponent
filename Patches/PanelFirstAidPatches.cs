@@ -1,4 +1,6 @@
 ﻿using AfflictionComponent.Components;
+using AsmResolver.DotNet;
+using Il2CppTLD.IntBackedUnit;
 
 namespace AfflictionComponent.Patches;
 
@@ -16,7 +18,7 @@ internal static class PanelFirstAidPatches
             }
         }
     }
-    
+
     [HarmonyPatch(nameof(Panel_FirstAid), nameof(Panel_FirstAid.HasBadAffliction))]
     private static class HasCustomBadAffliction
     {
@@ -29,7 +31,7 @@ internal static class PanelFirstAidPatches
             }
         }
     }
-    
+
     // This hasn't been tested with buffs, risks, multiple afflictions at once or with vanilla afflictions, so it'll probably hide the paperdoll if there is a buff lol
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshPaperDoll))]
     private static class RefreshPaperDollCustomAffliction
@@ -51,18 +53,18 @@ internal static class PanelFirstAidPatches
             {
                 List<CustomAffliction> afflictions = afflictionManager.GetAfflictionsByBodyArea(bodyArea);
                 if (afflictions.Count == 0) return;
-            
+
                 string bodyPartName = bodyArea.ToString().ToLower();
                 int iconIndex = Array.FindIndex<UISprite>(__instance.m_BodyIconList, icon => icon.name.ToLower().Contains(bodyPartName));
                 if (iconIndex == -1) return;
-            
+
                 UISprite bodyIcon = __instance.m_BodyIconList[iconIndex];
                 bodyIcon.gameObject.SetActive(true);
-            
+
                 var affliction = afflictions[0];
                 bodyIcon.spriteName = __instance.m_BodyIconSpriteNameAffliction;
                 bodyIcon.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
-            
+
                 foreach (var childSprite in bodyIcon.gameObject.GetComponentsInChildren<UISprite>())
                 {
                     var colorWithAlpha = __instance.m_ColorAffliction;
@@ -72,7 +74,7 @@ internal static class PanelFirstAidPatches
             }
         }
     }
-    
+
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshScrollList))]
     private static class RefreshScrollListOverride
     {
@@ -85,19 +87,19 @@ internal static class PanelFirstAidPatches
             __instance.m_ScrollListEffects.CleanUp();
             __instance.ClearAfflictionsAtLocationArray();
             Panel_Affliction.GetAllAfflictions(__instance.m_ScrollListAfflictions);
-            
+
             foreach (var uiSprite in __instance.m_BodyIconList)
             {
                 uiSprite.gameObject.SetActive(false);
             }
-            
+
             List<CustomAffliction> customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
             int totalAfflictions = __instance.m_ScrollListAfflictions.Count + customAfflictions.Count;
 
             __instance.m_ScrollListEffects.CreateList(totalAfflictions);
             AfflictionType lastAfflictionType = AfflictionType.BloodLoss;
             int count = 0;
-            
+
             for (int i = 0; i < totalAfflictions; i++)
             {
                 AfflictionButton component = __instance.m_ScrollListEffects.m_ScrollObjects[i].transform.GetChild(0).GetComponent<AfflictionButton>();
@@ -139,7 +141,7 @@ internal static class PanelFirstAidPatches
             component.SetSelected(isSelected);
             instance.UpdateBodyIconColors(component, isSelected, location);
         }
-        
+
         private static void ProcessCustomAffliction(Panel_FirstAid instance, CustomAffliction customAffliction, AfflictionButton component, ref AfflictionType lastAfflictionType, ref int count, bool hasSelectedButton, AfflictionType selectedType, AfflictionBodyArea selectedArea)
         {
             int location = (int)customAffliction.m_Location;
@@ -164,10 +166,205 @@ internal static class PanelFirstAidPatches
             instance.UpdateBodyIconColors(component, isSelected, location);
         }
     }
-    
+
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshRightPage))]
     private static class RefreshRightPagePatch
     {
-        private static void Postfix(Panel_FirstAid __instance) { }
+
+        public static bool Prefix(Panel_FirstAid __instance)
+        {
+
+            if (!__instance.m_SelectedAffButton) return true;
+
+            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        private static void Postfix(Panel_FirstAid __instance)
+        {
+
+            if (!__instance.m_SelectedAffButton) return;
+
+            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
+            {
+                return;
+            }
+
+            //generic UI crap, some of it we probably don't even need for this override
+            for (int i = 0; i < __instance.m_FakButtons.Length; i++)
+            {
+                __instance.m_FakButtons[i].SetNeeded(needed: false);
+            }
+            __instance.m_SpecialTreatmentWindow.SetActive(false);
+            __instance.m_BuffWindow.SetActive(false);
+            if (__instance.m_ScrollListEffects.m_ScrollObjects.Count == 0)
+            {
+                NGUITools.SetActive(__instance.m_RightPageHealthyObject, state: true);
+                __instance.HideRightPage();
+                return;
+            }
+            NGUITools.SetActive(__instance.m_RightPageHealthyObject, state: false);
+            if (__instance.m_SelectedAffButton == null)
+            {
+                __instance.HideRightPage();
+                return;
+            }
+            /** vanilla crap i'm not sure we even need here
+            if (Affliction.AfflictionTypeIsBuff(__instance.m_SelectedAffButton.m_AfflictionType))
+            {
+                if (!Panel_Affliction.HasAffliction(__instance.m_SelectedAffButton.m_AfflictionType))
+                {
+                    __instance.HideRightPage();
+                    return;
+                }
+            }
+            else if (!GameManager.GetConditionComponent().HasSpecificAffliction(__instance.m_SelectedAffButton.m_AfflictionType))
+                {
+                    __instance.HideRightPage();
+                    return;
+                }
+            **/
+            NGUITools.SetActive(__instance.m_RightPageObject, state: true);
+            for (int j = 0; j < __instance.m_BodyIconList.Length; j++)
+            {
+                __instance.m_BodyIconList[j].width = __instance.m_BodyIconWidthOriginal;
+                __instance.m_BodyIconList[j].height = __instance.m_BodyIconHeightOriginal;
+            }
+            int num = -1;
+
+            //colour stuff
+            if (Affliction.IsBeneficial(__instance.m_SelectedAffButton.m_AfflictionType))
+            {
+                __instance.m_LabelAfflictionName.color = InterfaceManager.m_FirstAidBuffColor;
+            }
+            else
+            {
+                __instance.m_LabelAfflictionName.color = InterfaceManager.m_FirstAidRedColor;
+            }
+
+            int num4 = 0; //THIS IS THE DURATION NUMBER
+            int selectedAfflictionIndex = __instance.GetSelectedAfflictionIndex(); //this will most likely need to be modified
+
+            switch (__instance.m_SelectedAffButton.m_AfflictionType)
+            {
+                case AfflictionType.Dysentery:
+                    {
+                        DysenteryMethod(__instance, selectedAfflictionIndex, out num, out num4); //this runs the vanilla code, IA will patch this method and override it to call custom code                   
+                        break;
+                    }
+                case AfflictionType.FoodPoisioning:
+                    {
+                        FoodPoisoningMethod(__instance, selectedAfflictionIndex, out num, out num4); //this runs the vanilla code, IA will patch this method and override it to call custom code                   
+                        break;
+                    }
+                case AfflictionType.Generic: //custom affliction
+
+                    //do stuff here
+
+                    break;
+            }
+            __instance.m_LabelCause.text = string.Format("{0} {1}", Localization.Get("GAMEPLAY_AfflictionCausedBy"), __instance.m_SelectedAffButton.m_LabelCause.text);
+            if (num >= 0)
+            {
+                __instance.m_BodyIconList[num].width = (int)((float)__instance.m_BodyIconWidthOriginal * 1.5f);
+                __instance.m_BodyIconList[num].height = (int)((float)__instance.m_BodyIconHeightOriginal * 1.5f);
+                __instance.UpdateBodyIconActiveAnimation(num, __instance.m_SelectedAffButton.m_AfflictionType);
+                __instance.UpdateBodyIconColors(__instance.m_SelectedAffButton, isButtonSelected: true, num);
+                __instance.UpdateAllButSelectedBodyIconColors();
+            }
+            else
+            {
+                __instance.m_BodyIconActiveAnimationObj.SetActive(false);
+            }
+            if (num4 > 0) //duration
+            {
+                Il2Cpp.Utils.SetActive(__instance.m_DurationWidgetParentObj, active: true);
+                int num5 = num4 / 60;
+                int num6 = num4 % 60;
+                __instance.m_DurationWidgetHoursLabel.text = num5.ToString();
+                __instance.m_DurationWidgetMinutesLabel.text = num6.ToString();
+            }
+            else
+            {
+                Il2Cpp.Utils.SetActive(__instance.m_DurationWidgetParentObj, active: false);
+            }
+        }
+
+        private static void FoodPoisoningMethod(Panel_FirstAid __instance, int selectedAfflictionIndex, out int num, out int num4)
+        {
+
+            FoodPoisoning foodPoisoningComponent = GameManager.GetFoodPoisoningComponent();
+            __instance.m_LabelAfflictionDescriptionNoRest.text = "";
+            __instance.m_LabelAfflictionDescription.text = foodPoisoningComponent.m_Description;
+            string[] remedySprites = new string[]
+            {
+                "GEAR_BottleAntibiotics"
+            };
+            bool[] remedyComplete = new bool[]
+            {
+                foodPoisoningComponent.HasTakenAntibiotics()
+            };
+            int[] remedyNumRequired = new int[]
+            {
+                2
+            };
+            string[] altRemedySprites = new string[]
+            {
+                "GEAR_ReishiTea"
+            };
+            bool[] altRemedyComplete = new bool[]
+            {
+                foodPoisoningComponent.HasTakenAntibiotics()
+            };
+            int[] altRemedyNumRequired = new int[]
+            {
+                1
+            };
+            __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, 0f, foodPoisoningComponent.GetRestAmountRemaining(), foodPoisoningComponent.m_NumHoursRestForCure);
+            num = (int)Panel_Affliction.GetAfflictionLocation(AfflictionType.FoodPoisioning, selectedAfflictionIndex);
+
+        }
+
+        private static void DysenteryMethod(Panel_FirstAid __instance, int selectedAfflictionIndex, out int num, out int num4)
+        {
+            Dysentery dysenteryComponent = GameManager.GetDysenteryComponent();
+            __instance.m_LabelAfflictionDescriptionNoRest.text = "";
+            __instance.m_LabelAfflictionDescription.text = dysenteryComponent.m_Description;
+            string[] remedySprites = new string[]
+            {
+                "GEAR_WaterSupplyPotable",
+                "GEAR_BottleAntibiotics"
+            };
+            bool[] remedyComplete = new bool[]
+            {
+                dysenteryComponent.GetWaterAmountRemaining().m_Units < 10000000,
+                dysenteryComponent.HasTakenAntibiotics()
+            };
+            int[] remedyNumRequired = new int[]
+            {
+                1,
+                2
+            };
+            string[] altRemedySprites = new string[]
+            {
+                "GEAR_WaterSupplyPotable",
+                "GEAR_ReishiTea"
+            };
+            bool[] altRemedyComplete = new bool[]
+            {
+                dysenteryComponent.GetWaterAmountRemaining().m_Units < 10000000,
+                dysenteryComponent.HasTakenAntibiotics()
+            };
+            int[] altRemedyNumRequired = new int[]
+            {
+                1,
+                1
+            };
+            __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, dysenteryComponent.GetWaterAmountRemaining(), dysenteryComponent.GetRestAmountRemaining(), dysenteryComponent.m_NumHoursRestForCure);
+            num = (int)Panel_Affliction.GetAfflictionLocation(AfflictionType.Dysentery, selectedAfflictionIndex);
+        }
     }
 }
