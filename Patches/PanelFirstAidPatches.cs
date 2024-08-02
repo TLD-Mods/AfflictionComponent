@@ -1,5 +1,6 @@
 ﻿using AfflictionComponent.Components;
 using AsmResolver.DotNet;
+using HarmonyLib;
 using Il2CppTLD.IntBackedUnit;
 
 namespace AfflictionComponent.Patches;
@@ -263,6 +264,52 @@ internal static class PanelFirstAidPatches
                 case AfflictionType.Generic: //custom affliction
 
                     //do stuff here
+                    CustomAffliction affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex);
+                    __instance.m_LabelAfflictionDescriptionNoRest.text = "";
+                    __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;
+
+                    float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
+
+
+                    //I don't know if the UI will support more than 2 items
+                    string[] remedySprites = new string[2];
+                    int[] remedyNumRequired = new int[2];
+                    bool[] remedyComplete = new bool[2];
+
+                    foreach (Tuple<string, int, int> e in affliction.m_RemedyItems)
+                    {
+                        remedySprites.AddItem(e.Item1);
+                        remedyNumRequired.AddItem(e.Item2);
+                        remedyComplete.AddItem(e.Item3 < 1);
+                    }
+
+
+
+                    string[] altRemedySprites = new string[2];
+                    int[] altRemedyNumRequired = new int[2];
+                    bool[] altRemedyComplete = new bool[2];
+                    
+                    foreach (Tuple<string, int, int> e in affliction.m_AltRemedyItems)
+                    {
+                        altRemedySprites.AddItem(e.Item1);
+                        altRemedyNumRequired.AddItem(e.Item2);
+                        altRemedyComplete.AddItem(e.Item3 < 1);
+                    }
+
+                    __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
+
+                    num = (int)affliction.m_Location;
+
+                    //duration calculation, requires some conditionals
+
+                    if (affliction.m_Permanent)
+                    {
+                        num4 = 0;
+                    }
+                    else num4 = Mathf.CeilToInt((affliction.m_EndTime - hoursPlayedNotPaused) * 60f);
+
+                    
+
 
                     break;
             }
@@ -323,9 +370,10 @@ internal static class PanelFirstAidPatches
             {
                 1
             };
-            __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, 0f, foodPoisoningComponent.GetRestAmountRemaining(), foodPoisoningComponent.m_NumHoursRestForCure);
+            __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, foodPoisoningComponent.GetRestAmountRemaining(), foodPoisoningComponent.m_NumHoursRestForCure);
             num = (int)Panel_Affliction.GetAfflictionLocation(AfflictionType.FoodPoisioning, selectedAfflictionIndex);
 
+            num4 = 0; //for compliance
         }
 
         private static void DysenteryMethod(Panel_FirstAid __instance, int selectedAfflictionIndex, out int num, out int num4)
@@ -365,6 +413,9 @@ internal static class PanelFirstAidPatches
             };
             __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, dysenteryComponent.GetWaterAmountRemaining(), dysenteryComponent.GetRestAmountRemaining(), dysenteryComponent.m_NumHoursRestForCure);
             num = (int)Panel_Affliction.GetAfflictionLocation(AfflictionType.Dysentery, selectedAfflictionIndex);
+            
+            //for compliance
+            num4 = 0;
         }
     }
 }

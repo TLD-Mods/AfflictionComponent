@@ -2,10 +2,12 @@
 
 public abstract class CustomAffliction
 {
+    public string m_AfflictionKey;
     public string m_Cause;
+    public string m_Desc;
+
     public AfflictionBodyArea m_Location;
     public string m_SpriteName;
-    public string m_AfflictionKey;
 
     public bool m_Risk;
     public bool m_Buff;
@@ -15,26 +17,35 @@ public abstract class CustomAffliction
     public float m_Duration; //in hours
     public bool m_Permanent;
     public bool m_InstantHeal;
-    
-    public Tuple<string, int>[] m_RemedyItems;
+
+    //gear item, required amount, current amount
+    public Tuple<string, int, int>[] m_RemedyItems;
+    public Tuple<string, int, int>[] m_AltRemedyItems;
+
+
 
     public bool m_BloodLoss; //the affliction causes blood loss, might not use, intended to override the vanilla Blood Loss affliction
-    
-    public CustomAffliction(string cause, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int>[] remedyItems)
+
+    public CustomAffliction(string cause, string desc, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
-        this.m_Cause = cause; // We don't neccessarily need to add 'this.', it's redundant - but we can keep it if you'd like.
-        this.m_Location = location;
-        this.m_SpriteName = spriteName;
-        this.m_AfflictionKey = afflictionName;
-        this.m_Risk = risk;
-        this.m_Buff = buff;
-        this.m_Duration = duration;
-        this.m_Permanent = permanent;
-        this.m_InstantHeal = instantHeal;
-        this.m_RemedyItems = remedyItems;
+        m_Cause = cause; 
+        m_Desc = desc;
+        m_Location = location;
+        m_SpriteName = spriteName;
+        m_AfflictionKey = afflictionName;
+        m_Risk = risk;
+        m_Buff = buff;
+        m_Duration = duration;
+        m_Permanent = permanent;
+        m_InstantHeal = instantHeal;
+        m_RemedyItems = remedyItems;
+        m_AltRemedyItems = altRemedyItems;
 
         if (this.m_Buff && this.m_Risk) this.m_Risk = false; //buff takes precedence
         if (this.m_Permanent) this.m_Duration = float.PositiveInfinity;
+
+
+
     }
     
     public void Cure()
@@ -42,30 +53,62 @@ public abstract class CustomAffliction
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         // Invoking the UI element on right side of the players HUD.
         PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
+        InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
-    
+
     public string GetAfflictionType()
     {
         if (HasAfflictionRisk()) return "Risk";
         return IsBuff() ? "Buff" : "Bad";
     }
     
-    public bool RequiresRemedy(FirstAidItem fai)
+    public bool RequiresRemedyItem(FirstAidItem fai)
     {
         if(m_RemedyItems.Length == 0) return false;
 
         string gi = fai.m_GearItem.name;
-        var elements = m_RemedyItems.Where(i => i.Item1 == gi).ToList();
 
+        Tuple<string, int, int>[] allRemedies = m_RemedyItems.Concat(m_AltRemedyItems).ToArray();
+
+        var elements = allRemedies.Where(i => i.Item1 == gi).ToList();
+        
         return elements.Count > 0 ? true : false;
     }
 
+    public bool NeedsRemedy()
+    {
+        if (m_RemedyItems.Length == 0) return false;
+
+        Tuple<string, int, int>[] allRemedies = m_RemedyItems.Concat(m_AltRemedyItems).ToArray();
+
+        var elements = m_RemedyItems.Where(i => i.Item3 > 0).ToList();
+        var elements2 = m_AltRemedyItems.Where(i => i.Item3 > 0).ToList();
+
+        return elements.Count <= 0 && elements2.Count <= 0 ? false : true;
+    }
     public void ApplyRemedy(FirstAidItem fai)
     {
+        Mod.Logger.Log("Applying remedy...", ComplexLogger.FlaggedLoggingLevel.Debug);
 
         if (m_InstantHeal) Cure();
 
-        Mod.Logger.Log("Applying remedy...", ComplexLogger.FlaggedLoggingLevel.Debug);
+        for(int i = 0; i < m_RemedyItems.Length; i++)
+        {
+            if (m_RemedyItems[i].Item1 == fai.name)
+            {
+                m_RemedyItems[i] = Tuple.Create(m_RemedyItems[i].Item1, m_RemedyItems[i].Item2, m_RemedyItems[i].Item3 - 1);
+            }
+        }
+
+        for (int j = 0; j < m_AltRemedyItems.Length; j++)
+        {
+            if (m_AltRemedyItems[j].Item1 == fai.name)
+            {
+                m_AltRemedyItems[j] = Tuple.Create(m_AltRemedyItems[j].Item1, m_AltRemedyItems[j].Item2, m_AltRemedyItems[j].Item3 - 1);
+            }
+        }
+
+        if (!NeedsRemedy() && m_Permanent) Cure();
     }
     public string GetSpriteName() => m_SpriteName;
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);    

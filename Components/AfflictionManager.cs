@@ -32,6 +32,8 @@ internal class AfflictionManager : MonoBehaviour
     
     public int GetCustomAfflictionCount() => m_Afflictions.Count();
     
+    public CustomAffliction GetAfflictionByIndex(int index) => m_Afflictions[index];
+
     //so mod authors can check if the player has at least one CustomAffliction of their own type
     [HideFromIl2Cpp]
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(obj => typeName.IsAssignableFrom(obj.GetType()));
@@ -60,7 +62,6 @@ internal class AfflictionManager : MonoBehaviour
             if (hoursPlayedNotPaused > affliction.m_EndTime)
             {
                 affliction.Cure();
-                InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
             }
         }
     }

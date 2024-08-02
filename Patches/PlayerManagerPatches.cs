@@ -54,7 +54,7 @@ internal static class PlayerManagerPatches
                 {
                     return false;
                 }
-                if (!selected.RequiresRemedy(__instance.m_FirstAidItemUsed))
+                if (!selected.RequiresRemedyItem(__instance.m_FirstAidItemUsed))
                 {
                     Mod.Logger.Log("Not the right healing item!", ComplexLogger.FlaggedLoggingLevel.Debug);
 
