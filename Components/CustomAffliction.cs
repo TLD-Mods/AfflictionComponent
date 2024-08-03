@@ -59,7 +59,8 @@ public abstract class CustomAffliction
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
 
-    //called when m_InstantHeal = false and m_Permanent
+    //called when applying all remedies and m_InstantHeal = false.
+    //Users of this function are expected to implement their own logic to reset the remedy counts over time, Improved Afflictions will use this functionality
     public abstract void CureSymptoms();
 
     public string GetAfflictionType()
