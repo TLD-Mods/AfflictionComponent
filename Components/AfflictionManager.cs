@@ -31,7 +31,12 @@ internal class AfflictionManager : MonoBehaviour
     }
     
     public int GetCustomAfflictionCount() => m_Afflictions.Count();
-    
+
+    public List<CustomAffliction> GetCustomAfflictionListCurable()
+    {
+        List<CustomAffliction> list = m_Afflictions.Where(ca => ca.m_RemedyItems.Length > 0 && ca.NeedsRemedy()).ToList();
+        return list;
+    }
     public CustomAffliction GetAfflictionByIndex(int index) => m_Afflictions[index];
 
     //so mod authors can check if the player has at least one CustomAffliction of their own type

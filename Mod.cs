@@ -40,8 +40,10 @@ internal sealed class Mod : MelonMod
     {
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-            TestAffliction test = new TestAffliction("TEST", "Test Affliction Description", AfflictionBodyArea.Neck, "ico_injury_majorBruising", "Test Affliction", false, false, 1, true, true, [Tuple.Create("GEAR_HeavyBandage", 1, 1), Tuple.Create("GEAR_BottlePainKillers", 2, 1)], []);
+            TestAffliction test = new TestAffliction("TEST", "Test Affliction Description", "You have a test affliction, wait until it heals", AfflictionBodyArea.Neck, "ico_injury_majorBruising", "Test Affliction", false, false, 1, true, true, [], []);
+            TestAffliction risktest = new TestAffliction("TEST", "Test Risk Affliction Description", "You are at risk of developing test affliction, buy Fuar a drink of suffer the consequences", AfflictionBodyArea.Neck, "ico_injury_majorBruising", "Test Risk Affliction", true, false, 1, false, true, [], []);
             test.Start();
+            risktest.Start();
         }
     }
 }

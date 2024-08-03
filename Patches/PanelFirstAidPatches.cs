@@ -204,6 +204,15 @@ internal static class PanelFirstAidPatches
             }
             __instance.m_SpecialTreatmentWindow.SetActive(false);
             __instance.m_BuffWindow.SetActive(false);
+
+            //disable treatment window & standard description because for somoe reason it doesn't do it on it's own
+            __instance.m_ItemsNeededOnlyOneObj.SetActive(false);
+            __instance.m_ItemsNeededMultipleObj.SetActive(false);
+            __instance.m_LabelAfflictionDescription.text = String.Empty;
+
+            //disable rest requirement since we're not using this yet
+            __instance.m_ObjectRestRemaining.SetActive(false);
+
             if (__instance.m_ScrollListEffects.m_ScrollObjects.Count == 0)
             {
                 NGUITools.SetActive(__instance.m_RightPageHealthyObject, state: true);
@@ -273,13 +282,14 @@ internal static class PanelFirstAidPatches
                     // This handles the out of index range error I was getting in the console.
                     CustomAffliction affliction = null;
                     try { affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex); }
-                    catch (ArgumentOutOfRangeException) { return; }
+                    catch (ArgumentOutOfRangeException e) {
+                        Mod.Logger.Log(e.Message, ComplexLogger.FlaggedLoggingLevel.Error);
+                        return; 
+                    }
                     
-                    //do stuff here
                     //CustomAffliction affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex);
                     __instance.m_LabelAfflictionName.text = affliction.m_AfflictionKey;
-                    __instance.m_LabelAfflictionDescriptionNoRest.text = "";
-                    __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;
+                    
 
                     float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
 
@@ -287,12 +297,16 @@ internal static class PanelFirstAidPatches
                     int[] remedyNumRequired;
                     bool[] remedyComplete;
 
-                    if(affliction.m_RemedyItems.Count() != 0)
+                    string[] altRemedySprites;
+                    int[] altRemedyNumRequired;
+                    bool[] altRemedyComplete;
+
+                    if (affliction.m_RemedyItems.Length != 0)
                     {
                         //I don't know if the UI will support more than 2 items
-                        remedySprites = new string[affliction.m_RemedyItems.Count()];
-                        remedyNumRequired = new int[affliction.m_RemedyItems.Count()];
-                        remedyComplete = new bool[affliction.m_RemedyItems.Count()];
+                        remedySprites = new string[affliction.m_RemedyItems.Length];
+                        remedyNumRequired = new int[affliction.m_RemedyItems.Length];
+                        remedyComplete = new bool[affliction.m_RemedyItems.Length];
 
                         for (int i = 0; i < affliction.m_RemedyItems.Length; i++)
                         {
@@ -301,44 +315,42 @@ internal static class PanelFirstAidPatches
                             remedyNumRequired[i] = e.Item2;
                             remedyComplete[i] = e.Item3 < 1;
                         }
+
+                        if (affliction.m_AltRemedyItems.Length != 0)
+                        {
+                            //I don't know if the UI will support more than 2 items
+                            altRemedySprites = new string[affliction.m_AltRemedyItems.Length];
+                            altRemedyNumRequired = new int[affliction.m_AltRemedyItems.Length];
+                            altRemedyComplete = new bool[affliction.m_AltRemedyItems.Length];
+
+                            for (int i = 0; i < affliction.m_AltRemedyItems.Length; i++)
+                            {
+                                Tuple<string, int, int> e = affliction.m_AltRemedyItems[i];
+                                altRemedySprites[i] = e.Item1;
+                                altRemedyNumRequired[i] = e.Item2;
+                                altRemedyComplete[i] = e.Item3 < 1;
+                            }
+                        }
+                        else
+                        {
+                            altRemedySprites = null;
+                            altRemedyNumRequired = null;
+                            altRemedyComplete = null;
+                        }
+
+                        __instance.m_LabelAfflictionDescriptionNoRest.text = "";
+                        __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;
+                        __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
                     }
                     else
                     {
-                        remedySprites = null;
-                        remedyNumRequired = null;
-                        remedyComplete = null;
-                    }
-
-                    string[] altRemedySprites;
-                    int[] altRemedyNumRequired;
-                    bool[] altRemedyComplete;
-
-                    if (affliction.m_AltRemedyItems.Count() != 0)
-                    {
-                        //I don't know if the UI will support more than 2 items
-                        altRemedySprites = new string[affliction.m_AltRemedyItems.Count()];
-                        altRemedyNumRequired = new int[affliction.m_AltRemedyItems.Count()];
-                        altRemedyComplete = new bool[affliction.m_AltRemedyItems.Count()];
-
-                        for (int i = 0; i < affliction.m_AltRemedyItems.Length; i++)
+                        if (affliction.m_NoHealDesc != null || affliction.m_NoHealDesc != String.Empty)
                         {
-                            Tuple<string, int, int> e = affliction.m_AltRemedyItems[i];
-                            altRemedySprites[i] = e.Item1;
-                            altRemedyNumRequired[i] = e.Item2;
-                            altRemedyComplete[i] = e.Item3 < 1;
+                            __instance.m_LabelSpecialTreatment.text = "No remedies treatment description";
+                            __instance.m_LabelSpecialTreatmentDescription.text = affliction.m_Desc;
+                            __instance.m_SpecialTreatmentWindow.SetActive(true);
                         }
                     }
-                    else
-                    {
-                        altRemedySprites = null;
-                        altRemedyNumRequired = null;
-                        altRemedyComplete = null;
-                    }
-
-
-
-                    __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
-
                     num = (int)affliction.m_Location;
 
                     //duration calculation, requires some conditionals
@@ -455,5 +467,6 @@ internal static class PanelFirstAidPatches
             //for compliance
             num4 = 0;
         }
+
     }
 }

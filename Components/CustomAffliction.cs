@@ -5,6 +5,7 @@ public abstract class CustomAffliction
     public string m_AfflictionKey;
     public string m_Cause;
     public string m_Desc;
+    public string m_NoHealDesc; 
 
     public AfflictionBodyArea m_Location;
     public string m_SpriteName;
@@ -26,10 +27,11 @@ public abstract class CustomAffliction
 
     public bool m_BloodLoss; //the affliction causes blood loss, might not use, intended to override the vanilla Blood Loss affliction
 
-    public CustomAffliction(string cause, string desc, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
+    public CustomAffliction(string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
         m_Cause = cause; 
         m_Desc = desc;
+        m_NoHealDesc = m_NoHealDesc;
         m_Location = location;
         m_SpriteName = spriteName;
         m_AfflictionKey = afflictionName;
@@ -41,18 +43,29 @@ public abstract class CustomAffliction
         m_RemedyItems = remedyItems;
         m_AltRemedyItems = altRemedyItems;
 
-        if (m_Buff && m_Risk) m_Risk = false; //buff takes precedence
+        //you can't have alternate remedy items if the main remedy items is blank
+        if (m_AltRemedyItems.Length > 0 && m_RemedyItems.Length == 0)
+        {
+            m_RemedyItems = m_AltRemedyItems;
+            m_AltRemedyItems = [];
+        }
+        if (m_Buff)
+        {
+            if(m_Risk) m_Risk = false; //buff takes precedence over risk if incorrectly assigned
+            //buffs also can't have remedy items
+            if (m_RemedyItems.Length > 0) m_RemedyItems = [];
+            if (m_AltRemedyItems.Length > 0) m_AltRemedyItems = [];
+        }
 
         if (m_Permanent)
         {
             m_Duration = float.PositiveInfinity;
         }
-
-
     }
     
     public void Cure()
     {
+        OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         // Invoking the UI element on right side of the players HUD.
         PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
@@ -63,6 +76,8 @@ public abstract class CustomAffliction
     //Users of this function are expected to implement their own logic to reset the remedy counts over time, Improved Afflictions will use this functionality
     public abstract void CureSymptoms();
 
+    //called when curing the affliction, to trigger any logic that is needed (i.e. applying a new affliction in case of a risk)
+    public abstract void OnCure();
     public string GetAfflictionType()
     {
         if (HasAfflictionRisk()) return "Risk";

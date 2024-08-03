@@ -7,6 +7,7 @@ namespace AfflictionComponent.Patches;
 internal static class PanelAfflictionPatches
 {
     public static CustomAffliction selectedCustomAffliction;
+    public static List<CustomAffliction> panelAfflictionList;
 
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
     private static class SetupCustomAfflictionOnScrollList
@@ -15,10 +16,13 @@ internal static class PanelAfflictionPatches
         
         private static void Postfix(ref Il2CppSystem.Collections.Generic.List<Affliction> afflictionList, Panel_Affliction __instance)
         {
-            if (afflictionList == null && AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() == 0) return;
+
+            panelAfflictionList = AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionListCurable();
+
+            if (afflictionList == null && panelAfflictionList.Count == 0) return;
 
             int vanillaAfflictionCount = afflictionList != null ? afflictionList.Count : 0;
-            int moddedAfflictionCount = Mod.afflictionManager.GetCustomAfflictionCount();
+            int moddedAfflictionCount = panelAfflictionList.Count();
 
             int combinedCount = vanillaAfflictionCount + moddedAfflictionCount;
             __instance.m_CoverflowAfflictions.Clear();
@@ -62,7 +66,7 @@ internal static class PanelAfflictionPatches
                     {
                         __instance.m_CoverflowAfflictions.Add(componentInChildren);
 
-                        componentInChildren.m_SpriteEffect.spriteName = Mod.afflictionManager.m_Afflictions[j - vanillaAfflictionCount].GetSpriteName();
+                        componentInChildren.m_SpriteEffect.spriteName = panelAfflictionList[j - vanillaAfflictionCount].GetSpriteName();
                     }
                 }
             }
@@ -110,10 +114,10 @@ internal static class PanelAfflictionPatches
                 int customAfflictionIndex = index - __instance.m_Afflictions.Count;
                 if (customAfflictionIndex < 0 || customAfflictionIndex >= am.m_Afflictions.Count) // This handles the index out of range error.
                 {
-                    Mod.Logger.Log($"Invalid custom affliction index: {customAfflictionIndex}. Custom afflictions count: {am.m_Afflictions.Count}", ComplexLogger.FlaggedLoggingLevel.Warning);
+                    Mod.Logger.Log($"Invalid custom affliction index: {customAfflictionIndex}. Custom afflictions count: {panelAfflictionList.Count}", ComplexLogger.FlaggedLoggingLevel.Warning);
                     return;
                 }
-                colorBasedOnAffliction = AfflictionManager.GetAfflictionColour(am.m_Afflictions[customAfflictionIndex].GetAfflictionType());
+                colorBasedOnAffliction = AfflictionManager.GetAfflictionColour(panelAfflictionList[customAfflictionIndex].GetAfflictionType());
             }
             else
             {
@@ -149,7 +153,7 @@ internal static class PanelAfflictionPatches
         private static bool Prefix(Panel_Affliction __instance, int selectedAfflictionIndex)
         {
             int vanillaAfflictionCount = __instance.m_Afflictions?.Count ?? 0;
-            int totalAfflictions = vanillaAfflictionCount + AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount();
+            int totalAfflictions = vanillaAfflictionCount + panelAfflictionList.Count;
 
             if (selectedAfflictionIndex >= 0 && selectedAfflictionIndex < totalAfflictions)
             {
@@ -159,7 +163,7 @@ internal static class PanelAfflictionPatches
                 }
                 else
                 {
-                    UpdateSelectedCustomAffliction(AfflictionManager.GetAfflictionManagerInstance().m_Afflictions[selectedAfflictionIndex - vanillaAfflictionCount], __instance);
+                    UpdateSelectedCustomAffliction(panelAfflictionList[selectedAfflictionIndex - vanillaAfflictionCount], __instance);
                 }
             }
             
@@ -194,11 +198,11 @@ internal static class PanelAfflictionPatches
             if (!TryGetVanillaAffliction(out afflictionSelected, __instance))
             {
                 int tweenTargetIndex = __instance.m_ScrollList.GetTweenTargetIndex();
-                int totalCount = AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() + __instance.m_Afflictions.Count;
+                int totalCount = panelAfflictionList.Count + __instance.m_Afflictions.Count;
 
                 if (tweenTargetIndex >= 0 && tweenTargetIndex < totalCount)
                 {
-                    selectedCustomAffliction = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions[tweenTargetIndex - __instance.m_Afflictions.Count];
+                    selectedCustomAffliction = panelAfflictionList[tweenTargetIndex - __instance.m_Afflictions.Count];
                     if (selectedCustomAffliction == null) return;
                     Mod.Logger.Log("Found custom affliction to heal", FlaggedLoggingLevel.Debug);
                 }
