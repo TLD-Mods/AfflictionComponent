@@ -12,4 +12,10 @@ internal class TestAffliction : CustomAffliction
     {
         //Mod.Logger.Log("Child class update is calling!", ComplexLogger.FlaggedLoggingLevel.Debug);
     }
+
+    public override void CureSymptoms()
+    {
+        Mod.Logger.Log("Curing symptoms only...", ComplexLogger.FlaggedLoggingLevel.Debug);
+    }
+
 }

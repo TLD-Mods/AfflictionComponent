@@ -175,9 +175,11 @@ internal static class PanelFirstAidPatches
         public static bool Prefix(Panel_FirstAid __instance)
         {
 
-            if (!__instance.m_SelectedAffButton) return true;
-
-            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
+            if (!__instance.m_SelectedAffButton)
+            {
+                return true;
+            }
+            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
             {
                 return true;
             }
@@ -187,9 +189,11 @@ internal static class PanelFirstAidPatches
         private static void Postfix(Panel_FirstAid __instance)
         {
 
-            if (!__instance.m_SelectedAffButton) return;
-
-            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery || __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
+            if (!__instance.m_SelectedAffButton)
+            {
+                return;
+            }
+            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
             {
                 return;
             }
@@ -236,6 +240,8 @@ internal static class PanelFirstAidPatches
             }
             int num = -1;
 
+            if(__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) __instance.m_LabelAfflictionName.text = Affliction.LocalizedNameFromAfflictionType(__instance.m_SelectedAffButton.m_AfflictionType, __instance.m_SelectedAffButton.GetAfflictionIndex());
+
             //colour stuff
             if (Affliction.IsBeneficial(__instance.m_SelectedAffButton.m_AfflictionType))
             {
@@ -265,36 +271,65 @@ internal static class PanelFirstAidPatches
 
                     //do stuff here
                     CustomAffliction affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex);
+                    __instance.m_LabelAfflictionName.text = affliction.m_AfflictionKey;
                     __instance.m_LabelAfflictionDescriptionNoRest.text = "";
                     __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;
 
                     float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
 
+                    string[] remedySprites;
+                    int[] remedyNumRequired;
+                    bool[] remedyComplete;
 
-                    //I don't know if the UI will support more than 2 items
-                    string[] remedySprites = new string[2];
-                    int[] remedyNumRequired = new int[2];
-                    bool[] remedyComplete = new bool[2];
-
-                    foreach (Tuple<string, int, int> e in affliction.m_RemedyItems)
+                    if(affliction.m_RemedyItems.Count() != 0)
                     {
-                        remedySprites.AddItem(e.Item1);
-                        remedyNumRequired.AddItem(e.Item2);
-                        remedyComplete.AddItem(e.Item3 < 1);
+                        //I don't know if the UI will support more than 2 items
+                        remedySprites = new string[affliction.m_RemedyItems.Count()];
+                        remedyNumRequired = new int[affliction.m_RemedyItems.Count()];
+                        remedyComplete = new bool[affliction.m_RemedyItems.Count()];
+
+                        for (int i = 0; i < affliction.m_RemedyItems.Length; i++)
+                        {
+                            Tuple<string, int, int> e = affliction.m_RemedyItems[i];
+                            remedySprites[i] = e.Item1;
+                            remedyNumRequired[i] = e.Item2;
+                            remedyComplete[i] = e.Item3 < 1;
+                        }
+                    }
+                    else
+                    {
+                        remedySprites = null;
+                        remedyNumRequired = null;
+                        remedyComplete = null;
+                    }
+
+                    string[] altRemedySprites;
+                    int[] altRemedyNumRequired;
+                    bool[] altRemedyComplete;
+
+                    if (affliction.m_AltRemedyItems.Count() != 0)
+                    {
+                        //I don't know if the UI will support more than 2 items
+                        altRemedySprites = new string[affliction.m_AltRemedyItems.Count()];
+                        altRemedyNumRequired = new int[affliction.m_AltRemedyItems.Count()];
+                        altRemedyComplete = new bool[affliction.m_AltRemedyItems.Count()];
+
+                        for (int i = 0; i < affliction.m_AltRemedyItems.Length; i++)
+                        {
+                            Tuple<string, int, int> e = affliction.m_AltRemedyItems[i];
+                            altRemedySprites[i] = e.Item1;
+                            altRemedyNumRequired[i] = e.Item2;
+                            altRemedyComplete[i] = e.Item3 < 1;
+                        }
+                    }
+                    else
+                    {
+                        altRemedySprites = null;
+                        altRemedyNumRequired = null;
+                        altRemedyComplete = null;
                     }
 
 
-
-                    string[] altRemedySprites = new string[2];
-                    int[] altRemedyNumRequired = new int[2];
-                    bool[] altRemedyComplete = new bool[2];
-                    
-                    foreach (Tuple<string, int, int> e in affliction.m_AltRemedyItems)
-                    {
-                        altRemedySprites.AddItem(e.Item1);
-                        altRemedyNumRequired.AddItem(e.Item2);
-                        altRemedyComplete.AddItem(e.Item3 < 1);
-                    }
 
                     __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
 
@@ -307,9 +342,6 @@ internal static class PanelFirstAidPatches
                         num4 = 0;
                     }
                     else num4 = Mathf.CeilToInt((affliction.m_EndTime - hoursPlayedNotPaused) * 60f);
-
-                    
-
 
                     break;
             }

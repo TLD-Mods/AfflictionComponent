@@ -41,9 +41,12 @@ public abstract class CustomAffliction
         m_RemedyItems = remedyItems;
         m_AltRemedyItems = altRemedyItems;
 
-        if (this.m_Buff && this.m_Risk) this.m_Risk = false; //buff takes precedence
-        if (this.m_Permanent) this.m_Duration = float.PositiveInfinity;
+        if (m_Buff && m_Risk) m_Risk = false; //buff takes precedence
 
+        if (m_Permanent)
+        {
+            m_Duration = float.PositiveInfinity;
+        }
 
 
     }
@@ -55,6 +58,9 @@ public abstract class CustomAffliction
         PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
+
+    //called when m_InstantHeal = false and m_Permanent
+    public abstract void CureSymptoms();
 
     public string GetAfflictionType()
     {
@@ -90,8 +96,6 @@ public abstract class CustomAffliction
     {
         Mod.Logger.Log("Applying remedy...", ComplexLogger.FlaggedLoggingLevel.Debug);
 
-        if (m_InstantHeal) Cure();
-
         for(int i = 0; i < m_RemedyItems.Length; i++)
         {
             if (m_RemedyItems[i].Item1 == fai.name)
@@ -108,7 +112,9 @@ public abstract class CustomAffliction
             }
         }
 
-        if (!NeedsRemedy() && m_Permanent) Cure();
+        if (!NeedsRemedy()) Cure();
+        else CureSymptoms();
+
     }
     public string GetSpriteName() => m_SpriteName;
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);    
