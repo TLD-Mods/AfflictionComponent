@@ -171,10 +171,8 @@ internal static class PanelFirstAidPatches
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshRightPage))]
     private static class RefreshRightPagePatch
     {
-
         public static bool Prefix(Panel_FirstAid __instance)
         {
-
             if (!__instance.m_SelectedAffButton)
             {
                 return true;
@@ -186,6 +184,7 @@ internal static class PanelFirstAidPatches
 
             return false;
         }
+        
         private static void Postfix(Panel_FirstAid __instance)
         {
 
@@ -217,7 +216,8 @@ internal static class PanelFirstAidPatches
                 __instance.HideRightPage();
                 return;
             }
-            /** vanilla crap i'm not sure we even need here
+            
+            /* vanilla crap i'm not sure we even need here
             if (Affliction.AfflictionTypeIsBuff(__instance.m_SelectedAffButton.m_AfflictionType))
             {
                 if (!Panel_Affliction.HasAffliction(__instance.m_SelectedAffButton.m_AfflictionType))
@@ -231,7 +231,8 @@ internal static class PanelFirstAidPatches
                     __instance.HideRightPage();
                     return;
                 }
-            **/
+            */
+            
             NGUITools.SetActive(__instance.m_RightPageObject, state: true);
             for (int j = 0; j < __instance.m_BodyIconList.Length; j++)
             {
@@ -269,8 +270,13 @@ internal static class PanelFirstAidPatches
                     }
                 case AfflictionType.Generic: //custom affliction
 
+                    // This handles the out of index range error I was getting in the console.
+                    CustomAffliction affliction = null;
+                    try { affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex); }
+                    catch (ArgumentOutOfRangeException) { return; }
+                    
                     //do stuff here
-                    CustomAffliction affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex);
+                    //CustomAffliction affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex);
                     __instance.m_LabelAfflictionName.text = affliction.m_AfflictionKey;
                     __instance.m_LabelAfflictionDescriptionNoRest.text = "";
                     __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;

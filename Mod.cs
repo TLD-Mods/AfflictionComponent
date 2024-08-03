@@ -40,7 +40,7 @@ internal sealed class Mod : MelonMod
     {
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-            TestAffliction test = new TestAffliction("TEST", "Test Affliction Description", AfflictionBodyArea.Neck, "ico_injury_majorBruising", "Test Affliction", false, false, 1, true, true, [Tuple.Create("GEAR_HeavyBandage", 1, 1), Tuple.Create("GEAR_BottlePainKillers", 2, 2)], []);
+            TestAffliction test = new TestAffliction("TEST", "Test Affliction Description", AfflictionBodyArea.Neck, "ico_injury_majorBruising", "Test Affliction", false, false, 1, true, true, [Tuple.Create("GEAR_HeavyBandage", 1, 1), Tuple.Create("GEAR_BottlePainKillers", 2, 1)], []);
             test.Start();
         }
     }
