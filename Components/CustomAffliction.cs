@@ -53,9 +53,11 @@ public abstract class CustomAffliction
         {
             if(m_Risk) m_Risk = false; //buff takes precedence over risk if incorrectly assigned
             //buffs also can't have remedy items
-            if (m_RemedyItems.Length > 0) m_RemedyItems = [];
-            if (m_AltRemedyItems.Length > 0) m_AltRemedyItems = [];
+            m_RemedyItems = [];
+            m_AltRemedyItems = [];
         }
+        if (m_Risk) m_Permanent = true;
+
 
         if (m_Permanent)
         {
