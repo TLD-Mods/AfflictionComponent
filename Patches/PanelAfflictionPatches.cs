@@ -3,7 +3,6 @@ using ComplexLogger;
 
 namespace AfflictionComponent.Patches;
 
-// This hasn't been tested, I have no idea if it works or not.
 internal static class PanelAfflictionPatches
 {
     public static CustomAffliction selectedCustomAffliction;
@@ -204,7 +203,6 @@ internal static class PanelAfflictionPatches
                 {
                     selectedCustomAffliction = panelAfflictionList[tweenTargetIndex - __instance.m_Afflictions.Count];
                     if (selectedCustomAffliction == null) return;
-                    Mod.Logger.Log("Found custom affliction to heal", FlaggedLoggingLevel.Debug);
                 }
                 else return;
             }

@@ -355,7 +355,7 @@ internal static class PanelFirstAidPatches
 
                     //duration calculation, requires some conditionals
 
-                    if (affliction.m_Permanent)
+                    if (affliction.m_NoTimer)
                     {
                         num4 = 0;
                     }

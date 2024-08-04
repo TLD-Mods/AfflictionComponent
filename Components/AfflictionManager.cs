@@ -52,8 +52,6 @@ internal class AfflictionManager : MonoBehaviour
     {
         if (GameManager.m_IsPaused || GameManager.s_IsGameplaySuspended) return;
         
-        //where the magic happens
-
         float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
 
         for (int num = m_Afflictions.Count - 1; num >= 0; num--)

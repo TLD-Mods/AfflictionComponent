@@ -4,7 +4,7 @@ namespace AfflictionComponent.Dev;
 
 internal class TestAffliction : CustomAffliction
 {
-    public TestAffliction(string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems) : base(cause, desc, noHealDesc, location, spriteName, afflictionName, risk, buff, duration, permanent, instantHeal, remedyItems, altRemedyItems)
+    public TestAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems) : base(afflictionName, cause, desc, noHealDesc, location, spriteName, risk, buff, duration, noTimer, instantHeal, remedyItems, altRemedyItems)
     {
     }
 

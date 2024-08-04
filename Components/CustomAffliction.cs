@@ -16,7 +16,7 @@ public abstract class CustomAffliction
     public float m_EndTime;
 
     public float m_Duration; //in hours
-    public bool m_Permanent;
+    public bool m_NoTimer;
     public bool m_InstantHeal;
 
     //gear item, required amount, current amount
@@ -27,18 +27,18 @@ public abstract class CustomAffliction
 
     public bool m_BloodLoss; //the affliction causes blood loss, might not use, intended to override the vanilla Blood Loss affliction
 
-    public CustomAffliction(string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, string afflictionName, bool risk, bool buff, float duration, bool permanent, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
+    public CustomAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
         m_Cause = cause; 
         m_Desc = desc;
-        m_NoHealDesc = m_NoHealDesc;
+        m_NoHealDesc = noHealDesc;
         m_Location = location;
         m_SpriteName = spriteName;
         m_AfflictionKey = afflictionName;
         m_Risk = risk;
         m_Buff = buff;
         m_Duration = duration;
-        m_Permanent = permanent;
+        m_NoTimer = noTimer;
         m_InstantHeal = instantHeal;
         m_RemedyItems = remedyItems;
         m_AltRemedyItems = altRemedyItems;
@@ -56,10 +56,10 @@ public abstract class CustomAffliction
             m_RemedyItems = [];
             m_AltRemedyItems = [];
         }
-        if (m_Risk) m_Permanent = true;
+        if (m_Risk) m_NoTimer = true;
 
 
-        if (m_Permanent)
+        if (m_NoTimer)
         {
             m_Duration = float.PositiveInfinity;
         }
