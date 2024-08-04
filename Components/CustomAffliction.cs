@@ -128,8 +128,9 @@ public abstract class CustomAffliction
             }
         }
 
-        if (!NeedsRemedy()) Cure();
-        else CureSymptoms();
+        //if you've taken all the remedy items and it's set to cure after taking them, cure the affliction
+        if (!NeedsRemedy() && m_InstantHeal) Cure();
+        else CureSymptoms(); //otherwise, just cure the symptoms (this can be empty and do nothing)
 
     }
     public string GetSpriteName() => m_SpriteName;
