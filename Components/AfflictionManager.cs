@@ -3,7 +3,7 @@
 namespace AfflictionComponent.Components;
 
 [RegisterTypeInIl2Cpp(false)]
-internal class AfflictionManager : MonoBehaviour
+public class AfflictionManager : MonoBehaviour
 {
     public List<CustomAffliction> m_Afflictions = [];
 
