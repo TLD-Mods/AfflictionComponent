@@ -10,7 +10,6 @@ internal static class StatusBarPatches
         private static void Postfix(StatusBar __instance, ref bool __result)
         {
             if (__instance.m_StatusBarType != StatusBar.StatusBarType.Condition) return;
-            
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
             foreach (var customAffliction in customAfflictions)
             {
