@@ -10,6 +10,7 @@ public abstract class CustomAffliction
     public string m_Desc;
     public float m_Duration; // In Hours.
     public float m_EndTime;
+    private float m_StartEndTime;
     public bool m_InstantHeal;
     public AfflictionBodyArea m_Location;
     public string m_NoHealDesc;
@@ -52,7 +53,21 @@ public abstract class CustomAffliction
         
         Start();
     }
-    
+
+    public void Start()
+    {
+        if (GameManager.GetPlayerManagerComponent().m_God) return;
+
+        m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
+        m_StartEndTime = m_EndTime;
+        AfflictionManager.GetAfflictionManagerInstance().Add(this);
+
+        if (GetAfflictionType() != "Buff")
+        {
+            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
+        }
+    }
+
     public void ApplyRemedy(FirstAidItem fai)
     {
         UpdateRemedyItems(m_RemedyItems, fai.name);
@@ -72,8 +87,9 @@ public abstract class CustomAffliction
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
 
-    // Called when applying all remedies and m_InstantHeal = false.
-    // Users of this function are expected to implement their own logic to reset the remedy counts over time, Improved Afflictions will use this functionality.
+    /// <summary>
+    /// Called when InstantHeal is false and all remedy items have been taken. Can be used to run any custom code for that use case.
+    /// </summary>
     public abstract void CureSymptoms();
 
     public string GetAfflictionType() => HasAfflictionRisk() ? "Risk" : IsBuff() ? "Buff" : "Bad";
@@ -86,28 +102,46 @@ public abstract class CustomAffliction
     
     public bool IsBuff() => m_Buff;
     
+    /// <summary>
+    /// Checks to see if the affliction needs any remedy items to be taken or not. 
+    /// </summary>
+    /// <returns></returns>
     public bool NeedsRemedy() => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(i => i.Item3 > 0);
 
-    // Called when curing the affliction, to trigger any logic that is needed (i.e. applying a new affliction in case of a risk).
+    /// <summary>
+    /// Called when the affliction is cured. Can be used to run custom code for this use case.
+    /// </summary>
     public abstract void OnCure();
 
-    // For specific events that need to occur on update
+    /// <summary>
+    /// Called when the affliction is updated. Can be used to run custom code for this use case.
+    /// </summary>
     public abstract void OnUpdate();
     
-    public bool RequiresRemedyItem(FirstAidItem fai) => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(i => i.Item1 == fai.m_GearItem.name);
-    
-    public void Start()
-    {
-        if (GameManager.GetPlayerManagerComponent().m_God) return; // Not quite sure if we need this here anymore as I'm curing all the afflictions when the player is in god-mode.
-
-        m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
-        AfflictionManager.GetAfflictionManagerInstance().Add(this); //am I allowed to do this? // You should be? Not quite sure ¯\_(ツ)_/¯.
-        
-        if (GetAfflictionType() != "Buff")
-        {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
-        }
-    }
-    
+    /// <summary>
+    /// Checks to see if current affliction has a given item as an item to cure the affliction with.
+    /// </summary>
+    /// <param name="fai"></param>
+    /// <returns></returns>
+    public bool RequiresRemedyItem(FirstAidItem fai) => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(i => i.Item1 == fai.m_GearItem.name);  
+   
     private static void UpdateRemedyItems(Tuple<string, int, int>[] remedyItems, string itemName) => _ = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
+
+    /// <summary>
+    /// Used to set the given list of remedy items back to their defaults.
+    /// </summary>
+    /// <param name="remedyItems"></param>
+    public void ResetRemedyItems(Tuple<string, int, int>[] remedyItems) => _ = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
+
+    /// <summary>
+    /// Resets the entire affliction back to it's default, including remedy items and the duration.
+    /// </summary>
+    public void ResetAffliction()
+    {
+        if(m_RemedyItems.Length > 0) ResetRemedyItems(m_RemedyItems);
+        if(m_AltRemedyItems.Length > 0) ResetRemedyItems(m_AltRemedyItems);
+
+        m_EndTime = m_StartEndTime;
+    }
+
 }
