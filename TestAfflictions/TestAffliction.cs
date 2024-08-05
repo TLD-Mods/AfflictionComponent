@@ -21,5 +21,4 @@ internal class TestAffliction : CustomAffliction
     {
         Mod.Logger.Log("Curing symptoms only...", ComplexLogger.FlaggedLoggingLevel.Debug);
     }
-
 }

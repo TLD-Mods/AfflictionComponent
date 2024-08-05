@@ -49,12 +49,12 @@ public abstract class CustomAffliction
 
         if (m_Risk) m_NoTimer = true;
         if (m_NoTimer) m_Duration = float.PositiveInfinity;
+        
+        Start();
     }
     
     public void ApplyRemedy(FirstAidItem fai)
     {
-        Mod.Logger.Log("Applying remedy...", ComplexLogger.FlaggedLoggingLevel.Debug);
-
         UpdateRemedyItems(m_RemedyItems, fai.name);
         UpdateRemedyItems(m_AltRemedyItems, fai.name);
 
@@ -84,7 +84,7 @@ public abstract class CustomAffliction
 
     public bool HasAfflictionRisk() => m_Risk;
     
-    private bool IsBuff() => m_Buff;
+    public bool IsBuff() => m_Buff;
     
     public bool NeedsRemedy() => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(i => i.Item3 > 0);
 
@@ -102,11 +102,10 @@ public abstract class CustomAffliction
 
         m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
         AfflictionManager.GetAfflictionManagerInstance().Add(this); //am I allowed to do this? // You should be? Not quite sure ¯\_(ツ)_/¯.
-
-        var afflictionColor = HasAfflictionRisk() ? "Risk" : m_Buff ? "Buff" : "Bad";
-        if (afflictionColor != "Buff")
+        
+        if (GetAfflictionType() != "Buff")
         {
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(afflictionColor));
+            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
         }
     }
     
