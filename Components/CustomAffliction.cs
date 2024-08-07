@@ -19,7 +19,7 @@ public abstract class CustomAffliction
     public bool m_Risk;
     public string m_SpriteName;
 
-    public CustomAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
+    protected CustomAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
         m_Cause = cause; 
         m_Desc = desc;
@@ -34,18 +34,17 @@ public abstract class CustomAffliction
         m_InstantHeal = instantHeal;
         m_RemedyItems = remedyItems;
         m_AltRemedyItems = altRemedyItems;
-
-        // You can't have alternate remedy items if the main remedy items is blank.
-        if (m_AltRemedyItems.Length > 0 && m_RemedyItems.Length == 0)
+        
+        if (m_AltRemedyItems.Length > 0 && m_RemedyItems.Length == 0) // You can't have alternate remedy items if the main remedy items is blank.
         {
             m_RemedyItems = m_AltRemedyItems;
-            m_AltRemedyItems = Array.Empty<Tuple<string, int, int>>();
+            m_AltRemedyItems = [];
         }
 
         if (m_Buff) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
         {
             m_Risk = false;
-            m_RemedyItems = m_AltRemedyItems = Array.Empty<Tuple<string, int, int>>();
+            m_RemedyItems = m_AltRemedyItems = [];
         }
 
         if (m_Risk) m_NoTimer = true;
@@ -54,7 +53,7 @@ public abstract class CustomAffliction
         Start();
     }
 
-    public void Start()
+    private void Start()
     {
         if (GameManager.GetPlayerManagerComponent().m_God) return;
 
@@ -106,7 +105,7 @@ public abstract class CustomAffliction
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRemedy() => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(i => i.Item3 > 0);
+    public bool NeedsRemedy() => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(item => item.Item3 > 0);
 
     /// <summary>
     /// Called when the affliction is cured. Can be used to run custom code for this use case.
@@ -123,16 +122,8 @@ public abstract class CustomAffliction
     /// </summary>
     /// <param name="fai"></param>
     /// <returns></returns>
-    public bool RequiresRemedyItem(FirstAidItem fai) => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(i => i.Item1 == fai.m_GearItem.name);  
+    public bool RequiresRemedyItem(FirstAidItem fai) => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(item => item.Item1 == fai.m_GearItem.name);  
    
-    private static void UpdateRemedyItems(Tuple<string, int, int>[] remedyItems, string itemName) => _ = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
-
-    /// <summary>
-    /// Used to set the given list of remedy items back to their defaults.
-    /// </summary>
-    /// <param name="remedyItems"></param>
-    public void ResetRemedyItems(Tuple<string, int, int>[] remedyItems) => _ = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
-
     /// <summary>
     /// Resets the entire affliction back to it's default, including remedy items and the duration.
     /// </summary>
@@ -143,5 +134,12 @@ public abstract class CustomAffliction
 
         m_EndTime = m_StartEndTime;
     }
-
+    
+    /// <summary>
+    /// Used to set the given list of remedy items back to their defaults.
+    /// </summary>
+    /// <param name="remedyItems"></param>
+    public void ResetRemedyItems(Tuple<string, int, int>[] remedyItems) => _ = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
+    
+    private static void UpdateRemedyItems(Tuple<string, int, int>[] remedyItems, string itemName) => _ = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
 }

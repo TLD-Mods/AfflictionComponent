@@ -1,4 +1,5 @@
-﻿using Il2CppInterop.Runtime.Attributes;
+﻿using AfflictionComponent.Interfaces;
+using Il2CppInterop.Runtime.Attributes;
 
 namespace AfflictionComponent.Components;
 
@@ -8,8 +9,8 @@ public class AfflictionManager : MonoBehaviour
     public List<CustomAffliction> m_Afflictions = [];
 
     [HideFromIl2Cpp]
-    public void Add(CustomAffliction ca) => m_Afflictions.Add(ca);
-
+    public void Add(CustomAffliction customAffliction) => m_Afflictions.Add(customAffliction);
+    
     public static AfflictionManager GetAfflictionManagerInstance() => Mod.afflictionManager;
 
     public int GetCustomAfflictionCount() => m_Afflictions.Count;
@@ -18,7 +19,7 @@ public class AfflictionManager : MonoBehaviour
     public CustomAffliction GetAfflictionByIndex(int index) => m_Afflictions[index];
 
     [HideFromIl2Cpp]
-    public List<CustomAffliction> GetAfflictionsByBodyArea(AfflictionBodyArea bodyArea) => m_Afflictions.Where(a => a.m_Location == bodyArea).ToList();
+    public List<CustomAffliction> GetAfflictionsByBodyArea(AfflictionBodyArea bodyArea) => m_Afflictions.Where(customAffliction => customAffliction.m_Location == bodyArea).ToList();
 
     /// <summary>
     /// Returns the colour based on the affliction.
@@ -41,7 +42,7 @@ public class AfflictionManager : MonoBehaviour
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(typeName.IsInstanceOfType);
 
     [HideFromIl2Cpp]
-    public void Remove(CustomAffliction ca) => m_Afflictions.Remove(ca);
+    public void Remove(CustomAffliction customAffliction) => m_Afflictions.Remove(customAffliction);
 
     public void Update()
     {
@@ -55,6 +56,9 @@ public class AfflictionManager : MonoBehaviour
 
             if (GameManager.GetPlayerManagerComponent().m_God) 
                 affliction.Cure();
+            
+            if (affliction is IRiskPercentage riskPercentage && riskPercentage.GetRiskValue() >= 100)
+                Remove(affliction);
             
             affliction.OnUpdate();
 
