@@ -1,4 +1,5 @@
 ﻿using AfflictionComponent.Components;
+using AfflictionComponent.Interfaces;
 using Il2CppTLD.IntBackedUnit;
 
 namespace AfflictionComponent.Patches;
@@ -301,23 +302,34 @@ internal static class PanelFirstAidPatches
                     }
 
                     __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
-                    __instance.m_LabelAfflictionDescriptionNoRest.text = "";
+                    __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                     __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;
                     __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
                 }
                 else
                 {
-                    if (affliction.m_NoHealDesc != null || affliction.m_NoHealDesc != string.Empty)
+                    if (!string.IsNullOrEmpty(affliction.m_NoHealDesc))
                     {
-                        __instance.m_LabelSpecialTreatment.text = "No remedies treatment description";
+                        __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
+                        __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
+                        __instance.m_LabelAfflictionDescription.text = string.Empty;
+                        __instance.m_MultipleDosesObject.SetActive(false);
+                        __instance.m_RightPageObject.SetActive(false);
+                        
+                        __instance.m_LabelSpecialTreatment.text = affliction.m_NoHealDesc; // Is this what we want here?
                         __instance.m_LabelSpecialTreatmentDescription.text = affliction.m_Desc;
                         __instance.m_SpecialTreatmentWindow.SetActive(true);
                     }
                 }
+                
+                if (affliction is IRiskPercentage riskPercentage && affliction.HasAfflictionRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
+                {
+                    var uiLabel = __instance.m_LabelAfflictionName;
+                    uiLabel.text = string.Concat([uiLabel.text, " (", Mathf.RoundToInt(riskPercentage.GetRiskValue()), "%)"]);
+                }
+                
                 num = (int)affliction.m_Location;
-
-                //duration calculation, requires some conditionals
-                num4 = affliction.m_NoTimer ? 0 : Mathf.CeilToInt((affliction.m_EndTime - hoursPlayedNotPaused) * 60f);
+                num4 = affliction.m_NoTimer ? 0 : Mathf.CeilToInt((affliction.m_EndTime - hoursPlayedNotPaused) * 60f); // Duration calculation, requires some conditionals.
 
                 break;
             }
@@ -335,7 +347,7 @@ internal static class PanelFirstAidPatches
             else
                 __instance.m_BodyIconActiveAnimationObj.SetActive(false);
             
-            if (num4 > 0) //duration
+            if (num4 > 0) // Duration.
             {
                 Utils.SetActive(__instance.m_DurationWidgetParentObj, active: true);
                 int num5 = num4 / 60;
