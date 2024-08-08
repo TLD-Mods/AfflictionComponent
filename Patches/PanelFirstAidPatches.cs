@@ -1,5 +1,6 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
+using AfflictionComponent.Interfaces.Risk;
 using Il2CppTLD.IntBackedUnit;
 using AfflictionComponent.Utilities;
 

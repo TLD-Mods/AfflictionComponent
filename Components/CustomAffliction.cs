@@ -1,7 +1,6 @@
-﻿using AfflictionComponent.Interfaces;
+﻿namespace AfflictionComponent.Components;
 
-namespace AfflictionComponent.Components;
-
+// TODO: Split certain functionality off into Interfaces, which developers can then extend onto their custom afflictions.
 public abstract class CustomAffliction
 {
     public string m_AfflictionKey;

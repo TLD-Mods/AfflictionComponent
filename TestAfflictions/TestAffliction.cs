@@ -1,5 +1,6 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
+using AfflictionComponent.Interfaces.Risk;
 
 namespace AfflictionComponent.TestAfflictions;
 
@@ -20,9 +21,7 @@ internal class TestAffliction : CustomAffliction, IRiskPercentage
     public override void OnUpdate()
     {
         if (HasAfflictionRisk())
-        {
             UpdateRiskValue();
-        }
     }
 
     protected override void OnCure() { }

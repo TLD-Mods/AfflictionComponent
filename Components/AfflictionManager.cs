@@ -1,4 +1,5 @@
 ﻿using AfflictionComponent.Interfaces;
+using AfflictionComponent.Interfaces.Risk;
 using Il2CppInterop.Runtime.Attributes;
 
 namespace AfflictionComponent.Components;
