@@ -13,30 +13,30 @@ internal class TestAffliction : CustomAffliction, IRiskPercentage
         m_LastUpdateTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
     }
 
+    protected override void CureSymptoms() { }
+    
     public float GetRiskValue() => m_RiskPercentage;
 
     public override void OnUpdate()
     {
         if (HasAfflictionRisk())
         {
-            float currentTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
-            float elapsedTime = currentTime - m_LastUpdateTime;
-            
-            float riskIncrease = elapsedTime * 60f;
-            
-            m_RiskPercentage = Mathf.Min(m_RiskPercentage + riskIncrease, 100f);
-            m_LastUpdateTime = currentTime;
-            
-            Mod.Logger.Log($"Risk for {m_AfflictionKey} increased to {m_RiskPercentage:F2}%", ComplexLogger.FlaggedLoggingLevel.Debug);
+            UpdateRiskValue();
         }
     }
 
-    public override void OnCure()
-    {
-    }
+    protected override void OnCure() { }
 
-    public override void CureSymptoms()
+    public void UpdateRiskValue()
     {
-        Mod.Logger.Log("Curing symptoms only...", ComplexLogger.FlaggedLoggingLevel.Debug);
+        var currentTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
+        var elapsedTime = currentTime - m_LastUpdateTime;
+            
+        var riskIncrease = elapsedTime * 120f;
+            
+        m_RiskPercentage = Mathf.Min(m_RiskPercentage + riskIncrease, 100f);
+        m_LastUpdateTime = currentTime;
+            
+        Mod.Logger.Log($"Risk for {m_AfflictionKey} increased to {m_RiskPercentage:F2}%", ComplexLogger.FlaggedLoggingLevel.Debug); // The UI seems to be updating about 0.5% quicker than what's being logged.
     }
 }

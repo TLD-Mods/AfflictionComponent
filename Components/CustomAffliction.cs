@@ -1,4 +1,6 @@
-﻿namespace AfflictionComponent.Components;
+﻿using AfflictionComponent.Interfaces;
+
+namespace AfflictionComponent.Components;
 
 public abstract class CustomAffliction
 {
@@ -8,16 +10,16 @@ public abstract class CustomAffliction
     public bool m_Buff;
     public string m_Cause;
     public string m_Desc;
-    public float m_Duration; // In Hours.
+    private float m_Duration; // In Hours.
     public float m_EndTime;
     private float m_StartEndTime;
-    public bool m_InstantHeal;
+    private bool m_InstantHeal;
     public AfflictionBodyArea m_Location;
     public string m_NoHealDesc;
     public bool m_NoTimer;
     public Tuple<string, int, int>[] m_RemedyItems; // GearItem, Required Amount, Current Amount.
-    public bool m_Risk;
-    public string m_SpriteName;
+    private bool m_Risk;
+    private string m_SpriteName;
 
     protected CustomAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
@@ -89,7 +91,7 @@ public abstract class CustomAffliction
     /// <summary>
     /// Called when InstantHeal is false and all remedy items have been taken. Can be used to run any custom code for that use case.
     /// </summary>
-    public abstract void CureSymptoms();
+    protected abstract void CureSymptoms();
 
     public string GetAfflictionType() => HasAfflictionRisk() ? "Risk" : IsBuff() ? "Buff" : "Bad";
 
@@ -98,8 +100,8 @@ public abstract class CustomAffliction
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);
 
     public bool HasAfflictionRisk() => m_Risk;
-    
-    public bool IsBuff() => m_Buff;
+
+    private bool IsBuff() => m_Buff;
     
     /// <summary>
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
@@ -110,7 +112,7 @@ public abstract class CustomAffliction
     /// <summary>
     /// Called when the affliction is cured. Can be used to run custom code for this use case.
     /// </summary>
-    public abstract void OnCure();
+    protected abstract void OnCure();
 
     /// <summary>
     /// Called when the affliction is updated. Can be used to run custom code for this use case.
@@ -139,7 +141,7 @@ public abstract class CustomAffliction
     /// Used to set the given list of remedy items back to their defaults.
     /// </summary>
     /// <param name="remedyItems"></param>
-    public void ResetRemedyItems(Tuple<string, int, int>[] remedyItems) => _ = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
+    private static void ResetRemedyItems(Tuple<string, int, int>[] remedyItems) => _ = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
     
     private static void UpdateRemedyItems(Tuple<string, int, int>[] remedyItems, string itemName) => _ = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
 }

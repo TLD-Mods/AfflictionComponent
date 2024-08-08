@@ -326,7 +326,7 @@ internal static class PanelFirstAidPatches
                 if (affliction is IRiskPercentage riskPercentage && affliction.HasAfflictionRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
                 {
                     var uiLabel = __instance.m_LabelAfflictionName;
-                    uiLabel.text = string.Concat([uiLabel.text, " (", Mathf.RoundToInt(riskPercentage.GetRiskValue()), "%)"]);
+                    uiLabel.text = string.Concat([uiLabel.text, " (", riskPercentage.GetRiskPercentage(), "%)"]);
                 }
                 
                 num = (int)affliction.m_Location;
