@@ -72,7 +72,6 @@ public abstract class CustomAffliction
     {
         if (!ApplyRemedyCondition()) return;
 
-        Mod.Logger.Log("Applying remedy...", ComplexLogger.FlaggedLoggingLevel.Debug);
         UpdateRemedyItems(ref m_RemedyItems, fai.name);
         UpdateRemedyItems(ref m_AltRemedyItems, fai.name);
 
@@ -151,7 +150,14 @@ public abstract class CustomAffliction
     /// Used to set the given list of remedy items back to their defaults.
     /// </summary>
     /// <param name="remedyItems"></param>
-    public static void ResetRemedyItems(ref Tuple<string, int, int>[] remedyItems) => remedyItems = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
-    
+    public static void ResetRemedyItems(ref Tuple<string, int, int>[] remedyItems) => remedyItems = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, GetResetValue(item.Item1, item.Item2)) : item).ToArray();
+    private static int GetResetValue(string item, int value)
+    {
+        if (item == "GEAR_BottlePainKillers")
+        {
+            return value > 1 ? value / 2 : value;
+        }
+        else return value;
+    }
     private static void UpdateRemedyItems(ref Tuple<string, int, int>[] remedyItems, string itemName) => remedyItems = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
 }
