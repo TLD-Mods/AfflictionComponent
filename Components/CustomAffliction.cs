@@ -70,6 +70,9 @@ public abstract class CustomAffliction
 
     public void ApplyRemedy(FirstAidItem fai)
     {
+        if (!ApplyRemedyCondition()) return;
+
+        Mod.Logger.Log("Applying remedy...", ComplexLogger.FlaggedLoggingLevel.Debug);
         UpdateRemedyItems(ref m_RemedyItems, fai.name);
         UpdateRemedyItems(ref m_AltRemedyItems, fai.name);
 
@@ -78,7 +81,15 @@ public abstract class CustomAffliction
         else
             CureSymptoms(); // Otherwise, just cure the symptoms (this can be empty and do nothing)
     }
-    
+
+    /// <summary>
+    /// Optional override used to define a condition when applying remedy items, if the condition is false the remedy item will not be applied when taken. Default is true.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual bool ApplyRemedyCondition()
+    {
+        return true;
+    }
     public void Cure()
     {
         OnCure();
