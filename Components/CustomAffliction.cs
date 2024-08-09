@@ -140,7 +140,7 @@ public abstract class CustomAffliction
     /// Used to set the given list of remedy items back to their defaults.
     /// </summary>
     /// <param name="remedyItems"></param>
-    private static void ResetRemedyItems(ref Tuple<string, int, int>[] remedyItems) => remedyItems = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
+    public static void ResetRemedyItems(ref Tuple<string, int, int>[] remedyItems) => remedyItems = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
     
     private static void UpdateRemedyItems(ref Tuple<string, int, int>[] remedyItems, string itemName) => remedyItems = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
 }
