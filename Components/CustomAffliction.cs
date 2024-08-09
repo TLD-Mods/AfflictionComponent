@@ -70,8 +70,8 @@ public abstract class CustomAffliction
 
     public void ApplyRemedy(FirstAidItem fai)
     {
-        UpdateRemedyItems(m_RemedyItems, fai.name);
-        UpdateRemedyItems(m_AltRemedyItems, fai.name);
+        UpdateRemedyItems(ref m_RemedyItems, fai.name);
+        UpdateRemedyItems(ref m_AltRemedyItems, fai.name);
 
         if (!NeedsRemedy() && m_InstantHeal) // If you've taken all the remedy items, and it's set to cure after taking them, cure the affliction.
             Cure();
@@ -130,8 +130,8 @@ public abstract class CustomAffliction
     /// </summary>
     public void ResetAffliction()
     {
-        if(m_RemedyItems.Length > 0) ResetRemedyItems(m_RemedyItems);
-        if(m_AltRemedyItems.Length > 0) ResetRemedyItems(m_AltRemedyItems);
+        if(m_RemedyItems.Length > 0) ResetRemedyItems(ref m_RemedyItems);
+        if(m_AltRemedyItems.Length > 0) ResetRemedyItems(ref m_AltRemedyItems);
 
         m_EndTime = m_StartEndTime;
     }
@@ -140,7 +140,7 @@ public abstract class CustomAffliction
     /// Used to set the given list of remedy items back to their defaults.
     /// </summary>
     /// <param name="remedyItems"></param>
-    private static void ResetRemedyItems(Tuple<string, int, int>[] remedyItems) => _ = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
+    private static void ResetRemedyItems(ref Tuple<string, int, int>[] remedyItems) => remedyItems = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item2) : item).ToArray();
     
-    private static void UpdateRemedyItems(Tuple<string, int, int>[] remedyItems, string itemName) => _ = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
+    private static void UpdateRemedyItems(ref Tuple<string, int, int>[] remedyItems, string itemName) => remedyItems = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
 }

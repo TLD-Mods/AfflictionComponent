@@ -42,13 +42,14 @@ internal sealed class Mod : MelonMod
         {
             TestAffliction test = new TestAffliction("Test Affliction", "TEST", "Test Affliction Description",
                 "You have a test affliction, wait until it heals", AfflictionBodyArea.Head, "ico_injury_majorBruising",
-                false, false, 1, true, true, [], []);
+                false, false, 1, true, true, [Tuple.Create("GEAR_HeavyBandage", 1, 1)], []);
+            
             
             TestAffliction risktest = new TestAffliction("Test Risk Affliction", "TEST",
                 "Test Risk Affliction Description",
                 "You are at risk of developing test affliction, buy Fuar a drink of suffer the consequences",
                 AfflictionBodyArea.Neck, "ico_injury_majorBruising", true, false, 2, false, true,
-                [], []);
+                [], []); 
         }
     }
 }
