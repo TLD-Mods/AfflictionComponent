@@ -51,8 +51,8 @@ internal static class PanelAfflictionPatches
             if (AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() > 0)
             {
                 int finalCounter = vanillaAfflictionCount <= moddedAfflictionCount ? combinedCount - 1 : combinedCount;
-  
-                for (int j = vanillaAfflictionCount; j < finalCounter; j++)
+              
+                for (int j = vanillaAfflictionCount; j <= finalCounter; j++)
                 {
                     AfflictionCoverflow componentInChildren = Utils.GetComponentInChildren<AfflictionCoverflow>(__instance.m_ScrollList.m_ScrollObjects[j]);
                     if (componentInChildren != null)
