@@ -11,7 +11,6 @@ public abstract class CustomAffliction
     public string m_Desc;
     private float m_Duration; // In Hours.
     public float m_EndTime;
-    private float m_StartEndTime;
     private bool m_InstantHeal;
     public AfflictionBodyArea m_Location;
     public string m_NoHealDesc;
@@ -59,7 +58,6 @@ public abstract class CustomAffliction
         if (GameManager.GetPlayerManagerComponent().m_God) return;
 
         m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
-        m_StartEndTime = m_EndTime;
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
 
         if (GetAfflictionType() != "Buff")
@@ -145,8 +143,8 @@ public abstract class CustomAffliction
             if (m_RemedyItems.Length > 0) ResetRemedyItems(ref m_RemedyItems);
             if (m_AltRemedyItems.Length > 0) ResetRemedyItems(ref m_AltRemedyItems);
         }
-       
-        m_EndTime = m_StartEndTime;
+
+        m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
     }
 
     /// <summary>
