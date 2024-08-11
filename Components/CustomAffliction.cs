@@ -138,14 +138,17 @@ public abstract class CustomAffliction
     /// <summary>
     /// Resets the entire affliction back to it's default, including remedy items and the duration.
     /// </summary>
-    public void ResetAffliction()
+    public void ResetAffliction(bool ResetRemedies = true)
     {
-        if(m_RemedyItems.Length > 0) ResetRemedyItems(ref m_RemedyItems);
-        if(m_AltRemedyItems.Length > 0) ResetRemedyItems(ref m_AltRemedyItems);
-
+        if (ResetRemedies)
+        {
+            if (m_RemedyItems.Length > 0) ResetRemedyItems(ref m_RemedyItems);
+            if (m_AltRemedyItems.Length > 0) ResetRemedyItems(ref m_AltRemedyItems);
+        }
+       
         m_EndTime = m_StartEndTime;
     }
-    
+
     /// <summary>
     /// Used to set the given list of remedy items back to their defaults.
     /// </summary>
