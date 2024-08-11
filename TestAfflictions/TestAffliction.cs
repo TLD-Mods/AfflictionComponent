@@ -31,11 +31,11 @@ internal class TestAffliction : CustomAffliction, IRiskPercentage
         var currentTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
         var elapsedTime = currentTime - m_LastUpdateTime;
             
-        var riskIncrease = elapsedTime * 120f;
+        var riskIncrease = elapsedTime * 60f;
             
         m_RiskPercentage = Mathf.Min(m_RiskPercentage + riskIncrease, 100f);
         m_LastUpdateTime = currentTime;
             
-        Mod.Logger.Log($"Risk for {m_AfflictionKey} increased to {m_RiskPercentage:F2}%", ComplexLogger.FlaggedLoggingLevel.Debug); // The UI seems to be updating about 0.5% quicker than what's being logged.
+        // Mod.Logger.Log($"Risk for {m_AfflictionKey} increased to {m_RiskPercentage:F2}%", ComplexLogger.FlaggedLoggingLevel.Debug); // The UI seems to be updating about 0.5% quicker than what's being logged.
     }
 }
