@@ -87,11 +87,11 @@ public abstract class CustomAffliction
     {
         return true;
     }
-    public void Cure()
+    public void Cure(bool displayHealed = true)
     {
         OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
-        PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
+        if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
 
