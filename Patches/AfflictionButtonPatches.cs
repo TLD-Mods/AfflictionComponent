@@ -30,7 +30,8 @@ internal static class AfflictionButtonPatches
 
             var customAffliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(__instance.GetAfflictionIndex());
             
-            if (customAffliction is IRiskPercentage riskPercentage)
+            var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(customAffliction);
+            if (riskPercentage != null)
             {
                 var num = riskPercentage.GetRiskValue() / 100f; // The 100f slows it down, otherwise right now it's way too quick.
                 Utils.SetActive(__instance.m_AnimatorAfflictionBar.gameObject, num > 0f);

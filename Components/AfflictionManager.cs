@@ -45,6 +45,13 @@ public class AfflictionManager : MonoBehaviour
     [HideFromIl2Cpp]
     public void Remove(CustomAffliction customAffliction) => m_Afflictions.Remove(customAffliction);
 
+    internal static T? TryGetInterface<T>(object obj) where T : class
+    {
+        if (obj is T interfaceInstance) return interfaceInstance;
+        
+        return null;
+    }
+    
     public void Update()
     {
         if (GameManager.m_IsPaused || GameManager.s_IsGameplaySuspended) return;
