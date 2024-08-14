@@ -13,17 +13,17 @@ public abstract class CustomAffliction
     public float m_EndTime;
     private bool m_InstantHeal;
     public AfflictionBodyArea m_Location;
-    public string m_NoHealDescription;
+    public string m_DescriptionNoHeal; // Should we make this nullable?
     public bool m_NoTimer;
     public Tuple<string, int, int>[] m_RemedyItems; // GearItem, Required Amount, Current Amount.
     private bool m_Risk;
     private string m_SpriteName;
 
-    protected CustomAffliction(string name, string causeText, string description, string noHealDescription, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
+    protected CustomAffliction(string name, string causeText, string description, string descriptionNoHeal, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
-        m_CauseText = causeText; 
-        m_Description = description;
-        m_NoHealDescription = noHealDescription;
+        m_CauseText = Localization.Get(causeText); 
+        m_Description = Localization.Get(description);
+        m_DescriptionNoHeal = Localization.Get(descriptionNoHeal);
         m_Location = location;
         m_SpriteName = spriteName;
         m_Name = Localization.Get(name);

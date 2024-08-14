@@ -9,10 +9,7 @@ internal sealed class Mod : MelonMod
     internal static AfflictionManager afflictionManager;
     internal static ComplexLogger<Mod> Logger = new();
 
-    public override void OnInitializeMelon()
-    {
-        Logger.Log("AfflictionComponent is online", FlaggedLoggingLevel.None);
-    }
+    public override void OnInitializeMelon() => RegisterLocalizationKeys("AfflictionComponent.Resources.Localization.json");
 
     public override void OnSceneWasInitialized(int buildIndex, string sceneName)
     {
@@ -40,22 +37,42 @@ internal sealed class Mod : MelonMod
     {
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-            TestAffliction test = new TestAffliction("Test Affliction", "TEST", "Test Affliction Description",
-                "You have a test affliction, wait until it heals", AfflictionBodyArea.Chest, "ico_injury_majorBruising",
-                false, false, 1, true, true, [Tuple.Create("GEAR_HeavyBandage", 1, 1)], []);
+            _ = new TestAffliction("GAMEPLAY_AfflictionTesting", 
+                "GAMEPLAY_AfflictionTestingCause", 
+                "GAMEPLAY_AfflictionTestingDescription",
+                "GAMEPLAY_AfflictionTestingDescriptionNoHeal", 
+                AfflictionBodyArea.Chest, "ico_injury_majorBruising", false, false, 1, true, true, 
+                [Tuple.Create("GEAR_HeavyBandage", 1, 1)], []);
             
-            
-            TestAffliction risktest = new TestAffliction("Test Risk Affliction", "TEST",
-                "Test Risk Affliction Description",
-                "You are at risk of developing test affliction, buy Fuar a drink of suffer the consequences",
+            _ = new TestAffliction("GAMEPLAY_AfflictionTestingRisk", 
+                "GAMEPLAY_AfflictionTestingCause",
+                "GAMEPLAY_AfflictionTestingRiskDescription",
+                "GAMEPLAY_AfflictionTestingRiskDescriptionNoHeal",
                 AfflictionBodyArea.Chest, "ico_injury_majorBruising", true, false, 2, false, true,
                 [], []);
             
-            TestAffliction buffTest = new TestAffliction("Test Buff Affliction", "TEST",
-                "Test Risk Affliction Description",
-                "You have a buff!",
+            _ = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
+                "GAMEPLAY_AfflictionTestingCause",
+                "GAMEPLAY_AfflictionTestingBuffDescription",
+                "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
                 AfflictionBodyArea.Stomach, "ico_injury_majorBruising", false, true, 0.50f, false, false,
                 [], []);
         }
+    }
+    
+    /* --- Testing Localization --- */
+    private static void RegisterLocalizationKeys(string jsonFilePath)
+    {
+        if (string.IsNullOrWhiteSpace(jsonFilePath)) throw new ArgumentNullException(nameof(jsonFilePath));
+
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(jsonFilePath);
+        if (stream == null) throw new FileNotFoundException($"Resource not found: {jsonFilePath}");
+
+        using var reader = new StreamReader(stream);
+        var jsonText = reader.ReadToEnd();
+
+        if (string.IsNullOrWhiteSpace(jsonText)) throw new InvalidDataException("JSON content is empty or whitespace.");
+
+        LocalizationManager.LoadJsonLocalization(jsonText);
     }
 }

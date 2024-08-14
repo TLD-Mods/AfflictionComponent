@@ -340,13 +340,13 @@ internal static class PanelFirstAidPatches
                     __instance.m_MultipleDosesObject.SetActive(false);
                     __instance.m_RightPageObject.SetActive(false);
                     
-                    if (!string.IsNullOrEmpty(affliction.m_NoHealDescription) && !affliction.m_Buff)
+                    if (!string.IsNullOrEmpty(affliction.m_DescriptionNoHeal) && !affliction.m_Buff)
                     {
                         __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                         __instance.m_LabelAfflictionDescription.text = string.Empty;
                         __instance.m_BuffWindow.SetActive(false);
                         
-                        __instance.m_LabelSpecialTreatment.text = affliction.m_NoHealDescription; // Is this what we want here?
+                        __instance.m_LabelSpecialTreatment.text = affliction.m_DescriptionNoHeal; // Is this what we want here?
                         __instance.m_LabelSpecialTreatmentDescription.text = affliction.m_Description;
                         __instance.m_SpecialTreatmentWindow.SetActive(true);
                     }

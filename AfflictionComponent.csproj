@@ -21,7 +21,7 @@
 	<!-- List of used references -->
 	<ItemGroup>
 		<!-- This is the base reference. MUST EXIST -->
-		<PackageReference Include="STBlade.Modding.TLD.Il2CppAssemblies.Windows" Version="2.30.0" />
+		<PackageReference Include="STBlade.Modding.TLD.Il2CppAssemblies.Windows" Version="2.32.0" />
 		<!-- This is only if you use the ModSettings -->
 		<PackageReference Include="STBlade.Modding.TLD.ModSettings" Version="1.9.0" />
 		<!-- Only if you need ModComponent -->
@@ -62,6 +62,10 @@
 		<Using Include="GearSpawner" />
 		<!-- Only if your using ModData -->
 		<Using Include="ModData" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Resources\Localization.json" />
+	  <EmbeddedResource Include="Resources\Localization.json" />
 	</ItemGroup>
 
 	<!-- This is a build event. It will copy your dll to the currently defined TheLongDarkPath's Mods folder -->
