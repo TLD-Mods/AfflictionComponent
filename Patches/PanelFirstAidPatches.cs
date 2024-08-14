@@ -1,5 +1,6 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
+using AfflictionComponent.TestAfflictions;
 using Il2CppTLD.IntBackedUnit;
 using AfflictionComponent.Utilities;
 
@@ -328,11 +329,20 @@ internal static class PanelFirstAidPatches
                     }
                 }
                 
+                var uiLabel = __instance.m_LabelAfflictionName;
+                
                 var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(affliction);
                 if (riskPercentage != null && affliction.HasAfflictionRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
                 {
-                    var uiLabel = __instance.m_LabelAfflictionName;
                     uiLabel.text = string.Concat([uiLabel.text, " (", riskPercentage.GetRiskPercentage(), "%)"]);
+                }
+                
+                // Now supports displaying multiple instances of the same custom affliction if the user has one.
+                // We should filter this out a bit more, maybe via a boolean to determine if the custom affliction will have multiple (instances).
+                var (hasMultiple, count, index) = AfflictionManager.GetAfflictionManagerInstance().CheckMultipleAfflictionsByKey(affliction.m_AfflictionKey, affliction);
+                if (hasMultiple)
+                {
+                    uiLabel.text = string.Concat([uiLabel.text, " (", index, "/", count, ")"]);
                 }
                 
                 num = (int)affliction.m_Location;

@@ -11,6 +11,15 @@ public class AfflictionManager : MonoBehaviour
     [HideFromIl2Cpp]
     public void Add(CustomAffliction customAffliction) => m_Afflictions.Add(customAffliction);
     
+    [HideFromIl2Cpp]
+    public (bool hasMultiple, int count, int index) CheckMultipleAfflictionsByKey(string afflictionKey, CustomAffliction currentAffliction)
+    {
+        var afflictionsOfType = m_Afflictions.Where(affliction => affliction.m_AfflictionKey == afflictionKey).ToList();
+        var count = afflictionsOfType.Count;
+        
+        return (count > 1, count, afflictionsOfType.IndexOf(currentAffliction) + 1);
+    }
+    
     public static AfflictionManager GetAfflictionManagerInstance() => Mod.afflictionManager;
 
     public int GetCustomAfflictionCount() => m_Afflictions.Count;
