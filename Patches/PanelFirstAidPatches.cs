@@ -41,12 +41,41 @@ internal static class PanelFirstAidPatches
         private static void Postfix(Panel_FirstAid __instance)
         {
             var afflictionManager = AfflictionManager.GetAfflictionManagerInstance();
-            if (afflictionManager == null || afflictionManager.m_Afflictions.Count == 0 || afflictionManager.m_Afflictions.Any(affliction => affliction.m_Buff)) return;
+            if (afflictionManager == null || afflictionManager.m_Afflictions.Count == 0) return;
 
-            Utils.SetActive(__instance.m_PaperDollMale, PlayerManager.m_VoicePersona == VoicePersona.Male);
-            Utils.SetActive(__instance.m_PaperDollFemale, PlayerManager.m_VoicePersona == VoicePersona.Female);
-
-            if (InterfaceManager.GetPanel<Panel_Clothing>().IsEnabled()) InterfaceManager.GetPanel<Panel_Clothing>().Enable(false);
+            var panelClothing = InterfaceManager.GetPanel<Panel_Clothing>();
+            
+            var flag = false;
+            for (var i = 0; i < afflictionManager.m_Afflictions.Count; i++)
+            {
+                if (!afflictionManager.GetAfflictionByIndex(i).m_Buff)
+                {
+                    flag = true;
+                }
+            }
+            
+            switch (flag)
+            {
+                case true:
+                {
+                    Utils.SetActive(__instance.m_PaperDollMale, PlayerManager.m_VoicePersona == VoicePersona.Male);
+                    Utils.SetActive(__instance.m_PaperDollFemale, PlayerManager.m_VoicePersona == VoicePersona.Female);
+                
+                    if (!panelClothing.IsEnabled()) return;
+                    panelClothing.Enable(false);
+                    break;
+                }
+                case false:
+                {
+                    Utils.SetActive(__instance.m_PaperDollMale, false);
+                    Utils.SetActive(__instance.m_PaperDollFemale, false);
+                
+                    if (panelClothing.IsEnabled()) return;
+                    panelClothing.Enable(true);
+                    panelClothing.ShowPaperDollOnly();
+                    break;
+                }
+            }
         }
     }
 
@@ -77,18 +106,18 @@ internal static class PanelFirstAidPatches
 
             for (int i = 0; i < totalAfflictions; i++)
             {
-                AfflictionButton component = __instance.m_ScrollListEffects.m_ScrollObjects[i].transform.GetChild(0).GetComponent<AfflictionButton>();
-                if (component == null) continue;
+                var afflictionButton = __instance.m_ScrollListEffects.m_ScrollObjects[i].transform.GetChild(0).GetComponent<AfflictionButton>();
+                if (afflictionButton == null) continue;
 
                 if (i < __instance.m_ScrollListAfflictions.Count)
                 {
                     Affliction affliction = __instance.m_ScrollListAfflictions[i];
-                    ProcessAffliction(__instance, affliction, component, ref lastAfflictionType, ref count, hasSelectedButton, selectedType, selectedArea);
+                    ProcessAffliction(__instance, affliction, afflictionButton, ref lastAfflictionType, ref count, hasSelectedButton, selectedType, selectedArea);
                 }
                 else
                 {
                     CustomAffliction customAffliction = customAfflictions[i - __instance.m_ScrollListAfflictions.Count];
-                    ProcessCustomAffliction(__instance, customAffliction, component, ref lastAfflictionType, ref count, hasSelectedButton, selectedType, selectedArea);
+                    ProcessCustomAffliction(__instance, customAffliction, afflictionButton, ref lastAfflictionType, ref count, hasSelectedButton, selectedType, selectedArea);
                 }
             }
 
