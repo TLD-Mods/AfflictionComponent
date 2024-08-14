@@ -9,7 +9,7 @@ public abstract class CustomAffliction
     public bool m_Buff;
     public string m_Cause;
     public string m_Desc;
-    private float m_Duration; // In Hours.
+    internal float m_Duration; // In Hours.
     public float m_EndTime;
     private bool m_InstantHeal;
     public AfflictionBodyArea m_Location;
@@ -26,7 +26,7 @@ public abstract class CustomAffliction
         m_NoHealDesc = noHealDesc;
         m_Location = location;
         m_SpriteName = spriteName;
-        m_AfflictionKey = afflictionName;
+        m_AfflictionKey = Localization.Get(afflictionName);;
         m_Risk = risk;
         m_Buff = buff;
         m_Duration = duration;
@@ -60,10 +60,10 @@ public abstract class CustomAffliction
         m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
 
-        if (GetAfflictionType() != "Buff")
-        {
+        if (!m_Buff)
             PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
-        }
+        else
+            InterfaceManager.GetPanel<Panel_HUD>().ShowBuffNotification(m_AfflictionKey, "GAMEPLAY_BuffHeader", m_SpriteName);
     }
 
     public void ApplyRemedy(FirstAidItem fai)
@@ -83,10 +83,8 @@ public abstract class CustomAffliction
     /// Optional override used to define a condition when applying remedy items, if the condition is false the remedy item will not be applied when taken. Default is true.
     /// </summary>
     /// <returns></returns>
-    protected virtual bool ApplyRemedyCondition()
-    {
-        return true;
-    }
+    protected virtual bool ApplyRemedyCondition() => true;
+    
     public void Cure(bool displayHealed = true)
     {
         OnCure();
@@ -100,15 +98,19 @@ public abstract class CustomAffliction
     /// </summary>
     protected abstract void CureSymptoms();
 
-    public string GetAfflictionType() => HasAfflictionRisk() ? "Risk" : IsBuff() ? "Buff" : "Bad";
+    public string GetAfflictionType() => HasAfflictionRisk() ? "Risk" : m_Buff ? "Buff" : "Bad";
 
+    private static int GetResetValue(string item, int value)
+    {
+        if (item == "GEAR_BottlePainKillers") return value > 1 ? value / 2 : value;
+        else return value;
+    }
+    
     public string GetSpriteName() => m_SpriteName;
 
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);
 
     public bool HasAfflictionRisk() => m_Risk;
-
-    private bool IsBuff() => m_Buff;
     
     /// <summary>
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
@@ -152,13 +154,6 @@ public abstract class CustomAffliction
     /// </summary>
     /// <param name="remedyItems"></param>
     public static void ResetRemedyItems(ref Tuple<string, int, int>[] remedyItems) => remedyItems = remedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, GetResetValue(item.Item1, item.Item2)) : item).ToArray();
-    private static int GetResetValue(string item, int value)
-    {
-        if (item == "GEAR_BottlePainKillers")
-        {
-            return value > 1 ? value / 2 : value;
-        }
-        else return value;
-    }
+    
     private static void UpdateRemedyItems(ref Tuple<string, int, int>[] remedyItems, string itemName) => remedyItems = remedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
 }

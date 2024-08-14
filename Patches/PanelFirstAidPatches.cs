@@ -266,6 +266,8 @@ internal static class PanelFirstAidPatches
                 int[] altRemedyNumRequired;
                 bool[] altRemedyComplete;
 
+                __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
+                
                 if (affliction.m_RemedyItems.Length != 0)
                 {
                     // I don't know if the UI will support more than 2 items.
@@ -302,25 +304,31 @@ internal static class PanelFirstAidPatches
                         altRemedyNumRequired = null;
                         altRemedyComplete = null;
                     }
-
-                    __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
+                    
                     __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                     __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;
                     __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(affliction.m_NoHealDesc))
+                    __instance.m_MultipleDosesObject.SetActive(false);
+                    __instance.m_RightPageObject.SetActive(false);
+                    
+                    if (!string.IsNullOrEmpty(affliction.m_NoHealDesc) && !affliction.m_Buff)
                     {
-                        __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
                         __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                         __instance.m_LabelAfflictionDescription.text = string.Empty;
-                        __instance.m_MultipleDosesObject.SetActive(false);
-                        __instance.m_RightPageObject.SetActive(false);
+                        __instance.m_BuffWindow.SetActive(false);
                         
                         __instance.m_LabelSpecialTreatment.text = affliction.m_NoHealDesc; // Is this what we want here?
                         __instance.m_LabelSpecialTreatmentDescription.text = affliction.m_Desc;
                         __instance.m_SpecialTreatmentWindow.SetActive(true);
+                    }
+
+                    if (affliction.m_Buff)
+                    {
+                        __instance.m_LabelBuffDescription.text = affliction.m_Desc;
+                        __instance.m_BuffWindow.SetActive(true);
                     }
                 }
                 

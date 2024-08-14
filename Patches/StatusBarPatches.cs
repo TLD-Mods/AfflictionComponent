@@ -11,6 +11,7 @@ internal static class StatusBarPatches
         {
             if (__instance.m_StatusBarType != StatusBar.StatusBarType.Condition) return;
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
+            
             foreach (var customAffliction in customAfflictions)
             {
                 __result = customAffliction.HasAfflictionRisk() || !customAffliction.m_Buff;
@@ -18,6 +19,7 @@ internal static class StatusBarPatches
         }
     }
     
+    // TODO: Need to add in checks for specific status bars such as hunger, thirst if this buff affects those.
     [HarmonyPatch(nameof(StatusBar), nameof(StatusBar.IsBuffActive))]
     private static class IsCustomAfflictionBuffActive
     {
@@ -25,6 +27,7 @@ internal static class StatusBarPatches
         {
             if (__instance.m_StatusBarType != StatusBar.StatusBarType.Condition) return;
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
+            
             foreach (var customAffliction in customAfflictions)
             {
                 __result = customAffliction.m_Buff;
