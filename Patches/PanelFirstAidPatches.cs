@@ -130,7 +130,7 @@ internal static class PanelFirstAidPatches
 
             bool isSelected = hasSelectedButton && afflictionType == selectedType && customAffliction.m_Location == selectedArea;
             component.SetSelected(isSelected);
-            UpdateBodyIconColorsCustomAffliction(instance, customAffliction, location);
+            instance.UpdateBodyIconColors(component, isSelected, location);
         }
         
         private static void AddCustomAfflictionAtLocation(Panel_FirstAid instance, int bodyIconIndex, CustomAffliction customAffliction)
@@ -366,54 +366,14 @@ internal static class PanelFirstAidPatches
                 Utils.SetActive(__instance.m_DurationWidgetParentObj, active: false);
         }
     }
-    
-    [HarmonyPatch(nameof(Panel_FirstAid), nameof(Panel_FirstAid.UpdateAllButSelectedBodyIconColors))]
-    private static class UpdateAllBodyIconColours
+
+    [HarmonyPatch(nameof(Panel_FirstAid), nameof(Panel_FirstAid.UpdateBodyIconColors))]
+    private static class OverrideUpdateBodyIconColors
     {
-        private static void Postfix(Panel_FirstAid __instance)
+        private static void Postfix(Panel_FirstAid __instance, AfflictionButton afflictionButton, bool isButtonSelected, int bodyIconIndex)
         {
-            var afflictionManager = AfflictionManager.GetAfflictionManagerInstance();
-            var customAfflictions = afflictionManager.m_Afflictions;
-
-            foreach (var customAffliction in customAfflictions)
-            {
-                int bodyIconIndex = (int)customAffliction.m_Location;
-                UpdateBodyIconColorsCustomAffliction(__instance, customAffliction, bodyIconIndex);
-            }
-        }
-    }
-
-    private static void UpdateBodyIconColorsCustomAffliction(Panel_FirstAid panelFirstAid, CustomAffliction customAffliction, int bodyIconIndex)
-    {
-        Color colorBasedOnAffliction = AfflictionManager.GetAfflictionColour(customAffliction.GetAfflictionType());
-
-        UISprite bodyIcon = panelFirstAid.m_BodyIconList[bodyIconIndex];
-        bodyIcon.color = colorBasedOnAffliction;
-        bodyIcon.spriteName = customAffliction.m_Buff ? panelFirstAid.m_BodyIconSpriteNameBuff : panelFirstAid.m_BodyIconSpriteNameAffliction;
-
-        var bodyIconTransform = bodyIcon.transform;
-        for (int i = 0; i < bodyIconTransform.childCount; i++)
-        {
-            Transform childTransform = bodyIconTransform.GetChild(i);
-            UISprite component = childTransform.GetComponent<UISprite>();
-            if (component)
-            {
-                Color adjustedColor = colorBasedOnAffliction;
-                adjustedColor.a = component.color.a;
-                component.color = adjustedColor;
-            }
-    
-            TweenColor tweenComponent = childTransform.GetComponent<TweenColor>();
-            if (tweenComponent)
-            {
-                Color fromColor = colorBasedOnAffliction;
-                fromColor.a = tweenComponent.from.a;
-                tweenComponent.from = fromColor;
-        
-                Color toColor = colorBasedOnAffliction;
-                toColor.a = tweenComponent.to.a;
-                tweenComponent.to = toColor;
-            }
+            if (afflictionButton.m_AfflictionType != AfflictionType.Generic) return;
+            __instance.m_BodyIconList[bodyIconIndex].spriteName = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(afflictionButton.m_Index).m_Buff ? __instance.m_BodyIconSpriteNameBuff : __instance.m_BodyIconSpriteNameAffliction;
         }
     }
 }
