@@ -63,9 +63,6 @@
 		<!-- Only if your using ModData -->
 		<Using Include="ModData" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Interfaces\Bad\" />
-	</ItemGroup>
 
 	<!-- This is a build event. It will copy your dll to the currently defined TheLongDarkPath's Mods folder -->
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -1,6 +1,5 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
-using AfflictionComponent.Interfaces.Risk;
 
 namespace AfflictionComponent.TestAfflictions;
 

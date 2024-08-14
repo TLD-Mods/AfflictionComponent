@@ -1,5 +1,4 @@
 ﻿using AfflictionComponent.Interfaces;
-using AfflictionComponent.Interfaces.Risk;
 using Il2CppInterop.Runtime.Attributes;
 
 namespace AfflictionComponent.Components;
@@ -37,9 +36,8 @@ public class AfflictionManager : MonoBehaviour
 
     [HideFromIl2Cpp]
     public List<CustomAffliction> GetCustomAfflictionListCurable() => m_Afflictions.Where(ca => ca.m_RemedyItems.Length > 0 && ca.NeedsRemedy()).ToList();
-
-    // So mod authors can check if the player has at least one CustomAffliction of their own type.
-    [HideFromIl2Cpp]
+    
+    [HideFromIl2Cpp] // So mod authors can check if the player has at least one CustomAffliction of their own type.
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(typeName.IsInstanceOfType);
 
     [HideFromIl2Cpp]

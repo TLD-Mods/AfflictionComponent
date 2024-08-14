@@ -1,5 +1,5 @@
 ﻿using AfflictionComponent.Components;
-using AfflictionComponent.Interfaces.Risk;
+using AfflictionComponent.Interfaces;
 
 namespace AfflictionComponent.Patches;
 

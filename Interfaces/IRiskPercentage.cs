@@ -1,6 +1,6 @@
-﻿namespace AfflictionComponent.Interfaces.Risk;
+﻿namespace AfflictionComponent.Interfaces;
 
-public interface IRiskPercentage
+public interface IRiskPercentage : IRisk
 {
     public sealed int GetRiskPercentage() => Mathf.RoundToInt(GetRiskValue());
     

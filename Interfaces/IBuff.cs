@@ -1,4 +1,4 @@
-﻿namespace AfflictionComponent.Interfaces.Buff;
+﻿namespace AfflictionComponent.Interfaces;
 
 public interface IBuff
 {

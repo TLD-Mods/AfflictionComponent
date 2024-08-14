@@ -1,6 +1,5 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
-using AfflictionComponent.Interfaces.Risk;
 using Il2CppTLD.IntBackedUnit;
 using AfflictionComponent.Utilities;
 
@@ -161,7 +160,7 @@ internal static class PanelFirstAidPatches
             if (!__instance.m_SelectedAffButton) return;
             if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) return;
 
-            //generic UI crap, some of it we probably don't even need for this override
+            // Generic UI crap, some of it we probably don't even need for this override.
             foreach (var firstAidKitButton in __instance.m_FakButtons)
             {
                 firstAidKitButton.SetNeeded(needed: false);
@@ -170,12 +169,12 @@ internal static class PanelFirstAidPatches
             __instance.m_SpecialTreatmentWindow.SetActive(false);
             __instance.m_BuffWindow.SetActive(false);
 
-            //disable treatment window & standard description because for some reason it doesn't do it on its own
+            // Disable treatment window & standard description because for some reason it doesn't do it on its own.
             __instance.m_ItemsNeededOnlyOneObj.SetActive(false);
             __instance.m_ItemsNeededMultipleObj.SetActive(false);
             __instance.m_LabelAfflictionDescription.text = string.Empty;
 
-            //disable rest requirement since we're not using this yet
+            // Disable rest requirement since we're not using this yet.
             __instance.m_ObjectRestRemaining.SetActive(false);
 
             if (__instance.m_ScrollListEffects.m_ScrollObjects.Count == 0)
@@ -193,7 +192,7 @@ internal static class PanelFirstAidPatches
                 return;
             }
             
-            /* vanilla crap i'm not sure we even need here
+            /* Vanilla crap I'm not sure if we even need here
             if (Affliction.AfflictionTypeIsBuff(__instance.m_SelectedAffButton.m_AfflictionType))
             {
                 if (!Panel_Affliction.HasAffliction(__instance.m_SelectedAffButton.m_AfflictionType))
@@ -219,15 +218,8 @@ internal static class PanelFirstAidPatches
 
             if(__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) __instance.m_LabelAfflictionName.text = Affliction.LocalizedNameFromAfflictionType(__instance.m_SelectedAffButton.m_AfflictionType, __instance.m_SelectedAffButton.GetAfflictionIndex());
 
-            //colour stuff
-            if (Affliction.IsBeneficial(__instance.m_SelectedAffButton.m_AfflictionType))
-            {
-                __instance.m_LabelAfflictionName.color = InterfaceManager.m_FirstAidBuffColor;
-            }
-            else
-            {
-                __instance.m_LabelAfflictionName.color = InterfaceManager.m_FirstAidRedColor;
-            }
+            // Colour stuff.
+            __instance.m_LabelAfflictionName.color = Affliction.IsBeneficial(__instance.m_SelectedAffButton.m_AfflictionType) ? InterfaceManager.m_FirstAidBuffColor : InterfaceManager.m_FirstAidRedColor;
 
             int num4 = 0; // THIS IS THE DURATION NUMBER
             int selectedAfflictionIndex = __instance.GetSelectedAfflictionIndex(); // This will most likely need to be modified.
@@ -248,8 +240,12 @@ internal static class PanelFirstAidPatches
 
                 // This handles the out of index range error I was getting in the console.
                 CustomAffliction affliction;
-                try { affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex); }
-                catch (ArgumentOutOfRangeException e) {
+                try
+                {
+                    affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex);
+                }
+                catch (ArgumentOutOfRangeException e) 
+                {
                     Mod.Logger.Log(e.Message, ComplexLogger.FlaggedLoggingLevel.Error);
                     return; 
                 }
@@ -332,7 +328,8 @@ internal static class PanelFirstAidPatches
                     }
                 }
                 
-                if (affliction is IRiskPercentage riskPercentage && affliction.HasAfflictionRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
+                var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(affliction);
+                if (riskPercentage != null && affliction.HasAfflictionRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
                 {
                     var uiLabel = __instance.m_LabelAfflictionName;
                     uiLabel.text = string.Concat([uiLabel.text, " (", riskPercentage.GetRiskPercentage(), "%)"]);
