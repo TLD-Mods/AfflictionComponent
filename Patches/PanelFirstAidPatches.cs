@@ -152,9 +152,9 @@ internal static class PanelFirstAidPatches
             AfflictionType afflictionType = AfflictionType.Generic;
             if (afflictionType != lastAfflictionType) count = 0;
 
-            string text = customAffliction.m_AfflictionKey;
+            string text = customAffliction.m_Name;
             string text2 = customAffliction.GetSpriteName();
-            component.SetCauseAndEffect(customAffliction.m_Cause, afflictionType, customAffliction.m_Location, count, text, text2);
+            component.SetCauseAndEffect(customAffliction.m_CauseText, afflictionType, customAffliction.m_Location, count, text, text2);
             count++;
             lastAfflictionType = afflictionType;
 
@@ -280,7 +280,7 @@ internal static class PanelFirstAidPatches
                     return; 
                 }
                 
-                __instance.m_LabelAfflictionName.text = affliction.m_AfflictionKey;
+                __instance.m_LabelAfflictionName.text = affliction.m_Name;
 
                 float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
 
@@ -332,7 +332,7 @@ internal static class PanelFirstAidPatches
                     }
                     
                     __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
-                    __instance.m_LabelAfflictionDescription.text = affliction.m_Desc;
+                    __instance.m_LabelAfflictionDescription.text = affliction.m_Description;
                     __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
                 }
                 else
@@ -340,20 +340,20 @@ internal static class PanelFirstAidPatches
                     __instance.m_MultipleDosesObject.SetActive(false);
                     __instance.m_RightPageObject.SetActive(false);
                     
-                    if (!string.IsNullOrEmpty(affliction.m_NoHealDesc) && !affliction.m_Buff)
+                    if (!string.IsNullOrEmpty(affliction.m_NoHealDescription) && !affliction.m_Buff)
                     {
                         __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                         __instance.m_LabelAfflictionDescription.text = string.Empty;
                         __instance.m_BuffWindow.SetActive(false);
                         
-                        __instance.m_LabelSpecialTreatment.text = affliction.m_NoHealDesc; // Is this what we want here?
-                        __instance.m_LabelSpecialTreatmentDescription.text = affliction.m_Desc;
+                        __instance.m_LabelSpecialTreatment.text = affliction.m_NoHealDescription; // Is this what we want here?
+                        __instance.m_LabelSpecialTreatmentDescription.text = affliction.m_Description;
                         __instance.m_SpecialTreatmentWindow.SetActive(true);
                     }
 
                     if (affliction.m_Buff)
                     {
-                        __instance.m_LabelBuffDescription.text = affliction.m_Desc;
+                        __instance.m_LabelBuffDescription.text = affliction.m_Description;
                         __instance.m_BuffWindow.SetActive(true);
                     }
                 }
@@ -368,7 +368,7 @@ internal static class PanelFirstAidPatches
                 
                 // Now supports displaying multiple instances of the same custom affliction if the user has one.
                 // We should filter this out a bit more, maybe via a boolean to determine if the custom affliction will have multiple (instances).
-                var (hasMultiple, count, index) = AfflictionManager.GetAfflictionManagerInstance().CheckMultipleAfflictionsByKey(affliction.m_AfflictionKey, affliction);
+                var (hasMultiple, count, index) = AfflictionManager.GetAfflictionManagerInstance().CheckMultipleAfflictionsByKey(affliction.m_Name, affliction);
                 if (hasMultiple)
                 {
                     uiLabel.text = string.Concat([uiLabel.text, " (", index, "/", count, ")"]);

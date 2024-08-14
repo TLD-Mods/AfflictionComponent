@@ -3,30 +3,30 @@
 // TODO: Split certain functionality off into Interfaces, which developers can then extend onto their custom afflictions.
 public abstract class CustomAffliction
 {
-    public string m_AfflictionKey;
+    public string m_Name;
     public Tuple<string, int, int>[] m_AltRemedyItems;
     public bool m_BloodLoss; // The affliction causes blood loss, might not use, intended to override the vanilla Blood Loss affliction.
     public bool m_Buff;
-    public string m_Cause;
-    public string m_Desc;
-    internal float m_Duration; // In Hours.
+    public string m_CauseText;
+    public string m_Description;
+    private float m_Duration; // In Hours.
     public float m_EndTime;
     private bool m_InstantHeal;
     public AfflictionBodyArea m_Location;
-    public string m_NoHealDesc;
+    public string m_NoHealDescription;
     public bool m_NoTimer;
     public Tuple<string, int, int>[] m_RemedyItems; // GearItem, Required Amount, Current Amount.
     private bool m_Risk;
     private string m_SpriteName;
 
-    protected CustomAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
+    protected CustomAffliction(string name, string causeText, string description, string noHealDescription, AfflictionBodyArea location, string spriteName, bool risk, bool buff, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
-        m_Cause = cause; 
-        m_Desc = desc;
-        m_NoHealDesc = noHealDesc;
+        m_CauseText = causeText; 
+        m_Description = description;
+        m_NoHealDescription = noHealDescription;
         m_Location = location;
         m_SpriteName = spriteName;
-        m_AfflictionKey = Localization.Get(afflictionName);;
+        m_Name = Localization.Get(name);
         m_Risk = risk;
         m_Buff = buff;
         m_Duration = duration;
@@ -61,9 +61,9 @@ public abstract class CustomAffliction
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
 
         if (!m_Buff)
-            PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
+            PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
         else
-            InterfaceManager.GetPanel<Panel_HUD>().ShowBuffNotification(m_AfflictionKey, "GAMEPLAY_BuffHeader", m_SpriteName);
+            InterfaceManager.GetPanel<Panel_HUD>().ShowBuffNotification(m_Name, "GAMEPLAY_BuffHeader", m_SpriteName);
     }
 
     public void ApplyRemedy(FirstAidItem fai)
@@ -89,7 +89,7 @@ public abstract class CustomAffliction
     {
         OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
-        if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_AfflictionKey, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
+        if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
 

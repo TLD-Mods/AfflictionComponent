@@ -157,8 +157,8 @@ internal static class PanelAfflictionPatches
 
         private static void UpdateSelectedCustomAffliction(CustomAffliction customAffliction, Panel_Affliction panelAffliction)
         {
-            panelAffliction.m_Label.text = customAffliction.m_AfflictionKey;
-            panelAffliction.m_LabelCause.text = customAffliction.m_Cause;
+            panelAffliction.m_Label.text = customAffliction.m_Name;
+            panelAffliction.m_LabelCause.text = customAffliction.m_CauseText;
             panelAffliction.m_LabelLocation.text = Panel_Affliction.LocalizedNameFromAfflictionLocation(customAffliction.m_Location);
 
             if (!panelAffliction.m_AfflictionButtonColorReferences) return;
