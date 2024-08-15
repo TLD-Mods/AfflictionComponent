@@ -14,7 +14,7 @@ internal static class StatusBarPatches
             
             foreach (var customAffliction in customAfflictions)
             {
-                __result = customAffliction.HasAfflictionRisk() || !customAffliction.InterfaceBuff.Buff;
+                __result = customAffliction.InterfaceRisk.HasRisk() || !customAffliction.InterfaceBuff.HasBuff();
             }
         }
     }
@@ -30,7 +30,7 @@ internal static class StatusBarPatches
             
             foreach (var customAffliction in customAfflictions)
             {
-                __result = customAffliction.InterfaceBuff.Buff;
+                __result = customAffliction.InterfaceBuff.HasBuff();
             }
         }
     }

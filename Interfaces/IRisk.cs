@@ -2,7 +2,7 @@
 
 public interface IRisk
 {
-    internal bool Risk { get; }
+    internal bool Risk { get; set; }
 
-    // protected sealed bool HasRisk() => Risk;
+    internal bool HasRisk() => Risk;
 }

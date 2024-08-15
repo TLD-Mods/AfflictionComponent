@@ -17,13 +17,13 @@ public abstract class CustomAffliction
     public string m_DescriptionNoHeal; // Should we make this nullable?
     public bool m_NoTimer;
     public Tuple<string, int, int>[] m_RemedyItems; // GearItem, Required Amount, Current Amount.
-    private bool m_Risk;
     private string m_SpriteName;
 
     // Interface fields
-    internal readonly IBuff InterfaceBuff; 
+    internal readonly IBuff InterfaceBuff;
+    internal readonly IRisk InterfaceRisk;
     
-    protected CustomAffliction(string name, string causeText, string description, string descriptionNoHeal, AfflictionBodyArea location, string spriteName, bool risk, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
+    protected CustomAffliction(string name, string causeText, string description, string descriptionNoHeal, AfflictionBodyArea location, string spriteName, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
         m_CauseText = Localization.Get(causeText); 
         m_Description = Localization.Get(description);
@@ -31,7 +31,6 @@ public abstract class CustomAffliction
         m_Location = location;
         m_SpriteName = spriteName;
         m_Name = Localization.Get(name);
-        m_Risk = risk;
         m_Duration = duration;
         m_NoTimer = noTimer;
         m_InstantHeal = instantHeal;
@@ -39,14 +38,20 @@ public abstract class CustomAffliction
         m_AltRemedyItems = altRemedyItems;
         
         // Check for implemented interfaces here, and then change certain conditionals.
+        var iRisk = AfflictionManager.TryGetInterface<IRisk>(this);
+        if (iRisk != null)
+        {
+            InterfaceRisk = iRisk;
+        }
+            
         var iBuff = AfflictionManager.TryGetInterface<IBuff>(this);
         if (iBuff != null)
         {
             InterfaceBuff = iBuff;
             
-            if (InterfaceBuff.Buff) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
+            if (InterfaceBuff.HasBuff()) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
             {
-                m_Risk = false;
+                if (InterfaceRisk != null) InterfaceRisk.Risk = false;
                 m_RemedyItems = m_AltRemedyItems = [];
             }
         }
@@ -57,7 +62,7 @@ public abstract class CustomAffliction
             m_AltRemedyItems = [];
         }
 
-        if (m_Risk) m_NoTimer = true;
+        if (InterfaceRisk != null && InterfaceRisk.Risk) m_NoTimer = true;
         if (m_NoTimer) m_Duration = float.PositiveInfinity;
     }
 
@@ -68,7 +73,7 @@ public abstract class CustomAffliction
         m_EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + m_Duration;
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
 
-        if (InterfaceBuff.Buff)
+        if (InterfaceBuff.HasBuff())
             InterfaceManager.GetPanel<Panel_HUD>().ShowBuffNotification(m_Name, "GAMEPLAY_BuffHeader", m_SpriteName);
         else
             PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
@@ -97,6 +102,7 @@ public abstract class CustomAffliction
     {
         OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
+        if (InterfaceBuff.HasBuff()) displayHealed = false;
         if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
@@ -106,19 +112,17 @@ public abstract class CustomAffliction
     /// </summary>
     protected abstract void CureSymptoms();
 
-    public string GetAfflictionType() => HasAfflictionRisk() ? "Risk" : InterfaceBuff.Buff ? "Buff" : "Bad";
+    public string GetAfflictionType() => InterfaceRisk.HasRisk() ? "Risk" : InterfaceBuff.HasBuff() ? "Buff" : "Bad";
 
     private static int GetResetValue(string item, int value)
     {
         if (item == "GEAR_BottlePainKillers") return value > 1 ? value / 2 : value;
-        else return value;
+        return value;
     }
     
     public string GetSpriteName() => m_SpriteName;
 
     public float GetTimeRemaining() => Mathf.CeilToInt(m_Duration * 60f);
-
-    public bool HasAfflictionRisk() => m_Risk;
     
     /// <summary>
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
@@ -144,11 +148,11 @@ public abstract class CustomAffliction
     public bool RequiresRemedyItem(FirstAidItem fai) => m_RemedyItems.Length > 0 && m_RemedyItems.Concat(m_AltRemedyItems).Any(item => item.Item1 == fai.m_GearItem.name);  
    
     /// <summary>
-    /// Resets the entire affliction back to it's default, including remedy items and the duration.
+    /// Resets the entire affliction back to its default, including remedy items and the duration.
     /// </summary>
-    public void ResetAffliction(bool ResetRemedies = true)
+    public void ResetAffliction(bool resetRemedies = true)
     {
-        if (ResetRemedies)
+        if (resetRemedies)
         {
             if (m_RemedyItems.Length > 0) ResetRemedyItems(ref m_RemedyItems);
             if (m_AltRemedyItems.Length > 0) ResetRemedyItems(ref m_AltRemedyItems);

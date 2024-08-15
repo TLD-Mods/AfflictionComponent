@@ -15,7 +15,7 @@ internal static class PanelFirstAidPatches
             if (__result) return;
             
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            __result = customAfflictions.Any(affliction => !affliction.InterfaceBuff.Buff && !affliction.HasAfflictionRisk());
+            __result = customAfflictions.Any(affliction => !affliction.InterfaceBuff.HasBuff() && !affliction.InterfaceRisk.HasRisk());
         }
     }
     
@@ -27,9 +27,9 @@ internal static class PanelFirstAidPatches
             if (__result) return;
             
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            if (!customAfflictions.Any(affliction => !affliction.InterfaceBuff.Buff && !affliction.HasAfflictionRisk()))
+            if (!customAfflictions.Any(affliction => !affliction.InterfaceBuff.HasBuff() && !affliction.InterfaceRisk.HasRisk()))
             {
-                __result = customAfflictions.Any(affliction => affliction.HasAfflictionRisk());
+                __result = customAfflictions.Any(affliction => affliction.InterfaceRisk.HasRisk());
             }
         }
     }
@@ -47,7 +47,7 @@ internal static class PanelFirstAidPatches
             var flag = false;
             for (var i = 0; i < afflictionManager.m_Afflictions.Count; i++)
             {
-                if (!afflictionManager.GetAfflictionByIndex(i).InterfaceBuff.Buff)
+                if (!afflictionManager.GetAfflictionByIndex(i).InterfaceBuff.HasBuff())
                 {
                     flag = true;
                 }
@@ -339,7 +339,7 @@ internal static class PanelFirstAidPatches
                     __instance.m_MultipleDosesObject.SetActive(false);
                     __instance.m_RightPageObject.SetActive(false);
                     
-                    if (!string.IsNullOrEmpty(affliction.m_DescriptionNoHeal) && !affliction.InterfaceBuff.Buff)
+                    if (!string.IsNullOrEmpty(affliction.m_DescriptionNoHeal) && !affliction.InterfaceBuff.HasBuff())
                     {
                         __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                         __instance.m_LabelAfflictionDescription.text = string.Empty;
@@ -350,7 +350,7 @@ internal static class PanelFirstAidPatches
                         __instance.m_SpecialTreatmentWindow.SetActive(true);
                     }
 
-                    if (affliction.InterfaceBuff.Buff)
+                    if (affliction.InterfaceBuff.HasBuff())
                     {
                         __instance.m_LabelBuffDescription.text = affliction.m_Description;
                         __instance.m_BuffWindow.SetActive(true);
@@ -360,7 +360,7 @@ internal static class PanelFirstAidPatches
                 var uiLabel = __instance.m_LabelAfflictionName;
                 
                 var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(affliction);
-                if (riskPercentage != null && affliction.HasAfflictionRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
+                if (riskPercentage != null && affliction.InterfaceRisk.HasRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
                 {
                     uiLabel.text = string.Concat([uiLabel.text, " (", riskPercentage.GetRiskPercentage(), "%)"]);
                 }
@@ -411,7 +411,7 @@ internal static class PanelFirstAidPatches
         private static void Postfix(Panel_FirstAid __instance, AfflictionButton afflictionButton, bool isButtonSelected, int bodyIconIndex)
         {
             if (afflictionButton.m_AfflictionType != AfflictionType.Generic) return;
-            __instance.m_BodyIconList[bodyIconIndex].spriteName = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(afflictionButton.m_Index).InterfaceBuff.Buff ? __instance.m_BodyIconSpriteNameBuff : __instance.m_BodyIconSpriteNameAffliction;
+            __instance.m_BodyIconList[bodyIconIndex].spriteName = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(afflictionButton.m_Index).InterfaceBuff.HasBuff() ? __instance.m_BodyIconSpriteNameBuff : __instance.m_BodyIconSpriteNameAffliction;
         }
     }
 }

@@ -41,23 +41,28 @@ internal sealed class Mod : MelonMod
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingDescription",
                 "GAMEPLAY_AfflictionTestingDescriptionNoHeal",
-                AfflictionBodyArea.Chest, "ico_injury_majorBruising", false, 1, true, true,
+                AfflictionBodyArea.Chest, "ico_injury_majorBruising", 1, true, true,
                 [Tuple.Create("GEAR_HeavyBandage", 1, 1)], []);
 
             testAffliction.Start();
-            
-            /*_ = new TestAffliction("GAMEPLAY_AfflictionTestingRisk", 
+
+            var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingRiskDescription",
                 "GAMEPLAY_AfflictionTestingRiskDescriptionNoHeal",
-                AfflictionBodyArea.Chest, "ico_injury_majorBruising", true, false, 2, false, true,
-                [], []); */
+                AfflictionBodyArea.Chest, "ico_injury_majorBruising", 2, false, true,
+                [], [])
+            {
+                Risk = true
+            };
             
+            testAfflictionRisk.Start();
+                
             var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingBuffDescription",
                 "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
-                AfflictionBodyArea.Stomach, "ico_injury_majorBruising", false, 0.50f, false, false,
+                AfflictionBodyArea.Stomach, "ico_injury_majorBruising", 0.50f, false, false,
                 [], [])
             {
                 Buff = true
