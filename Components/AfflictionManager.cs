@@ -55,7 +55,6 @@ public class AfflictionManager : MonoBehaviour
     internal static T? TryGetInterface<T>(object obj) where T : class
     {
         if (obj is T interfaceInstance) return interfaceInstance;
-        
         return null;
     }
     

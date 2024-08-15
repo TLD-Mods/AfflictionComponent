@@ -19,11 +19,11 @@ internal static class AfflictionButtonPatches
                 if (customAffliction.HasAfflictionRisk())
                     color = __instance.m_RiskColorHover;
                 else
-                    color = customAffliction.m_Buff ? __instance.m_BeneficialColorHover : __instance.m_NegativeColorHover;
+                    color = customAffliction.InterfaceBuff.Buff ? __instance.m_BeneficialColorHover : __instance.m_NegativeColorHover;
             else if (customAffliction.HasAfflictionRisk())
                 color = __instance.m_RiskColor;
             else
-                color = customAffliction.m_Buff ? __instance.m_BeneficialColor : __instance.m_NegativeColor;
+                color = customAffliction.InterfaceBuff.Buff ? __instance.m_BeneficialColor : __instance.m_NegativeColor;
             
             __result = color;
         }
@@ -63,12 +63,16 @@ internal static class AfflictionButtonPatches
                 __instance.m_SizeModifierAfflictionBar.localScale = new Vector3(num, 1f, 1f);
             }
 
-            if (customAffliction is { m_Buff: true, m_NoTimer: false })
+            var iBuff = AfflictionManager.TryGetInterface<IBuff>(customAffliction);
+            if (iBuff != null)
             {
-                var num2 = customAffliction.GetTimeRemaining(); // Right now nothing is happening with the bar, because we aren't actually updating the m_Duration or anything. We are only handling the UI in PanelFirstAidPatches.cs
-                Utils.SetActive(__instance.m_AnimatorBuffBar.gameObject, num2 > 0f);
-                __instance.m_FillSpriteBuffBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num2);
-                __instance.m_SizeModifierBuffBar.localScale = new Vector3(num2, 1f, 1f);
+                if (!customAffliction.m_NoTimer)
+                {
+                    var num2 = customAffliction.GetTimeRemaining(); // Right now nothing is happening with the bar, because we aren't actually updating the m_Duration or anything. We are only handling the UI in PanelFirstAidPatches.cs
+                    Utils.SetActive(__instance.m_AnimatorBuffBar.gameObject, num2 > 0f);
+                    __instance.m_FillSpriteBuffBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num2);
+                    __instance.m_SizeModifierBuffBar.localScale = new Vector3(num2, 1f, 1f);
+                }
             }
         }
     }

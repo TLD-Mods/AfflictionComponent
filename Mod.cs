@@ -37,26 +37,33 @@ internal sealed class Mod : MelonMod
     {
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-            _ = new TestAffliction("GAMEPLAY_AfflictionTesting", 
-                "GAMEPLAY_AfflictionTestingCause", 
+            var testAffliction = new TestAffliction("GAMEPLAY_AfflictionTesting",
+                "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingDescription",
-                "GAMEPLAY_AfflictionTestingDescriptionNoHeal", 
-                AfflictionBodyArea.Chest, "ico_injury_majorBruising", false, false, 1, true, true, 
+                "GAMEPLAY_AfflictionTestingDescriptionNoHeal",
+                AfflictionBodyArea.Chest, "ico_injury_majorBruising", false, 1, true, true,
                 [Tuple.Create("GEAR_HeavyBandage", 1, 1)], []);
+
+            testAffliction.Start();
             
-            _ = new TestAffliction("GAMEPLAY_AfflictionTestingRisk", 
+            /*_ = new TestAffliction("GAMEPLAY_AfflictionTestingRisk", 
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingRiskDescription",
                 "GAMEPLAY_AfflictionTestingRiskDescriptionNoHeal",
                 AfflictionBodyArea.Chest, "ico_injury_majorBruising", true, false, 2, false, true,
-                [], []);
+                [], []); */
             
-            _ = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
+            var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingBuffDescription",
                 "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
-                AfflictionBodyArea.Stomach, "ico_injury_majorBruising", false, true, 0.50f, false, false,
-                [], []);
+                AfflictionBodyArea.Stomach, "ico_injury_majorBruising", false, 0.50f, false, false,
+                [], [])
+            {
+                Buff = true
+            };
+            
+            testAfflictionBuff.Start();
         }
     }
     

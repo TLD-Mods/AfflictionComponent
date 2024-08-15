@@ -2,5 +2,5 @@
 
 public interface IBuff
 {
-    protected bool Buff { get; set; }
+    internal bool Buff { get; }
 }
