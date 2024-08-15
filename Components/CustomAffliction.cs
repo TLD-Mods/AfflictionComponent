@@ -9,7 +9,7 @@ public abstract class CustomAffliction
     public bool m_BloodLoss; // The affliction causes blood loss, might not use, intended to override the vanilla Blood Loss affliction. // Do we still need this?
     public string m_CauseText;
     public string m_Description;
-    public string m_DescriptionNoHeal; // Should we make this nullable?
+    public string? m_DescriptionNoHeal;
     private bool m_InstantHeal;
     public AfflictionBodyArea m_Location;
     public string m_Name;
@@ -21,7 +21,7 @@ public abstract class CustomAffliction
     internal readonly IDuration InterfaceDuration;
     internal readonly IRisk InterfaceRisk;
     
-    protected CustomAffliction(string name, string causeText, string description, string descriptionNoHeal, string spriteName, AfflictionBodyArea location, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
+    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
         m_AltRemedyItems = altRemedyItems;
         m_CauseText = Localization.Get(causeText); 

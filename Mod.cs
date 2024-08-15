@@ -50,7 +50,7 @@ internal sealed class Mod : MelonMod
             var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingRiskDescription",
-                "GAMEPLAY_AfflictionTestingRiskDescriptionNoHeal",
+                null,
                 "ico_injury_majorBruising",
                 AfflictionBodyArea.Chest,
                 true, [], [])
