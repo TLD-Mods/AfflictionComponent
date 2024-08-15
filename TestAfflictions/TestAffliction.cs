@@ -3,15 +3,20 @@ using AfflictionComponent.Interfaces;
 
 namespace AfflictionComponent.TestAfflictions;
 
-internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage
+internal class TestAffliction : CustomAffliction, IBuff, IRisk, IDuration
 {
     private float m_RiskValue;
     private float m_LastUpdateTime;
  
     public bool Buff { get; set; }
+    
+    public float Duration { get; set; }
+    
+    public float EndTime { get; set; }
+    
     public bool Risk { get; set; }
     
-    public TestAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, float duration, bool noTimer, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems) : base(afflictionName, cause, desc, noHealDesc, location, spriteName, duration, noTimer, instantHeal, remedyItems, altRemedyItems)
+    public TestAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems) : base(afflictionName, cause, desc, noHealDesc, spriteName, location, instantHeal, remedyItems, altRemedyItems)
     {
         m_LastUpdateTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
     }

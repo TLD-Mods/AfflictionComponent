@@ -66,9 +66,10 @@ internal static class AfflictionButtonPatches
             var iBuff = AfflictionManager.TryGetInterface<IBuff>(customAffliction);
             if (iBuff != null && iBuff.HasBuff())
             {
-                if (!customAffliction.m_NoTimer)
+                var iDuration = AfflictionManager.TryGetInterface<IDuration>(customAffliction);
+                if (iDuration != null)
                 {
-                    var num2 = customAffliction.GetTimeRemaining(); // Right now nothing is happening with the bar, because we aren't actually updating the m_Duration or anything. We are only handling the UI in PanelFirstAidPatches.cs
+                    var num2 = customAffliction.InterfaceDuration.GetTimeRemaining(); // Right now nothing is happening with the bar, because we aren't actually updating the m_Duration or anything. We are only handling the UI in PanelFirstAidPatches.cs
                     Utils.SetActive(__instance.m_AnimatorBuffBar.gameObject, num2 > 0f);
                     __instance.m_FillSpriteBuffBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num2);
                     __instance.m_SizeModifierBuffBar.localScale = new Vector3(num2, 1f, 1f);

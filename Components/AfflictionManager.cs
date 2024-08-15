@@ -62,7 +62,7 @@ public class AfflictionManager : MonoBehaviour
     {
         if (GameManager.m_IsPaused || GameManager.s_IsGameplaySuspended) return;
         
-        float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
+        // float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
 
         for (int i = m_Afflictions.Count - 1; i >= 0; i--)
         {
@@ -71,13 +71,15 @@ public class AfflictionManager : MonoBehaviour
             if (GameManager.GetPlayerManagerComponent().m_God) 
                 affliction.Cure();
             
+            // This throws an out of index range error if you are in the FirstAid panel when it removes our custom affliction.
             if (affliction is IRiskPercentage riskPercentage && riskPercentage.GetRiskValue() >= 100)
                 Remove(affliction);
             
             affliction.OnUpdate();
 
-            if (hoursPlayedNotPaused > affliction.m_EndTime)
-                affliction.Cure();
+            // This was instantly curing the afflictions if no duration was set which is why it's now commented out.
+            /*if (hoursPlayedNotPaused > affliction.InterfaceDuration.EndTime)
+                affliction.Cure();*/
         }
     }
 }

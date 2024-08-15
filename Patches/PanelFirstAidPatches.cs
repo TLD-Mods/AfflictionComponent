@@ -374,7 +374,7 @@ internal static class PanelFirstAidPatches
                 }
                 
                 num = (int)affliction.m_Location;
-                num4 = affliction.m_NoTimer ? 0 : Mathf.CeilToInt((affliction.m_EndTime - hoursPlayedNotPaused) * 60f); // Duration calculation, requires some conditionals.
+                num4 = Mathf.CeilToInt((affliction.InterfaceDuration.EndTime - hoursPlayedNotPaused) * 60f); // Duration calculation, requires some conditionals. (Removed the conditional as the EndTime properties initialises with the value 0)
 
                 break;
             }
