@@ -281,8 +281,6 @@ internal static class PanelFirstAidPatches
                 
                 __instance.m_LabelAfflictionName.text = affliction.m_Name;
 
-                float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
-
                 string[] remedySprites;
                 int[] remedyNumRequired;
                 bool[] remedyComplete;
@@ -374,8 +372,8 @@ internal static class PanelFirstAidPatches
                 }
                 
                 num = (int)affliction.m_Location;
-                num4 = Mathf.CeilToInt((affliction.InterfaceDuration.EndTime - hoursPlayedNotPaused) * 60f); // Duration calculation, requires some conditionals. (Removed the conditional as the EndTime properties initialises with the value 0)
-
+                num4 = Mathf.CeilToInt(affliction.InterfaceDuration.GetTimeRemaining());
+                
                 break;
             }
             

@@ -2,9 +2,11 @@
 
 public interface IDuration
 {
-    internal float Duration { get; } // In Hours.
+    internal float Duration { get; set; } // In Hours.
     
     internal float EndTime { get; set; }
 
-    public sealed float GetTimeRemaining() => Mathf.CeilToInt(Duration * 60f);
+    public sealed float GetTimeRemaining() => Duration * 60f;
+
+    public sealed void UpdateBuffDuration() => Duration = EndTime - GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
 }

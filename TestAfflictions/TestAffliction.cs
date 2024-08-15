@@ -16,7 +16,7 @@ internal class TestAffliction : CustomAffliction, IBuff, IRisk, IDuration
     
     public bool Risk { get; set; }
     
-    public TestAffliction(string afflictionName, string cause, string desc, string noHealDesc, AfflictionBodyArea location, string spriteName, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems) : base(afflictionName, cause, desc, noHealDesc, spriteName, location, instantHeal, remedyItems, altRemedyItems)
+    public TestAffliction(string afflictionName, string cause, string desc, string noHealDesc, string spriteName, AfflictionBodyArea location, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems) : base(afflictionName, cause, desc, noHealDesc, spriteName, location, instantHeal, remedyItems, altRemedyItems)
     {
         m_LastUpdateTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
     }
@@ -29,6 +29,8 @@ internal class TestAffliction : CustomAffliction, IBuff, IRisk, IDuration
     {
         if (Risk) // I can't call the HasRisk method from IRisk here for some reason?
             UpdateRiskValue();
+        if (Buff)
+            InterfaceDuration.UpdateBuffDuration();
     }
 
     protected override void OnCure() { }
