@@ -17,9 +17,9 @@ public abstract class CustomAffliction
     private string m_SpriteName;
 
     // Interface fields
-    internal readonly IBuff InterfaceBuff;
-    internal readonly IDuration InterfaceDuration;
-    internal readonly IRisk InterfaceRisk;
+    public readonly IBuff InterfaceBuff;
+    public readonly IDuration InterfaceDuration;
+    public readonly IRisk InterfaceRisk;
     
     protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems)
     {
@@ -51,7 +51,7 @@ public abstract class CustomAffliction
         {
             InterfaceBuff = iBuff;
             
-            if (InterfaceBuff.HasBuff()) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
+            if (HasBuff()) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
             {
                 if (InterfaceRisk != null) InterfaceRisk.Risk = false;
                 m_RemedyItems = m_AltRemedyItems = [];
@@ -66,8 +66,11 @@ public abstract class CustomAffliction
 
         /*if (InterfaceRisk != null && InterfaceRisk.Risk) m_NoTimer = true;
         if (m_NoTimer) m_Duration = float.PositiveInfinity;*/
-    }
+    } 
 
+    public bool HasBuff() => InterfaceBuff is not null ? InterfaceBuff.Buff : false;
+    public bool HasRisk() => InterfaceRisk is not null ? InterfaceRisk.Risk : false;
+    public bool HasDuration() => InterfaceDuration is not null;
     public void ApplyRemedy(FirstAidItem fai)
     {
         if (!ApplyRemedyCondition()) return;
@@ -91,7 +94,7 @@ public abstract class CustomAffliction
     {
         OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
-        if (InterfaceBuff.HasBuff()) displayHealed = false;
+        if (HasBuff()) displayHealed = false;
         if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
@@ -101,7 +104,7 @@ public abstract class CustomAffliction
     /// </summary>
     protected abstract void CureSymptoms();
 
-    public string GetAfflictionType() => InterfaceRisk.HasRisk() ? "Risk" : InterfaceBuff.HasBuff() ? "Buff" : "Bad";
+    public string GetAfflictionType() => HasRisk() ? "Risk" : HasBuff() ? "Buff" : "Bad";
 
     private static int GetResetValue(string item, int value)
     {
@@ -158,10 +161,10 @@ public abstract class CustomAffliction
     {
         if (GameManager.GetPlayerManagerComponent().m_God) return;
 
-        InterfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + InterfaceDuration.Duration;
+        if(HasDuration()) InterfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + InterfaceDuration.Duration;
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
 
-        if (InterfaceBuff.HasBuff())
+        if (HasBuff())
             InterfaceManager.GetPanel<Panel_HUD>().ShowBuffNotification(m_Name, "GAMEPLAY_BuffHeader", m_SpriteName);
         else
             PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));

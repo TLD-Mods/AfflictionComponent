@@ -2,9 +2,9 @@
 
 public interface IDuration
 {
-    internal float Duration { get; set; } // In Hours.
+    public float Duration { get; set; } // In Hours.
     
-    internal float EndTime { get; set; }
+    public float EndTime { get; set; }
 
     public sealed float GetTimeRemaining() => Duration * 60f;
 

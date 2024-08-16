@@ -2,7 +2,6 @@
 
 public interface IBuff
 {
-    internal bool Buff { get; }
+    public bool Buff { get; }
     
-    internal bool HasBuff() => Buff;
 }

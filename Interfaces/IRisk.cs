@@ -2,7 +2,6 @@
 
 public interface IRisk
 {
-    internal bool Risk { get; set; }
+    public bool Risk { get; set; }
 
-    internal bool HasRisk() => Risk;
 }

@@ -16,14 +16,14 @@ internal static class AfflictionButtonPatches
             var color = Color.white;
             
             if (isHovering)
-                if (customAffliction.InterfaceRisk.HasRisk())
+                if (customAffliction.HasRisk())
                     color = __instance.m_RiskColorHover;
                 else
-                    color = customAffliction.InterfaceBuff.HasBuff() ? __instance.m_BeneficialColorHover : __instance.m_NegativeColorHover;
-            else if (customAffliction.InterfaceRisk.HasRisk())
+                    color = customAffliction.HasBuff() ? __instance.m_BeneficialColorHover : __instance.m_NegativeColorHover;
+            else if (customAffliction.HasRisk())
                 color = __instance.m_RiskColor;
             else
-                color = customAffliction.InterfaceBuff.HasBuff() ? __instance.m_BeneficialColor : __instance.m_NegativeColor;
+                color = customAffliction.HasBuff() ? __instance.m_BeneficialColor : __instance.m_NegativeColor;
             
             __result = color;
         }
@@ -55,7 +55,7 @@ internal static class AfflictionButtonPatches
             var customAffliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(__instance.GetAfflictionIndex());
             
             var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(customAffliction);
-            if (riskPercentage != null && riskPercentage.HasRisk())
+            if (riskPercentage != null && riskPercentage.Risk)
             {
                 var num = riskPercentage.GetRiskValue() / 100f; // The 100f slows it down, otherwise right now it's way too quick.
                 Utils.SetActive(__instance.m_AnimatorAfflictionBar.gameObject, num > 0f);
@@ -63,8 +63,8 @@ internal static class AfflictionButtonPatches
                 __instance.m_SizeModifierAfflictionBar.localScale = new Vector3(num, 1f, 1f);
             }
 
-            var iBuff = AfflictionManager.TryGetInterface<IBuff>(customAffliction);
-            if (iBuff != null && iBuff.HasBuff())
+            
+            if (customAffliction.HasBuff())
             {
                 var iDuration = AfflictionManager.TryGetInterface<IDuration>(customAffliction);
                 if (iDuration != null)

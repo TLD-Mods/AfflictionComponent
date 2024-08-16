@@ -11,26 +11,26 @@ internal static class StatusBarPatches
         {
             if (__instance.m_StatusBarType != StatusBar.StatusBarType.Condition) return;
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            
+
             foreach (var customAffliction in customAfflictions)
             {
-                __result = customAffliction.InterfaceRisk.HasRisk() || !customAffliction.InterfaceBuff.HasBuff();
+                __result = customAffliction.HasRisk() || !customAffliction.HasBuff();
             }
         }
-    }
-    
-    // TODO: Need to add in checks for specific status bars such as hunger, thirst if this buff affects those.
-    [HarmonyPatch(nameof(StatusBar), nameof(StatusBar.IsBuffActive))]
-    private static class IsCustomAfflictionBuffActive
-    {
-        private static void Postfix(StatusBar __instance, ref bool __result)
+
+        // TODO: Need to add in checks for specific status bars such as hunger, thirst if this buff affects those.
+        [HarmonyPatch(nameof(StatusBar), nameof(StatusBar.IsBuffActive))]
+        private static class IsCustomAfflictionBuffActive
         {
-            if (__instance.m_StatusBarType != StatusBar.StatusBarType.Condition) return;
-            var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            
-            foreach (var customAffliction in customAfflictions)
+            private static void Postfix(StatusBar __instance, ref bool __result)
             {
-                __result = customAffliction.InterfaceBuff.HasBuff();
+                if (__instance.m_StatusBarType != StatusBar.StatusBarType.Condition) return;
+                var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
+
+                foreach (var customAffliction in customAfflictions)
+                {
+                    __result = customAffliction.HasBuff();
+                }
             }
         }
     }

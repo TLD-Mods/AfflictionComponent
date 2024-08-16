@@ -76,8 +76,10 @@ public class AfflictionManager : MonoBehaviour
             
             customAffliction.OnUpdate();
 
-            if (customAffliction.InterfaceDuration.Duration < 0f)
-                customAffliction.Cure();
+            if (customAffliction.HasDuration())
+            { 
+                if(customAffliction.InterfaceDuration.Duration < 0f) customAffliction.Cure();
+            }
         }
     }
 }
