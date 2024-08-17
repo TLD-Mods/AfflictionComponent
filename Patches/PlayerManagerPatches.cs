@@ -13,7 +13,7 @@ internal static class PlayerManagerPatches
             if (gi.m_StackableItem && GameManager.GetInventoryComponent().NumGearInInventory(gi.name) < gi.m_FirstAidItem.m_UnitsPerUse)
             {
                 GameAudioManager.PlayGUIError();
-                HUDMessage.AddMessage(Localization.Get("GAMEPLAY_PillsRequiredValue").Replace("{num-pills}", gi.m_FirstAidItem.m_UnitsPerUse.ToString()), false, false);
+                HUDMessage.AddMessage(Localization.Get("GAMEPLAY_PillsRequiredValue").Replace("{num-pills}", gi.m_FirstAidItem.m_UnitsPerUse.ToString()));
                 return false;
             }
             

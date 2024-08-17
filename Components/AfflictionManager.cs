@@ -44,7 +44,12 @@ public class AfflictionManager : MonoBehaviour
     };
 
     [HideFromIl2Cpp]
-    public List<CustomAffliction> GetCustomAfflictionListCurable() => m_Afflictions.Where(ca => ca.InterfaceRemedies.RemedyItems.Length > 0 && ca.NeedsRemedy()).ToList();
+    public List<CustomAffliction> GetCustomAfflictionListCurable()
+    {
+        return m_Afflictions
+            .Where(ca => ca != null && ca.InterfaceRemedies != null && ca.InterfaceRemedies.RemedyItems != null && ca.InterfaceRemedies.RemedyItems.Length > 0 && ca.NeedsRemedy())
+            .ToList();
+    }
     
     [HideFromIl2Cpp] // So mod authors can check if the player has at least one CustomAffliction of their own type.
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(typeName.IsInstanceOfType);

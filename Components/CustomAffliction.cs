@@ -2,7 +2,6 @@
 
 namespace AfflictionComponent.Components;
 
-// TODO: Split certain functionality off into Interfaces, which developers can then extend onto their custom afflictions.
 public abstract class CustomAffliction
 {
     public string m_CauseText;
@@ -34,12 +33,11 @@ public abstract class CustomAffliction
         var iDuration = AfflictionManager.TryGetInterface<IDuration>(this);
         if (iDuration != null) InterfaceDuration = iDuration;
         
-        // TODO: Need to add nullchecks everywhere the remedy items are used, as everything is kinda broken right now.
         var iRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (iRemedies != null)
         {
             InterfaceRemedies = iRemedies;
-            
+
             // This seems to be causing an object no reference error - will fix later.
             /*if (InterfaceRemedies.AltRemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Length == 0) // You can't have alternate remedy items if the main remedy items is blank.
             {
@@ -114,7 +112,19 @@ public abstract class CustomAffliction
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRemedy() => InterfaceRemedies.RemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Concat(InterfaceRemedies.AltRemedyItems).Any(item => item.Item3 > 0);
+    public bool NeedsRemedy()
+    {
+        if (InterfaceRemedies == null) return false;
+
+        var remedyItems = InterfaceRemedies.RemedyItems;
+        var altRemedyItems = InterfaceRemedies.AltRemedyItems;
+
+        if (remedyItems == null && altRemedyItems == null) return false;
+        if (remedyItems == null) remedyItems = [];
+        if (altRemedyItems == null) altRemedyItems = [];
+
+        return remedyItems.Length > 0 && remedyItems.Concat(altRemedyItems).Any(item => item is { Item3: > 0 });
+    }
 
     /// <summary>
     /// Called when the affliction is cured. Can be used to run custom code for this use case.

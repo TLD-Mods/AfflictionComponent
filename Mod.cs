@@ -40,7 +40,7 @@ internal sealed class Mod : MelonMod
             var testAffliction = new TestAffliction("GAMEPLAY_AfflictionTesting",
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingDescription",
-                "GAMEPLAY_AfflictionTestingDescriptionNoHeal",
+                "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
                 "ico_injury_majorBruising",
                 AfflictionBodyArea.Chest)
             {
@@ -50,7 +50,7 @@ internal sealed class Mod : MelonMod
 
             testAffliction.Start();
 
-            /*var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
+            var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingRiskDescription",
                 null,
@@ -74,7 +74,7 @@ internal sealed class Mod : MelonMod
                 Duration = 0.5f
             };
             
-            testAfflictionBuff.Start();*/
+            testAfflictionBuff.Start();
         }
     }
     
