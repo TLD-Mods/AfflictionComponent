@@ -3,5 +3,4 @@
 public interface IRisk
 {
     public bool Risk { get; set; }
-
 }

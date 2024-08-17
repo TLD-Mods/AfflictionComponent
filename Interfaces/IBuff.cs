@@ -3,5 +3,4 @@
 public interface IBuff
 {
     public bool Buff { get; }
-    
 }

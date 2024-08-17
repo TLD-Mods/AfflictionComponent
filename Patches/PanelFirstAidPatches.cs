@@ -291,31 +291,31 @@ internal static class PanelFirstAidPatches
 
                 __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
                 
-                if (affliction.m_RemedyItems.Length != 0)
+                if (affliction.InterfaceRemedies.RemedyItems.Length != 0)
                 {
                     // I don't know if the UI will support more than 2 items.
-                    remedySprites = new string[affliction.m_RemedyItems.Length];
-                    remedyNumRequired = new int[affliction.m_RemedyItems.Length];
-                    remedyComplete = new bool[affliction.m_RemedyItems.Length];
+                    remedySprites = new string[affliction.InterfaceRemedies.RemedyItems.Length];
+                    remedyNumRequired = new int[affliction.InterfaceRemedies.RemedyItems.Length];
+                    remedyComplete = new bool[affliction.InterfaceRemedies.RemedyItems.Length];
 
-                    for (int i = 0; i < affliction.m_RemedyItems.Length; i++)
+                    for (int i = 0; i < affliction.InterfaceRemedies.RemedyItems.Length; i++)
                     {
-                        Tuple<string, int, int> e = affliction.m_RemedyItems[i];
+                        Tuple<string, int, int> e = affliction.InterfaceRemedies.RemedyItems[i];
                         remedySprites[i] = e.Item1;
                         remedyNumRequired[i] = e.Item2;
                         remedyComplete[i] = e.Item3 < 1;
                     }
 
-                    if (affliction.m_AltRemedyItems.Length != 0)
+                    if (affliction.InterfaceRemedies.AltRemedyItems.Length != 0)
                     {
                         // I don't know if the UI will support more than 2 items.
-                        altRemedySprites = new string[affliction.m_AltRemedyItems.Length];
-                        altRemedyNumRequired = new int[affliction.m_AltRemedyItems.Length];
-                        altRemedyComplete = new bool[affliction.m_AltRemedyItems.Length];
+                        altRemedySprites = new string[affliction.InterfaceRemedies.AltRemedyItems.Length];
+                        altRemedyNumRequired = new int[affliction.InterfaceRemedies.AltRemedyItems.Length];
+                        altRemedyComplete = new bool[affliction.InterfaceRemedies.AltRemedyItems.Length];
 
-                        for (int i = 0; i < affliction.m_AltRemedyItems.Length; i++)
+                        for (int i = 0; i < affliction.InterfaceRemedies.AltRemedyItems.Length; i++)
                         {
-                            Tuple<string, int, int> e = affliction.m_AltRemedyItems[i];
+                            Tuple<string, int, int> e = affliction.InterfaceRemedies.AltRemedyItems[i];
                             altRemedySprites[i] = e.Item1;
                             altRemedyNumRequired[i] = e.Item2;
                             altRemedyComplete[i] = e.Item3 < 1;

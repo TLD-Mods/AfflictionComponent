@@ -3,26 +3,27 @@ using AfflictionComponent.Interfaces;
 
 namespace AfflictionComponent.TestAfflictions;
 
-internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDuration
+internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDuration, IRemedies
 {
     private float m_RiskValue;
     private float m_LastUpdateTime;
  
     public bool Buff { get; set; }
-    
     public float Duration { get; set; }
-    
     public float EndTime { get; set; }
-    
     public bool Risk { get; set; }
     
-    public TestAffliction(string afflictionName, string cause, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location, bool instantHeal, Tuple<string, int, int>[] remedyItems, Tuple<string, int, int>[] altRemedyItems) : base(afflictionName, cause, description, descriptionNoHeal, spriteName, location, instantHeal, remedyItems, altRemedyItems)
+    public TestAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location) : base(name, causeText, description, descriptionNoHeal, spriteName, location)
     {
         m_LastUpdateTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
     }
 
-    protected override void CureSymptoms() { }
+    public Tuple<string, int, int>[] AltRemedyItems { get; set; }
+    public bool InstantHeal { get; set; }
+    public Tuple<string, int, int>[] RemedyItems { get; set; }
     
+    protected override void CureSymptoms() { }
+
     public float GetRiskValue() => m_RiskValue;
 
     public override void OnUpdate()
