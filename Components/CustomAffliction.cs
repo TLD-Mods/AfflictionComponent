@@ -16,6 +16,7 @@ public abstract class CustomAffliction
     public readonly IDuration InterfaceDuration;
     public readonly IRemedies InterfaceRemedies;
     public readonly IRisk InterfaceRisk;
+    public readonly IInstance InterfaceInstance;
     
     protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location)
     {
@@ -57,6 +58,9 @@ public abstract class CustomAffliction
                 if (InterfaceRemedies != null) InterfaceRemedies.RemedyItems = InterfaceRemedies.AltRemedyItems = [];
             }
         }
+
+        var iInstance = AfflictionManager.TryGetInterface<IInstance>(this);
+        if(iInstance != null) { InterfaceInstance = iInstance; }
     }
     
     public void ApplyRemedy(FirstAidItem fai)
@@ -168,6 +172,20 @@ public abstract class CustomAffliction
     public void Start()
     {
         if (GameManager.GetPlayerManagerComponent().m_God) return;
+
+        //the below code is a bit hard to read but it gets the job done
+        if(InterfaceInstance is not null)
+        {
+            CustomAffliction? existingAff = null;
+            if (InterfaceInstance.type == Resources.InstanceType.Single) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name).ElementAt(0) : null;
+            else if (InterfaceInstance.type == Resources.InstanceType.SingleLocation) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name && aff.m_Location == m_Location) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name && aff.m_Location == m_Location).ElementAt(0) : null;
+            if (existingAff != null)
+            {
+                InterfaceInstance.OnFoundExistingInstance(existingAff);
+                return;
+            }
+        }
+
 
         if (HasDuration()) InterfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + InterfaceDuration.Duration;
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
