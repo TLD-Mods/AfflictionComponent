@@ -83,7 +83,7 @@ public class AfflictionManager : MonoBehaviour
 
             if (customAffliction.HasDuration())
             { 
-                if(customAffliction.InterfaceDuration.Duration < 0f) customAffliction.Cure();
+                if(customAffliction.InterfaceDuration.IsDurationUp()) customAffliction.Cure();
             }
         }
     }
