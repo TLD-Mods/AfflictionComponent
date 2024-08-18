@@ -117,7 +117,7 @@ internal static class PanelAfflictionPatches
         }
     }
     
-    [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateSelectedAffliction), [typeof(Affliction)])]
+    [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateSelectedAffliction), typeof(Affliction))]
     private static class UpdateSelectedAfflictionOverride
     {
         private static bool Prefix(Panel_Affliction __instance, Affliction affliction)
@@ -136,7 +136,7 @@ internal static class PanelAfflictionPatches
         }
     }
     
-    [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateSelectedAffliction), [typeof(int)])]
+    [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.UpdateSelectedAffliction), typeof(int))]
     private static class UpdateSelectedAfflictionOverrideInt
     {
         private static bool Prefix(Panel_Affliction __instance, int selectedAfflictionIndex)

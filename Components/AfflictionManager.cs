@@ -44,7 +44,12 @@ public class AfflictionManager : MonoBehaviour
     };
 
     [HideFromIl2Cpp]
-    public List<CustomAffliction> GetCustomAfflictionListCurable() => m_Afflictions.Where(ca => ca.m_RemedyItems.Length > 0 && ca.NeedsRemedy()).ToList();
+    public List<CustomAffliction> GetCustomAfflictionListCurable()
+    {
+        return m_Afflictions
+            .Where(ca => ca != null && ca.InterfaceRemedies != null && ca.InterfaceRemedies.RemedyItems != null && ca.InterfaceRemedies.RemedyItems.Length > 0 && ca.NeedsRemedy())
+            .ToList();
+    }
     
     [HideFromIl2Cpp] // So mod authors can check if the player has at least one CustomAffliction of their own type.
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(typeName.IsInstanceOfType);
@@ -55,30 +60,30 @@ public class AfflictionManager : MonoBehaviour
     internal static T? TryGetInterface<T>(object obj) where T : class
     {
         if (obj is T interfaceInstance) return interfaceInstance;
-        
         return null;
     }
     
     public void Update()
     {
         if (GameManager.m_IsPaused || GameManager.s_IsGameplaySuspended) return;
-        
-        float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
 
         for (int i = m_Afflictions.Count - 1; i >= 0; i--)
         {
-            CustomAffliction affliction = m_Afflictions[i];
+            var customAffliction = m_Afflictions[i];
 
             if (GameManager.GetPlayerManagerComponent().m_God) 
-                affliction.Cure();
+                customAffliction.Cure();
             
-            if (affliction is IRiskPercentage riskPercentage && riskPercentage.GetRiskValue() >= 100)
-                Remove(affliction);
-            
-            affliction.OnUpdate();
+            customAffliction.OnUpdate();
 
-            if (hoursPlayedNotPaused > affliction.m_EndTime)
-                affliction.Cure();
+            if (customAffliction.HasDuration())
+            {
+                if (customAffliction.InterfaceDuration.IsDurationUp())
+                {
+                    Mod.Logger.Log("Duration is up! Curing affliction", ComplexLogger.FlaggedLoggingLevel.Debug);
+                    customAffliction.Cure();
+                }
+            }
         }
     }
 }

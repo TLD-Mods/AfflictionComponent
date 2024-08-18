@@ -16,14 +16,14 @@ internal static class AfflictionButtonPatches
             var color = Color.white;
             
             if (isHovering)
-                if (customAffliction.HasAfflictionRisk())
+                if (customAffliction.HasRisk())
                     color = __instance.m_RiskColorHover;
                 else
-                    color = customAffliction.m_Buff ? __instance.m_BeneficialColorHover : __instance.m_NegativeColorHover;
-            else if (customAffliction.HasAfflictionRisk())
+                    color = customAffliction.HasBuff() ? __instance.m_BeneficialColorHover : __instance.m_NegativeColorHover;
+            else if (customAffliction.HasRisk())
                 color = __instance.m_RiskColor;
             else
-                color = customAffliction.m_Buff ? __instance.m_BeneficialColor : __instance.m_NegativeColor;
+                color = customAffliction.HasBuff() ? __instance.m_BeneficialColor : __instance.m_NegativeColor;
             
             __result = color;
         }
@@ -55,7 +55,7 @@ internal static class AfflictionButtonPatches
             var customAffliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(__instance.GetAfflictionIndex());
             
             var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(customAffliction);
-            if (riskPercentage != null)
+            if (riskPercentage != null && riskPercentage.Risk)
             {
                 var num = riskPercentage.GetRiskValue() / 100f; // The 100f slows it down, otherwise right now it's way too quick.
                 Utils.SetActive(__instance.m_AnimatorAfflictionBar.gameObject, num > 0f);
@@ -63,12 +63,17 @@ internal static class AfflictionButtonPatches
                 __instance.m_SizeModifierAfflictionBar.localScale = new Vector3(num, 1f, 1f);
             }
 
-            if (customAffliction is { m_Buff: true, m_NoTimer: false })
+            
+            if (customAffliction.HasBuff())
             {
-                var num2 = customAffliction.GetTimeRemaining(); // Right now nothing is happening with the bar, because we aren't actually updating the m_Duration or anything. We are only handling the UI in PanelFirstAidPatches.cs
-                Utils.SetActive(__instance.m_AnimatorBuffBar.gameObject, num2 > 0f);
-                __instance.m_FillSpriteBuffBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num2);
-                __instance.m_SizeModifierBuffBar.localScale = new Vector3(num2, 1f, 1f);
+                var iDuration = AfflictionManager.TryGetInterface<IDuration>(customAffliction);
+                if (iDuration != null)
+                {
+                    var num2 = customAffliction.InterfaceDuration.GetTimeRemaining() / 30f; // 30 seems to be the magic number! But it's still slightly off a tad.
+                    Utils.SetActive(__instance.m_AnimatorBuffBar.gameObject, num2 > 0f);
+                    __instance.m_FillSpriteBuffBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num2);
+                    __instance.m_SizeModifierBuffBar.localScale = new Vector3(num2, 1f, 1f);
+                }
             }
         }
     }

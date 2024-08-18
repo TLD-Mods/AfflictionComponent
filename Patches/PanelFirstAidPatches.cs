@@ -1,6 +1,5 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
-using AfflictionComponent.TestAfflictions;
 using Il2CppTLD.IntBackedUnit;
 using AfflictionComponent.Utilities;
 
@@ -16,7 +15,7 @@ internal static class PanelFirstAidPatches
             if (__result) return;
             
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            __result = customAfflictions.Any(affliction => !affliction.m_Buff && !affliction.HasAfflictionRisk());
+            __result = customAfflictions.Any(affliction => !affliction.HasBuff() && !affliction.HasRisk());
         }
     }
     
@@ -28,9 +27,9 @@ internal static class PanelFirstAidPatches
             if (__result) return;
             
             var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            if (!customAfflictions.Any(affliction => !affliction.m_Buff && !affliction.HasAfflictionRisk()))
+            if (!customAfflictions.Any(affliction => !affliction.HasBuff() && !affliction.HasRisk()))
             {
-                __result = customAfflictions.Any(affliction => affliction.HasAfflictionRisk());
+                __result = customAfflictions.Any(affliction => affliction.HasRisk());
             }
         }
     }
@@ -48,7 +47,7 @@ internal static class PanelFirstAidPatches
             var flag = false;
             for (var i = 0; i < afflictionManager.m_Afflictions.Count; i++)
             {
-                if (!afflictionManager.GetAfflictionByIndex(i).m_Buff)
+                if (!afflictionManager.GetAfflictionByIndex(i).HasBuff())
                 {
                     flag = true;
                 }
@@ -222,22 +221,6 @@ internal static class PanelFirstAidPatches
                 return;
             }
             
-            /* Vanilla crap I'm not sure if we even need here
-            if (Affliction.AfflictionTypeIsBuff(__instance.m_SelectedAffButton.m_AfflictionType))
-            {
-                if (!Panel_Affliction.HasAffliction(__instance.m_SelectedAffButton.m_AfflictionType))
-                {
-                    __instance.HideRightPage();
-                    return;
-                }
-            }
-            else if (!GameManager.GetConditionComponent().HasSpecificAffliction(__instance.m_SelectedAffButton.m_AfflictionType))
-                {
-                    __instance.HideRightPage();
-                    return;
-                }
-            */
-            
             NGUITools.SetActive(__instance.m_RightPageObject, state: true);
             for (int j = 0; j < __instance.m_BodyIconList.Length; j++)
             {
@@ -282,43 +265,41 @@ internal static class PanelFirstAidPatches
                 
                 __instance.m_LabelAfflictionName.text = affliction.m_Name;
 
-                float hoursPlayedNotPaused = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
-
                 string[] remedySprites;
                 int[] remedyNumRequired;
                 bool[] remedyComplete;
 
-                string[] altRemedySprites;
-                int[] altRemedyNumRequired;
-                bool[] altRemedyComplete;
+                string[]? altRemedySprites;
+                int[]? altRemedyNumRequired;
+                bool[]? altRemedyComplete;
 
                 __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
-                
-                if (affliction.m_RemedyItems.Length != 0)
+
+                if (affliction.InterfaceRemedies != null && affliction.InterfaceRemedies.RemedyItems != null && affliction.InterfaceRemedies.RemedyItems.Length != 0)
                 {
                     // I don't know if the UI will support more than 2 items.
-                    remedySprites = new string[affliction.m_RemedyItems.Length];
-                    remedyNumRequired = new int[affliction.m_RemedyItems.Length];
-                    remedyComplete = new bool[affliction.m_RemedyItems.Length];
+                    remedySprites = new string[affliction.InterfaceRemedies.RemedyItems.Length];
+                    remedyNumRequired = new int[affliction.InterfaceRemedies.RemedyItems.Length];
+                    remedyComplete = new bool[affliction.InterfaceRemedies.RemedyItems.Length];
 
-                    for (int i = 0; i < affliction.m_RemedyItems.Length; i++)
+                    for (int i = 0; i < affliction.InterfaceRemedies.RemedyItems.Length; i++)
                     {
-                        Tuple<string, int, int> e = affliction.m_RemedyItems[i];
+                        Tuple<string, int, int> e = affliction.InterfaceRemedies.RemedyItems[i];
                         remedySprites[i] = e.Item1;
                         remedyNumRequired[i] = e.Item2;
                         remedyComplete[i] = e.Item3 < 1;
                     }
 
-                    if (affliction.m_AltRemedyItems.Length != 0)
+                    if (affliction.InterfaceRemedies.AltRemedyItems != null && affliction.InterfaceRemedies.AltRemedyItems.Length != 0)
                     {
                         // I don't know if the UI will support more than 2 items.
-                        altRemedySprites = new string[affliction.m_AltRemedyItems.Length];
-                        altRemedyNumRequired = new int[affliction.m_AltRemedyItems.Length];
-                        altRemedyComplete = new bool[affliction.m_AltRemedyItems.Length];
+                        altRemedySprites = new string[affliction.InterfaceRemedies.AltRemedyItems.Length];
+                        altRemedyNumRequired = new int[affliction.InterfaceRemedies.AltRemedyItems.Length];
+                        altRemedyComplete = new bool[affliction.InterfaceRemedies.AltRemedyItems.Length];
 
-                        for (int i = 0; i < affliction.m_AltRemedyItems.Length; i++)
+                        for (int i = 0; i < affliction.InterfaceRemedies.AltRemedyItems.Length; i++)
                         {
-                            Tuple<string, int, int> e = affliction.m_AltRemedyItems[i];
+                            Tuple<string, int, int> e = affliction.InterfaceRemedies.AltRemedyItems[i];
                             altRemedySprites[i] = e.Item1;
                             altRemedyNumRequired[i] = e.Item2;
                             altRemedyComplete[i] = e.Item3 < 1;
@@ -331,6 +312,7 @@ internal static class PanelFirstAidPatches
                         altRemedyComplete = null;
                     }
                     
+                    __instance.m_LabelRiskDescription.text = string.Empty;
                     __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                     __instance.m_LabelAfflictionDescription.text = affliction.m_Description;
                     __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, 0f, 0f);
@@ -340,7 +322,7 @@ internal static class PanelFirstAidPatches
                     __instance.m_MultipleDosesObject.SetActive(false);
                     __instance.m_RightPageObject.SetActive(false);
                     
-                    if (!string.IsNullOrEmpty(affliction.m_DescriptionNoHeal) && !affliction.m_Buff)
+                    if (!string.IsNullOrEmpty(affliction.m_DescriptionNoHeal) && !affliction.HasBuff())
                     {
                         __instance.m_LabelAfflictionDescriptionNoRest.text = string.Empty;
                         __instance.m_LabelAfflictionDescription.text = string.Empty;
@@ -350,9 +332,14 @@ internal static class PanelFirstAidPatches
                         __instance.m_LabelSpecialTreatmentDescription.text = affliction.m_Description;
                         __instance.m_SpecialTreatmentWindow.SetActive(true);
                     }
-
-                    if (affliction.m_Buff)
+                    else
                     {
+                        __instance.m_LabelRiskDescription.text = affliction.m_Description;
+                    }
+                    
+                    if (affliction.HasBuff())
+                    {
+                        __instance.m_LabelRiskDescription.text = string.Empty;
                         __instance.m_LabelBuffDescription.text = affliction.m_Description;
                         __instance.m_BuffWindow.SetActive(true);
                     }
@@ -361,9 +348,9 @@ internal static class PanelFirstAidPatches
                 var uiLabel = __instance.m_LabelAfflictionName;
                 
                 var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(affliction);
-                if (riskPercentage != null && affliction.HasAfflictionRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
+                if (riskPercentage != null && affliction.InterfaceRisk.Risk) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
                 {
-                    uiLabel.text = string.Concat([uiLabel.text, " (", riskPercentage.GetRiskPercentage(), "%)"]);
+                    uiLabel.text = string.Concat(uiLabel.text, " (", riskPercentage.GetRiskPercentage(), "%)");
                 }
                 
                 // Now supports displaying multiple instances of the same custom affliction if the user has one.
@@ -371,12 +358,12 @@ internal static class PanelFirstAidPatches
                 var (hasMultiple, count, index) = AfflictionManager.GetAfflictionManagerInstance().CheckMultipleAfflictionsByKey(affliction.m_Name, affliction);
                 if (hasMultiple)
                 {
-                    uiLabel.text = string.Concat([uiLabel.text, " (", index, "/", count, ")"]);
+                    uiLabel.text = string.Concat(uiLabel.text, " (", index, "/", count, ")");
                 }
                 
                 num = (int)affliction.m_Location;
-                num4 = affliction.m_NoTimer ? 0 : Mathf.CeilToInt((affliction.m_EndTime - hoursPlayedNotPaused) * 60f); // Duration calculation, requires some conditionals.
-
+                num4 = affliction.HasDuration() ? Mathf.CeilToInt(affliction.InterfaceDuration.GetTimeRemaining()) : 0;
+                
                 break;
             }
             
@@ -412,7 +399,7 @@ internal static class PanelFirstAidPatches
         private static void Postfix(Panel_FirstAid __instance, AfflictionButton afflictionButton, bool isButtonSelected, int bodyIconIndex)
         {
             if (afflictionButton.m_AfflictionType != AfflictionType.Generic) return;
-            __instance.m_BodyIconList[bodyIconIndex].spriteName = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(afflictionButton.m_Index).m_Buff ? __instance.m_BodyIconSpriteNameBuff : __instance.m_BodyIconSpriteNameAffliction;
+            __instance.m_BodyIconList[bodyIconIndex].spriteName = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(afflictionButton.m_Index).HasBuff() ? __instance.m_BodyIconSpriteNameBuff : __instance.m_BodyIconSpriteNameAffliction;
         }
     }
 }

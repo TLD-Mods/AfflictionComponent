@@ -37,26 +37,44 @@ internal sealed class Mod : MelonMod
     {
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-            _ = new TestAffliction("GAMEPLAY_AfflictionTesting", 
-                "GAMEPLAY_AfflictionTestingCause", 
+            var testAffliction = new TestAffliction("GAMEPLAY_AfflictionTesting",
+                "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingDescription",
-                "GAMEPLAY_AfflictionTestingDescriptionNoHeal", 
-                AfflictionBodyArea.Chest, "ico_injury_majorBruising", false, false, 1, true, true, 
-                [Tuple.Create("GEAR_HeavyBandage", 1, 1)], []);
-            
-            _ = new TestAffliction("GAMEPLAY_AfflictionTestingRisk", 
+                "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
+                "ico_injury_majorBruising",
+                AfflictionBodyArea.Chest)
+            {
+                RemedyItems = [Tuple.Create("GEAR_HeavyBandage", 1, 1)],
+                InstantHeal = true
+            };
+
+            testAffliction.Start();
+
+            var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingRiskDescription",
-                "GAMEPLAY_AfflictionTestingRiskDescriptionNoHeal",
-                AfflictionBodyArea.Chest, "ico_injury_majorBruising", true, false, 2, false, true,
-                [], []);
+                null,
+                "ico_injury_majorBruising",
+                AfflictionBodyArea.Chest)
+            {
+                Risk = true,
+                InstantHeal = true
+            };
             
-            _ = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
+            testAfflictionRisk.Start();
+                
+            var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingBuffDescription",
-                "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
-                AfflictionBodyArea.Stomach, "ico_injury_majorBruising", false, true, 0.50f, false, false,
-                [], []);
+                "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal", 
+                "ico_injury_majorBruising", 
+                AfflictionBodyArea.Stomach)
+            {
+                Buff = true,
+                Duration = 0.5f
+            };
+            
+            testAfflictionBuff.Start();
         }
     }
     
