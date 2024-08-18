@@ -103,8 +103,8 @@ public abstract class CustomAffliction
     public string GetSpriteName() => m_SpriteName;
     
     public bool HasBuff() => InterfaceBuff is not null ? InterfaceBuff.Buff : false;
-    
-    public bool HasDuration() => InterfaceDuration is not null;
+
+    public bool HasDuration() => InterfaceDuration is not null ? InterfaceDuration.Duration > 0 : false;
     
     public bool HasRisk() => InterfaceRisk is not null ? InterfaceRisk.Risk : false;
     

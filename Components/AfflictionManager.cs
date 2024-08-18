@@ -74,16 +74,15 @@ public class AfflictionManager : MonoBehaviour
             if (GameManager.GetPlayerManagerComponent().m_God) 
                 customAffliction.Cure();
             
-            // This throws an out of index range error if you are in the FirstAid panel when it removes our custom affliction.
-            // UPDATE: the Cure() method should solve this issue, HAVEN'T tested it yet!
-            if (customAffliction is IRiskPercentage riskPercentage && riskPercentage.GetRiskValue() >= 100f)
-                customAffliction.Cure();
-            
             customAffliction.OnUpdate();
 
             if (customAffliction.HasDuration())
-            { 
-                if(customAffliction.InterfaceDuration.IsDurationUp()) customAffliction.Cure();
+            {
+                if (customAffliction.InterfaceDuration.IsDurationUp())
+                {
+                    Mod.Logger.Log("Duration is up! Curing affliction", ComplexLogger.FlaggedLoggingLevel.Debug);
+                    customAffliction.Cure();
+                }
             }
         }
     }

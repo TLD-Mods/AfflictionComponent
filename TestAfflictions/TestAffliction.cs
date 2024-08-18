@@ -29,7 +29,13 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
     public override void OnUpdate()
     {
         if (Risk)
+        {
             UpdateRiskValue();
+
+            if (GetRiskValue() >= 100) Cure(false);
+            else if (GetRiskValue() < 0f) Cure();
+        }
+            
         if (Buff)
             InterfaceDuration.UpdateBuffDuration();
     }
