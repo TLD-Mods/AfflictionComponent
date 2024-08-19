@@ -9,7 +9,7 @@ public abstract class CustomAffliction
     public string? m_DescriptionNoHeal;
     public AfflictionBodyArea m_Location;
     public string m_Name;
-    private string m_SpriteName;
+    private string? m_SpriteName;
 
     // Interface fields
     public readonly IBuff InterfaceBuff;
@@ -18,7 +18,7 @@ public abstract class CustomAffliction
     public readonly IRisk InterfaceRisk;
     public readonly IInstance InterfaceInstance;
     
-    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location)
+    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string? spriteName, AfflictionBodyArea location)
     {
         m_CauseText = Localization.Get(causeText); 
         m_Description = Localization.Get(description);
@@ -73,7 +73,7 @@ public abstract class CustomAffliction
         if (!NeedsRemedy() && InterfaceRemedies.InstantHeal) // If you've taken all the remedy items, and it's set to cure after taking them, cure the affliction.
             Cure();
         else
-            CureSymptoms(); // Otherwise, just cure the symptoms (this can be empty and do nothing)
+            if (InterfaceRemedies != null) InterfaceRemedies.CureSymptoms(); // Otherwise, just cure the symptoms (this can be empty and do nothing)
     }
 
     /// <summary>
@@ -84,17 +84,12 @@ public abstract class CustomAffliction
     
     public void Cure(bool displayHealed = true)
     {
-        OnCure();
+        if (InterfaceRemedies != null) InterfaceRemedies.OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         if (HasBuff()) displayHealed = false;
         if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
-
-    /// <summary>
-    /// Called when InstantHeal is false and all remedy items have been taken. Can be used to run any custom code for that use case.
-    /// </summary>
-    protected abstract void CureSymptoms();
 
     public string GetAfflictionType() => HasRisk() ? "Risk" : HasBuff() ? "Buff" : "Bad";
 
@@ -129,11 +124,6 @@ public abstract class CustomAffliction
 
         return remedyItems.Length > 0 && remedyItems.Concat(altRemedyItems).Any(item => item is { Item3: > 0 });
     }
-
-    /// <summary>
-    /// Called when the affliction is cured. Can be used to run custom code for this use case.
-    /// </summary>
-    protected abstract void OnCure();
 
     /// <summary>
     /// Called when the affliction is updated. Can be used to run custom code for this use case.

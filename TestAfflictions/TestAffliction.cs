@@ -13,7 +13,7 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
     public float EndTime { get; set; }
     public bool Risk { get; set; }
     
-    public TestAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location) : base(name, causeText, description, descriptionNoHeal, spriteName, location)
+    public TestAffliction(string name, string causeText, string description, string? descriptionNoHeal, string? spriteName, AfflictionBodyArea location) : base(name, causeText, description, descriptionNoHeal, spriteName, location)
     {
         m_LastUpdateTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
     }
@@ -22,7 +22,15 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
     public bool InstantHeal { get; set; }
     public Tuple<string, int, int>[] RemedyItems { get; set; }
     
-    protected override void CureSymptoms() { }
+    public void CureSymptoms()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnCure()
+    {
+        throw new NotImplementedException();
+    }
 
     public float GetRiskValue() => m_RiskValue;
 
@@ -39,8 +47,6 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
         if (Buff)
             InterfaceDuration.UpdateBuffDuration();
     }
-
-    protected override void OnCure() { }
 
     public void UpdateRiskValue()
     {

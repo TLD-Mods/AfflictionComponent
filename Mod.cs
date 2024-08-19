@@ -66,8 +66,8 @@ internal sealed class Mod : MelonMod
             var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingBuffDescription",
-                "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal", 
-                "ico_injury_majorBruising", 
+                null, 
+                null, 
                 AfflictionBodyArea.Stomach)
             {
                 Buff = true,
