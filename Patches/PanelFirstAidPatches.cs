@@ -275,31 +275,33 @@ internal static class PanelFirstAidPatches
 
                 __instance.m_LabelAfflictionName.color = AfflictionManager.GetAfflictionColour(affliction.GetAfflictionType());
 
-                if (affliction.InterfaceRemedies != null && affliction.InterfaceRemedies.RemedyItems != null && affliction.InterfaceRemedies.RemedyItems.Length != 0)
-                {
-                    // I don't know if the UI will support more than 2 items.
-                    remedySprites = new string[affliction.InterfaceRemedies.RemedyItems.Length];
-                    remedyNumRequired = new int[affliction.InterfaceRemedies.RemedyItems.Length];
-                    remedyComplete = new bool[affliction.InterfaceRemedies.RemedyItems.Length];
+                    var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(affliction);
 
-                    for (int i = 0; i < affliction.InterfaceRemedies.RemedyItems.Length; i++)
+                    if (affliction.HasRemedies())
                     {
-                        Tuple<string, int, int> e = affliction.InterfaceRemedies.RemedyItems[i];
+                    // I don't know if the UI will support more than 2 items.
+                    remedySprites = new string[InterfaceRemedies.RemedyItems.Length];
+                    remedyNumRequired = new int[InterfaceRemedies.RemedyItems.Length];
+                    remedyComplete = new bool[InterfaceRemedies.RemedyItems.Length];
+
+                    for (int i = 0; i < InterfaceRemedies.RemedyItems.Length; i++)
+                    {
+                        Tuple<string, int, int> e = InterfaceRemedies.RemedyItems[i];
                         remedySprites[i] = e.Item1;
                         remedyNumRequired[i] = e.Item2;
                         remedyComplete[i] = e.Item3 < 1;
                     }
 
-                    if (affliction.InterfaceRemedies.AltRemedyItems != null && affliction.InterfaceRemedies.AltRemedyItems.Length != 0)
+                    if (affliction.HasRemedies(true))
                     {
                         // I don't know if the UI will support more than 2 items.
-                        altRemedySprites = new string[affliction.InterfaceRemedies.AltRemedyItems.Length];
-                        altRemedyNumRequired = new int[affliction.InterfaceRemedies.AltRemedyItems.Length];
-                        altRemedyComplete = new bool[affliction.InterfaceRemedies.AltRemedyItems.Length];
+                        altRemedySprites = new string[InterfaceRemedies.AltRemedyItems.Length];
+                        altRemedyNumRequired = new int[InterfaceRemedies.AltRemedyItems.Length];
+                        altRemedyComplete = new bool[InterfaceRemedies.AltRemedyItems.Length];
 
-                        for (int i = 0; i < affliction.InterfaceRemedies.AltRemedyItems.Length; i++)
+                        for (int i = 0; i < InterfaceRemedies.AltRemedyItems.Length; i++)
                         {
-                            Tuple<string, int, int> e = affliction.InterfaceRemedies.AltRemedyItems[i];
+                            Tuple<string, int, int> e = InterfaceRemedies.AltRemedyItems[i];
                             altRemedySprites[i] = e.Item1;
                             altRemedyNumRequired[i] = e.Item2;
                             altRemedyComplete[i] = e.Item3 < 1;
@@ -348,7 +350,7 @@ internal static class PanelFirstAidPatches
                 var uiLabel = __instance.m_LabelAfflictionName;
                 
                 var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(affliction);
-                if (riskPercentage != null && affliction.InterfaceRisk.Risk) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
+                if (affliction.HasRisk()) // Need to add another check in here to actually determine if the risk affliction has a timer or not.
                 {
                     uiLabel.text = string.Concat(uiLabel.text, " (", riskPercentage.GetRiskPercentage(), "%)");
                 }
@@ -360,9 +362,11 @@ internal static class PanelFirstAidPatches
                 {
                     uiLabel.text = string.Concat(uiLabel.text, " (", index, "/", count, ")");
                 }
-                
+
+                var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(affliction);
+
                 num = (int)affliction.m_Location;
-                num4 = affliction.HasDuration() ? Mathf.CeilToInt(affliction.InterfaceDuration.GetTimeRemaining()) : 0;
+                num4 = affliction.HasDuration() ? Mathf.CeilToInt(InterfaceDuration.GetTimeRemaining()) : 0;
                 
                 break;
             }

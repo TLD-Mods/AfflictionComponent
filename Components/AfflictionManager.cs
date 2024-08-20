@@ -46,8 +46,9 @@ public class AfflictionManager : MonoBehaviour
     [HideFromIl2Cpp]
     public List<CustomAffliction> GetCustomAfflictionListCurable()
     {
+
         return m_Afflictions
-            .Where(ca => ca != null && ca.InterfaceRemedies != null && ca.InterfaceRemedies.RemedyItems != null && ca.InterfaceRemedies.RemedyItems.Length > 0 && ca.NeedsRemedy())
+            .Where(ca => ca != null && ca.HasRemedies() && ca.NeedsRemedy())
             .ToList();
     }
     
@@ -63,6 +64,10 @@ public class AfflictionManager : MonoBehaviour
         return null;
     }
     
+    public void Start()
+    {
+        LoadAndSaveData();
+    }
     public void Update()
     {
         if (GameManager.m_IsPaused || GameManager.s_IsGameplaySuspended) return;
@@ -78,12 +83,29 @@ public class AfflictionManager : MonoBehaviour
 
             if (customAffliction.HasDuration())
             {
-                if (customAffliction.InterfaceDuration.IsDurationUp())
+                var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(customAffliction);
+                if (InterfaceDuration != null && InterfaceDuration.IsDurationUp())
                 {
                     Mod.Logger.Log("Duration is up! Curing affliction", ComplexLogger.FlaggedLoggingLevel.Debug);
                     customAffliction.Cure();
                 }
             }
+        }
+    }
+
+    private void LoadAndSaveData()
+    {
+        Mod.Logger.Log("Loading data", ComplexLogger.FlaggedLoggingLevel.Debug);
+        AfflictionManagerSaveDataProxy? sdp = Mod.sdm?.Load();
+
+        if(sdp != null)
+        {
+            Mod.Logger.Log($"Found loaded data list of count {sdp.AfflictionList.Count()}", ComplexLogger.FlaggedLoggingLevel.Debug);
+            m_Afflictions = sdp.AfflictionList;
+        }
+        else
+        {
+            Mod.Logger.Log("Loaded data is null, creating new", ComplexLogger.FlaggedLoggingLevel.Debug);
         }
     }
 }

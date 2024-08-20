@@ -1,10 +1,12 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
+using Newtonsoft.Json;
 
 namespace AfflictionComponent.TestAfflictions;
 
 internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDuration, IRemedies
 {
+    [JsonProperty]
     private float m_RiskValue;
     private float m_LastUpdateTime;
  
@@ -41,11 +43,17 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
             UpdateRiskValue();
 
             if (GetRiskValue() >= 100) Cure(false);
-            else if (GetRiskValue() < 0f) Cure();
+            else if (GetRiskValue() < 0f)
+            {
+                Mod.Logger.Log("Risk value is less than 0. Curing", ComplexLogger.FlaggedLoggingLevel.Debug);
+                Cure();
+            }
         }
             
-        if (Buff)
-            InterfaceDuration.UpdateBuffDuration();
+        
+        if (Buff) //can't call the sealed method anymore so.. this'll have to do. Idk of a better solution here
+            Duration = EndTime - GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
+        
     }
 
     public void UpdateRiskValue()
@@ -54,7 +62,8 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
         var elapsedTime = currentTime - m_LastUpdateTime;
             
         var riskIncrease = elapsedTime * 60f;
-            
+        Mod.Logger.Log($"Risk increase value is {riskIncrease}", ComplexLogger.FlaggedLoggingLevel.Debug);
+
         m_RiskValue = Mathf.Min(m_RiskValue + riskIncrease, 100f);
         m_LastUpdateTime = currentTime;
             

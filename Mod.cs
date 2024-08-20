@@ -1,5 +1,6 @@
 using AfflictionComponent.Components;
 using AfflictionComponent.TestAfflictions;
+using AfflictionComponent.Utilities;
 using ComplexLogger;
 
 namespace AfflictionComponent;
@@ -8,6 +9,7 @@ internal sealed class Mod : MelonMod
 {
     internal static AfflictionManager afflictionManager;
     internal static ComplexLogger<Mod> Logger = new();
+    internal static SaveDataManager sdm = new();
 
     public override void OnInitializeMelon() => RegisterLocalizationKeys("AfflictionComponent.Resources.Localization.json");
 

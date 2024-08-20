@@ -1,4 +1,5 @@
 ﻿using AfflictionComponent.Interfaces;
+using Newtonsoft.Json;
 
 namespace AfflictionComponent.Components;
 
@@ -9,16 +10,19 @@ public abstract class CustomAffliction
     public string? m_DescriptionNoHeal;
     public AfflictionBodyArea m_Location;
     public string m_Name;
-    private string? m_SpriteName;
+    [JsonProperty]
+    private string m_SpriteName;
 
     // Interface fields
-    public readonly IBuff InterfaceBuff;
-    public readonly IDuration InterfaceDuration;
-    public readonly IRemedies InterfaceRemedies;
-    public readonly IRisk InterfaceRisk;
-    public readonly IInstance InterfaceInstance;
-    
-    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string? spriteName, AfflictionBodyArea location)
+    /**
+    public readonly IBuff InterfaceBuff = new IBuffImpl();
+    public readonly IDuration InterfaceDuration = new IDurationImpl();
+    public readonly IRemedies InterfaceRemedies = new IRemediesImpl();
+    public readonly IRisk InterfaceRisk = new IRiskImpl();  
+    public readonly IInstance InterfaceInstance = new IInstanceImpl();
+    **/
+
+    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location)
     {
         m_CauseText = Localization.Get(causeText); 
         m_Description = Localization.Get(description);
@@ -29,16 +33,10 @@ public abstract class CustomAffliction
         
         // Check for implemented interfaces here, and then change certain conditionals.
         var iRisk = AfflictionManager.TryGetInterface<IRisk>(this);
-        if (iRisk != null) InterfaceRisk = iRisk;
-           
-        var iDuration = AfflictionManager.TryGetInterface<IDuration>(this);
-        if (iDuration != null) InterfaceDuration = iDuration;
-        
+            
         var iRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (iRemedies != null)
         {
-            InterfaceRemedies = iRemedies;
-
             // This seems to be causing an object no reference error - will fix later.
             /*if (InterfaceRemedies.AltRemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Length == 0) // You can't have alternate remedy items if the main remedy items is blank.
             {
@@ -49,23 +47,21 @@ public abstract class CustomAffliction
         
         var iBuff = AfflictionManager.TryGetInterface<IBuff>(this);
         if (iBuff != null)
-        {
-            InterfaceBuff = iBuff;
-            
-            if (InterfaceBuff.Buff) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
+        {            
+            if (iBuff.Buff) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
             {
-                if (InterfaceRisk != null) InterfaceRisk.Risk = false;
-                if (InterfaceRemedies != null) InterfaceRemedies.RemedyItems = InterfaceRemedies.AltRemedyItems = [];
+                if (iRisk != null) iRisk.Risk = false;
+                if (iRemedies != null) iRemedies.RemedyItems = iRemedies.AltRemedyItems = [];
             }
         }
-
-        var iInstance = AfflictionManager.TryGetInterface<IInstance>(this);
-        if(iInstance != null) { InterfaceInstance = iInstance; }
     }
     
     public void ApplyRemedy(FirstAidItem fai)
     {
         if (!ApplyRemedyCondition()) return;
+
+        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if (InterfaceRemedies is null) return;
 
         UpdateRemedyItems(InterfaceRemedies, fai.name);
         UpdateAltRemedyItems(InterfaceRemedies, fai.name);
@@ -100,19 +96,39 @@ public abstract class CustomAffliction
     }
     
     public string GetSpriteName() => m_SpriteName;
-    
-    public bool HasBuff() => InterfaceBuff is not null ? InterfaceBuff.Buff : false;
 
-    public bool HasDuration() => InterfaceDuration is not null ? InterfaceDuration.Duration > 0 : false;
-    
-    public bool HasRisk() => InterfaceRisk is not null ? InterfaceRisk.Risk : false;
-    
+    public bool HasBuff()
+    {
+        var InterfaceBuff = AfflictionManager.TryGetInterface<IBuff>(this);
+        return InterfaceBuff is not null ? InterfaceBuff.Buff : false;
+    }
+    public bool HasDuration()
+    {
+        var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
+        return InterfaceDuration is not null ? InterfaceDuration.Duration > 0 : false;
+    }
+
+    public bool HasRisk()
+    {
+        var InterfaceRisk = AfflictionManager.TryGetInterface<IRisk>(this);
+        return InterfaceRisk is not null ? InterfaceRisk.Risk : false;
+    }
+
+    public bool HasRemedies(bool alt = false)
+    {
+        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if(InterfaceRemedies == null) return false;
+
+        return alt ? InterfaceRemedies.AltRemedyItems != null && InterfaceRemedies.AltRemedyItems.Length > 0 : InterfaceRemedies.RemedyItems != null && InterfaceRemedies.RemedyItems.Length > 0;
+    }
+
     /// <summary>
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
     /// </summary>
     /// <returns></returns>
     public bool NeedsRemedy()
     {
+        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (InterfaceRemedies == null) return false;
 
         var remedyItems = InterfaceRemedies.RemedyItems;
@@ -129,24 +145,33 @@ public abstract class CustomAffliction
     /// Called when the affliction is updated. Can be used to run custom code for this use case.
     /// </summary>
     public abstract void OnUpdate();
-    
+
     /// <summary>
     /// Checks to see if current affliction has a given item as an item to cure the affliction with.
     /// </summary>
     /// <param name="fai"></param>
     /// <returns></returns>
-    public bool RequiresRemedyItem(FirstAidItem fai) => InterfaceRemedies.RemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Concat(InterfaceRemedies.AltRemedyItems).Any(item => item.Item1 == fai.m_GearItem.name);  
-   
+    public bool RequiresRemedyItem(FirstAidItem fai)
+    {
+        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if (InterfaceRemedies == null) return false;
+        return InterfaceRemedies.RemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Concat(InterfaceRemedies.AltRemedyItems).Any(item => item.Item1 == fai.m_GearItem.name);
+    }
     /// <summary>
     /// Resets the entire affliction back to its default, including remedy items and the duration.
     /// </summary>
     public void ResetAffliction(bool resetRemedies = true)
     {
-        if (resetRemedies)
+        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
+
+        if (resetRemedies && InterfaceRemedies != null)
         {
             if (InterfaceRemedies.RemedyItems.Length > 0) ResetRemedyItems(InterfaceRemedies);
             if (InterfaceRemedies.AltRemedyItems.Length > 0) ResetAltRemedyItems(InterfaceRemedies);
         }
+
+        if (InterfaceDuration == null) return;
 
         InterfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + InterfaceDuration.Duration;
     }
@@ -163,8 +188,11 @@ public abstract class CustomAffliction
     {
         if (GameManager.GetPlayerManagerComponent().m_God) return;
 
+        var InterfaceInstance = AfflictionManager.TryGetInterface<IInstance>(this);
+        var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
+
         //the below code is a bit hard to read but it gets the job done
-        if(InterfaceInstance is not null)
+        if (InterfaceInstance is not null)
         {
             CustomAffliction? existingAff = null;
             if (InterfaceInstance.type == Resources.InstanceType.Single) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name).ElementAt(0) : null;
@@ -176,7 +204,7 @@ public abstract class CustomAffliction
             }
         }
 
-
+        //calling HasDuration here is a bit redundant butttt it's not a big deal
         if (HasDuration()) InterfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + InterfaceDuration.Duration;
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
 
@@ -185,7 +213,7 @@ public abstract class CustomAffliction
         else
             PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Affliction", m_SpriteName, AfflictionManager.GetAfflictionColour(GetAfflictionType()));
     }
-    
+
     private static void UpdateAltRemedyItems(IRemedies iRemedies, string itemName) => iRemedies.AltRemedyItems = iRemedies.AltRemedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
     
     private static void UpdateRemedyItems(IRemedies iRemedies, string itemName) => iRemedies.RemedyItems = iRemedies.RemedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
