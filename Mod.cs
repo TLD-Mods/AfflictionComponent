@@ -1,5 +1,6 @@
 using AfflictionComponent.Components;
 using AfflictionComponent.TestAfflictions;
+using AfflictionComponent.Utilities;
 using ComplexLogger;
 
 namespace AfflictionComponent;
@@ -9,6 +10,8 @@ internal sealed class Mod : MelonMod
     internal static AfflictionManager afflictionManager;
     internal static ComplexLogger<Mod> Logger = new();
 
+    internal static UIAtlas customAtlas;
+    
     public override void OnInitializeMelon() => RegisterLocalizationKeys("AfflictionComponent.Resources.Localization.json");
 
     public override void OnSceneWasInitialized(int buildIndex, string sceneName)
@@ -29,6 +32,38 @@ internal sealed class Mod : MelonMod
                 UnityEngine.Object.Instantiate(AfflictionManager, GameManager.GetVpFPSPlayer().transform);
                 UnityEngine.Object.DontDestroyOnLoad(AfflictionManager);
                 afflictionManager = AfflictionManager.AddComponent<AfflictionManager>();
+                
+                GameObject CustomAtlas = new() { name = "CustomAtlas", layer = vp_Layer.Default };
+                UnityEngine.Object.Instantiate(CustomAtlas, GameManager.GetVpFPSPlayer().transform);
+                UnityEngine.Object.DontDestroyOnLoad(CustomAtlas);
+                customAtlas = CustomAtlas.AddComponent<UIAtlas>();
+                
+                var customTexture = ImageUtilities.GetImage("AfflictionComponent", "Lambda", "png");
+                if (customTexture != null)
+                {
+                    // Create a new UISpriteData for our custom sprite
+                    var spriteData = new UISpriteData
+                    {
+                        name = "CustomSprite",
+                        x = 0,
+                        y = 0,
+                        width = customTexture.width,
+                        height = customTexture.height
+                    };
+
+                    // Add the sprite data to the atlas
+                    customAtlas.spriteList.Add(spriteData);
+                    customAtlas.material = new Material(Shader.Find("Unlit/Transparent Colored"))
+                    {
+                        mainTexture = customTexture
+                    };
+
+                    Debug.Log("Custom UISprite added to HUD");
+                }
+                else
+                {
+                    Debug.LogError("Failed to load custom texture");
+                }
             }
         }
     }
@@ -41,8 +76,9 @@ internal sealed class Mod : MelonMod
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingDescription",
                 "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
-                "ico_injury_majorBruising",
-                AfflictionBodyArea.Chest)
+                "CustomSprite",
+                AfflictionBodyArea.Chest,
+                true)
             {
                 RemedyItems = [Tuple.Create("GEAR_HeavyBandage", 1, 1)],
                 InstantHeal = true
@@ -63,12 +99,13 @@ internal sealed class Mod : MelonMod
             
             testAfflictionRisk.Start();
                 
-            var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
+            var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff",
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingBuffDescription",
-                null, 
-                null, 
-                AfflictionBodyArea.Stomach)
+                null,
+                "CustomSprite",
+                AfflictionBodyArea.Stomach,
+                true)
             {
                 Buff = true,
                 Duration = 0.5f

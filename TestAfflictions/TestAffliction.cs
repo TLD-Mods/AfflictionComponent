@@ -13,7 +13,7 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
     public float EndTime { get; set; }
     public bool Risk { get; set; }
     
-    public TestAffliction(string name, string causeText, string description, string? descriptionNoHeal, string? spriteName, AfflictionBodyArea location) : base(name, causeText, description, descriptionNoHeal, spriteName, location)
+    public TestAffliction(string name, string causeText, string description, string? descriptionNoHeal, string? spriteName, AfflictionBodyArea location, bool customSprite = false) : base(name, causeText, description, descriptionNoHeal, spriteName, location, customSprite)
     {
         m_LastUpdateTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
     }

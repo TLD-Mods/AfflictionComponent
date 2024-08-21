@@ -229,7 +229,7 @@ internal static class PanelFirstAidPatches
             }
             int num = -1;
 
-            if(__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) __instance.m_LabelAfflictionName.text = Affliction.LocalizedNameFromAfflictionType(__instance.m_SelectedAffButton.m_AfflictionType, __instance.m_SelectedAffButton.GetAfflictionIndex());
+            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) __instance.m_LabelAfflictionName.text = Affliction.LocalizedNameFromAfflictionType(__instance.m_SelectedAffButton.m_AfflictionType, __instance.m_SelectedAffButton.GetAfflictionIndex());
 
             // Colour stuff.
             __instance.m_LabelAfflictionName.color = Affliction.IsBeneficial(__instance.m_SelectedAffButton.m_AfflictionType) ? InterfaceManager.m_FirstAidBuffColor : InterfaceManager.m_FirstAidRedColor;

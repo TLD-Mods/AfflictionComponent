@@ -10,6 +10,7 @@ public abstract class CustomAffliction
     public AfflictionBodyArea m_Location;
     public string m_Name;
     private string? m_SpriteName;
+    public bool m_CustomSprite;
 
     // Interface fields
     public readonly IBuff InterfaceBuff;
@@ -18,7 +19,7 @@ public abstract class CustomAffliction
     public readonly IRisk InterfaceRisk;
     public readonly IInstance InterfaceInstance;
     
-    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string? spriteName, AfflictionBodyArea location)
+    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string? spriteName, AfflictionBodyArea location, bool customSprite = false)
     {
         m_CauseText = Localization.Get(causeText); 
         m_Description = Localization.Get(description);
@@ -26,6 +27,7 @@ public abstract class CustomAffliction
         m_Location = location;
         m_Name = Localization.Get(name);
         m_SpriteName = spriteName;
+        m_CustomSprite = customSprite;
         
         // Check for implemented interfaces here, and then change certain conditionals.
         var iRisk = AfflictionManager.TryGetInterface<IRisk>(this);
