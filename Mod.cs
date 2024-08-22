@@ -71,7 +71,7 @@ internal sealed class Mod : MelonMod
             
             testAfflictionRisk.Start();*/
 
-            /*var testAfflictionBuff = new TestAffliction("Testing Buff 1",
+            var testAfflictionBuff = new TestAffliction("Testing Buff 1",
                 "Testing Cause",
                 "Testing Buff Description 1",
                 null,
@@ -83,7 +83,7 @@ internal sealed class Mod : MelonMod
                 Duration = 2f
             };
             
-            testAfflictionBuff.Start();*/
+            testAfflictionBuff.Start();
         }
     }
 }
