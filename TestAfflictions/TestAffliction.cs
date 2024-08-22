@@ -26,12 +26,12 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
     
     public void CureSymptoms()
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnCure()
     {
-        throw new NotImplementedException();
+        
     }
 
     public float GetRiskValue() => m_RiskValue;
@@ -45,7 +45,6 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
             if (GetRiskValue() >= 100) Cure(false);
             else if (GetRiskValue() < 0f)
             {
-                Mod.Logger.Log("Risk value is less than 0. Curing", ComplexLogger.FlaggedLoggingLevel.Debug);
                 Cure();
             }
         }
@@ -62,7 +61,6 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
         var elapsedTime = currentTime - m_LastUpdateTime;
             
         var riskIncrease = elapsedTime * 60f;
-        Mod.Logger.Log($"Risk increase value is {riskIncrease}", ComplexLogger.FlaggedLoggingLevel.Debug);
 
         m_RiskValue = Mathf.Min(m_RiskValue + riskIncrease, 100f);
         m_LastUpdateTime = currentTime;

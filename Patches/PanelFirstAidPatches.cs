@@ -170,8 +170,10 @@ internal static class PanelFirstAidPatches
                 afflictionsAtLocation = new Panel_FirstAid.AfflictionsAtLocation(customAffliction.m_Location);
                 instance.m_AfflictionsAtLocationArray[bodyIconIndex] = afflictionsAtLocation;
             }
+            afflictionsAtLocation.AddAffliction(AfflictionType.Generic); //adding this fixes index out of bounds error
         }
     }
+
 
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshRightPage))]
     private static class RefreshRightPagePatch

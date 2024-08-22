@@ -80,6 +80,8 @@ public abstract class CustomAffliction
     
     public void Cure(bool displayHealed = true)
     {
+
+        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (InterfaceRemedies != null) InterfaceRemedies.OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         if (HasBuff()) displayHealed = false;

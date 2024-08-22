@@ -63,7 +63,7 @@ internal sealed class Mod : MelonMod
                 InstantHeal = true
             };
             
-            testAfflictionRisk.Start();
+            //testAfflictionRisk.Start();
                 
             var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff", 
                 "GAMEPLAY_AfflictionTestingCause",
@@ -73,7 +73,7 @@ internal sealed class Mod : MelonMod
                 AfflictionBodyArea.Stomach)
             {
                 Buff = true,
-                Duration = 0.5f
+                Duration = 2f
             };
             
             testAfflictionBuff.Start();

@@ -66,7 +66,7 @@ public class AfflictionManager : MonoBehaviour
     
     public void Start()
     {
-        LoadAndSaveData();
+        LoadData();
     }
     public void Update()
     {
@@ -93,14 +93,12 @@ public class AfflictionManager : MonoBehaviour
         }
     }
 
-    private void LoadAndSaveData()
+    private void LoadData()
     {
-        Mod.Logger.Log("Loading data", ComplexLogger.FlaggedLoggingLevel.Debug);
         AfflictionManagerSaveDataProxy? sdp = Mod.sdm?.Load();
 
         if(sdp != null)
         {
-            Mod.Logger.Log($"Found loaded data list of count {sdp.AfflictionList.Count()}", ComplexLogger.FlaggedLoggingLevel.Debug);
             m_Afflictions = sdp.AfflictionList;
         }
         else
