@@ -34,8 +34,11 @@
 		<PackageReference Include="STBlade.Modding.TLD.GearSpawner" Version="2.3.1" />
 		<!-- Only if you need ModData  -->
 		<PackageReference Include="STBlade.Modding.TLD.ModData" Version="1.5.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
+	
+	
 	<ItemGroup>
 		<Reference Include="ComplexLogger">
 			<HintPath>$(TheLongDarkPath)\Mods\ComplexLogger.dll</HintPath>
