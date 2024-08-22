@@ -67,7 +67,6 @@
 		<Using Include="ModData" />
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="Resources\Localization.json" />
 	  <None Remove="Resources\Lambda.png" />
 	  <EmbeddedResource Include="Resources\Lambda.png" />
 	  <None Remove="Resources\Aperture.png" />

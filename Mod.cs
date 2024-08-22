@@ -12,8 +12,6 @@ internal sealed class Mod : MelonMod
     internal static SaveDataManager sdm = new();
 
     internal static UIAtlas customAtlas;
-    
-    public override void OnInitializeMelon() => RegisterLocalizationKeys("AfflictionComponent.Resources.Localization.json");
 
     public override void OnSceneWasInitialized(int buildIndex, string sceneName)
     {
@@ -46,10 +44,10 @@ internal sealed class Mod : MelonMod
     {
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-            var testAffliction = new TestAffliction("GAMEPLAY_AfflictionTesting",
-                "GAMEPLAY_AfflictionTestingCause",
-                "GAMEPLAY_AfflictionTestingDescription",
-                "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
+            var testAffliction = new TestAffliction("Testing Affliction",
+                "Testing Cause",
+                "Testing Description",
+                null,
                 "AfflictionComponent.Resources.Lambda.png",
                 AfflictionBodyArea.Chest,
                 true)
@@ -60,9 +58,9 @@ internal sealed class Mod : MelonMod
 
             testAffliction.Start();
 
-            var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
-                "GAMEPLAY_AfflictionTestingCause",
-                "GAMEPLAY_AfflictionTestingRiskDescription",
+            /*var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
+                "Testing Cause",
+                "Testing Risk Description",
                 null,
                 "ico_injury_majorBruising",
                 AfflictionBodyArea.Chest)
@@ -71,11 +69,11 @@ internal sealed class Mod : MelonMod
                 InstantHeal = true
             };
             
-            //testAfflictionRisk.Start();
+            testAfflictionRisk.Start();*/
 
-            /*var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff",
-                "GAMEPLAY_AfflictionTestingCause",
-                "GAMEPLAY_AfflictionTestingBuffDescription",
+            /*var testAfflictionBuff = new TestAffliction("Testing Buff 1",
+                "Testing Cause",
+                "Testing Buff Description 1",
                 null,
                 "AfflictionComponent.Resources.Aperture.png",
                 AfflictionBodyArea.Stomach,
@@ -83,25 +81,9 @@ internal sealed class Mod : MelonMod
             {
                 Buff = true,
                 Duration = 2f
-            };*/
+            };
             
-            // testAfflictionBuff.Start();
+            testAfflictionBuff.Start();*/
         }
-    }
-    
-    /* --- Testing Localization --- */
-    private static void RegisterLocalizationKeys(string jsonFilePath)
-    {
-        if (string.IsNullOrWhiteSpace(jsonFilePath)) throw new ArgumentNullException(nameof(jsonFilePath));
-
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(jsonFilePath);
-        if (stream == null) throw new FileNotFoundException($"Resource not found: {jsonFilePath}");
-
-        using var reader = new StreamReader(stream);
-        var jsonText = reader.ReadToEnd();
-
-        if (string.IsNullOrWhiteSpace(jsonText)) throw new InvalidDataException("JSON content is empty or whitespace.");
-
-        LocalizationManager.LoadJsonLocalization(jsonText);
     }
 }

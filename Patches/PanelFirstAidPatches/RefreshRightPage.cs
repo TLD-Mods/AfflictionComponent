@@ -191,6 +191,7 @@ internal static class RefreshRightPage
                 
                 // Now supports displaying multiple instances of the same custom affliction if the user has one.
                 // We should filter this out a bit more, maybe via a boolean to determine if the custom affliction will have multiple (instances).
+                // TODO: We aren't actually checking here if we are using the IInstances interface, so the label will update regardless.
                 var (hasMultiple, count, index) = AfflictionManager.GetAfflictionManagerInstance().CheckMultipleAfflictionsByKey(affliction.m_Name, affliction);
                 if (hasMultiple)
                 {

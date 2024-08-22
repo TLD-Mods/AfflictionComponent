@@ -32,7 +32,7 @@ public abstract class CustomAffliction
         var iRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (iRemedies != null)
         {
-            // This seems to be causing an object no reference error - will fix later.
+            // TODO: This seems to be causing an object no reference error - will fix later.
             /*if (InterfaceRemedies.AltRemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Length == 0) // You can't have alternate remedy items if the main remedy items is blank.
             {
                 InterfaceRemedies.RemedyItems = InterfaceRemedies.AltRemedyItems;
@@ -49,8 +49,6 @@ public abstract class CustomAffliction
                 if (iRemedies != null) iRemedies.RemedyItems = iRemedies.AltRemedyItems = [];
             }
         }
-
-        if (m_CustomSprite) AtlasUtilities.AddCustomSpriteToAtlas(m_SpriteName);
     }
     
     public void ApplyRemedy(FirstAidItem fai)
@@ -77,7 +75,6 @@ public abstract class CustomAffliction
     
     public void Cure(bool displayHealed = true)
     {
-
         var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (InterfaceRemedies != null) InterfaceRemedies.OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
@@ -186,24 +183,28 @@ public abstract class CustomAffliction
     {
         if (GameManager.GetPlayerManagerComponent().m_God) return;
 
-        var InterfaceInstance = AfflictionManager.TryGetInterface<IInstance>(this);
-        var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
+        if (m_CustomSprite) AtlasUtilities.AddCustomSpriteToAtlas(m_SpriteName);
+        
+        var interfaceInstance = AfflictionManager.TryGetInterface<IInstance>(this);
+        var interfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
 
-        //the below code is a bit hard to read but it gets the job done
-        if (InterfaceInstance is not null)
+        // The below code is a bit hard to read, but it gets the job done.
+        if (interfaceInstance is not null)
         {
             CustomAffliction? existingAff = null;
-            if (InterfaceInstance.Type == InstanceType.Single) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name).ElementAt(0) : null;
-            else if (InterfaceInstance.Type == InstanceType.SingleLocation) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name && aff.m_Location == m_Location) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name && aff.m_Location == m_Location).ElementAt(0) : null;
+            
+            if (interfaceInstance.Type == InstanceType.Single) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name).ElementAt(0) : null;
+            else if (interfaceInstance.Type == InstanceType.SingleLocation) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name && aff.m_Location == m_Location) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name && aff.m_Location == m_Location).ElementAt(0) : null;
+            
             if (existingAff != null)
             {
-                InterfaceInstance.OnFoundExistingInstance(existingAff);
+                interfaceInstance.OnFoundExistingInstance(existingAff);
                 return;
             }
         }
 
-        //calling HasDuration here is a bit redundant butttt it's not a big deal
-        if (HasDuration()) InterfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + InterfaceDuration.Duration;
+        // Calling HasDuration here is a bit redundant butttt it's not a big deal
+        if (HasDuration()) interfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + interfaceDuration.Duration;
         AfflictionManager.GetAfflictionManagerInstance().Add(this);
 
         if (HasBuff())

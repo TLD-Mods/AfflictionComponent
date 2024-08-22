@@ -4,6 +4,7 @@ namespace AfflictionComponent.Patches.PanelAfflictionPatches;
 
 internal static class SetupScrollList
 {
+    // TODO: Fix another out of range index error that is happening here, not sure what is causing it yet.
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
     private static class SetupCustomAfflictionOnScrollList
     {

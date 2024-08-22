@@ -1,14 +1,21 @@
-﻿namespace AfflictionComponent.Patches.PanelHUDPatches;
+﻿using AfflictionComponent.Components;
+
+namespace AfflictionComponent.Patches.PanelHUDPatches;
 
 internal static class DoShowBuffNotification
 {
     [HarmonyPatch(nameof(Panel_HUD), nameof(Panel_HUD.DoShowBuffNotification))]
-    private static class Test
+    private static class SwapBuffSpriteAtlas
     {
         private static void Postfix(Panel_HUD __instance, Panel_HUD.BuffNotification buffNotification)
         {
-            // TODO: Need to add conditions to see if it is a custom sprite, or a custom affliction. If neither, then don't change the atlas.
-            __instance.m_BuffSprite.atlas = Mod.customAtlas;
+            if (AfflictionManager.GetAfflictionManagerInstance().m_Afflictions.Any(customAffliction => buffNotification.m_BuffNameLocID == customAffliction.m_Name && customAffliction.m_CustomSprite))
+            {
+                __instance.m_BuffSprite.atlas = Mod.customAtlas;
+                return;
+            }
+
+            __instance.m_BuffSprite.atlas = __instance.m_StruggleBar.atlas;
         }
     }
 }
