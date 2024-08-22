@@ -25,16 +25,12 @@ internal static class UpdateFillBar
                 __instance.m_SizeModifierAfflictionBar.localScale = new Vector3(num, 1f, 1f);
             }
 
-            // TODO: The buff fill bar is no longer updating
             if (customAffliction.HasBuff())
             {
                 var interfaceDuration = AfflictionManager.TryGetInterface<IDuration>(customAffliction);
                 if (interfaceDuration != null)
                 {
-                    Mod.Logger.Log($"Time remaining: {interfaceDuration.GetTimeRemaining()}", ComplexLogger.FlaggedLoggingLevel.Debug);
-                    Mod.Logger.Log($"Duration in minutes: {interfaceDuration.Duration * 60f}", ComplexLogger.FlaggedLoggingLevel.Debug);
                     var num2 = interfaceDuration.GetTimeRemaining() / (interfaceDuration.Duration * 60f);
-                    Mod.Logger.Log($"num2: {num2}", ComplexLogger.FlaggedLoggingLevel.Debug);
                     Utils.SetActive(__instance.m_AnimatorBuffBar.gameObject, num2 > 0f);
                     __instance.m_FillSpriteBuffBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num2);
                     __instance.m_SizeModifierBuffBar.localScale = new Vector3(num2, 1f, 1f);

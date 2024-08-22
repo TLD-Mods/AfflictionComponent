@@ -52,7 +52,8 @@ internal sealed class Mod : MelonMod
                 AfflictionBodyArea.Chest,
                 true)
             {
-                RemedyItems = [Tuple.Create("GEAR_HeavyBandage", 1, 1)],
+                AltRemedyItems = [Tuple.Create("GEAR_HeavyBandage", 1, 1)],
+                RemedyItems = [],
                 InstantHeal = true
             };
 
@@ -71,6 +72,7 @@ internal sealed class Mod : MelonMod
             
             testAfflictionRisk.Start();*/
 
+            /**
             var testAfflictionBuff = new TestAffliction("Testing Buff 1",
                 "Testing Cause",
                 "Testing Buff Description 1",
@@ -83,7 +85,7 @@ internal sealed class Mod : MelonMod
                 Duration = 2f
             };
             
-            testAfflictionBuff.Start();
+            testAfflictionBuff.Start(); **/
         }
     }
 }

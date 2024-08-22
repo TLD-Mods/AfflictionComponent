@@ -25,24 +25,27 @@ public abstract class CustomAffliction
         m_Name = Localization.Get(name);
         m_SpriteName = spriteName;
         m_CustomSprite = customSprite;
-        
+            
         // Check for implemented interfaces here, and then change certain conditionals.
         var iRisk = AfflictionManager.TryGetInterface<IRisk>(this);
             
         var iRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (iRemedies != null)
         {
-            // TODO: This seems to be causing an object no reference error - will fix later.
-            /*if (InterfaceRemedies.AltRemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Length == 0) // You can't have alternate remedy items if the main remedy items is blank.
+            
+            if(iRemedies.AltRemedyItems is not null && iRemedies.RemedyItems is not null)
             {
-                InterfaceRemedies.RemedyItems = InterfaceRemedies.AltRemedyItems;
-                InterfaceRemedies.AltRemedyItems = [];
-            }*/
+                if (iRemedies.AltRemedyItems.Length > 0 && iRemedies.RemedyItems.Length == 0) // You can't have alternate remedy items if the main remedy items is blank.
+                {
+                    iRemedies.RemedyItems = iRemedies.AltRemedyItems;
+                    iRemedies.AltRemedyItems = [];
+                }
+            }
         }
         
         var iBuff = AfflictionManager.TryGetInterface<IBuff>(this);
         if (iBuff != null)
-        {            
+        {
             if (iBuff.Buff) // Buff takes precedence over risk if incorrectly assigned, they also cannot have remedy items.
             {
                 if (iRisk != null) iRisk.Risk = false;
