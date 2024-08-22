@@ -1,184 +1,16 @@
 ﻿using AfflictionComponent.Components;
 using AfflictionComponent.Interfaces;
-using Il2CppTLD.IntBackedUnit;
 using AfflictionComponent.Utilities;
+using Il2CppTLD.IntBackedUnit;
 
-namespace AfflictionComponent.Patches;
+namespace AfflictionComponent.Patches.PanelFirstAidPatches;
 
-internal static class PanelFirstAidPatches
+internal static class RefreshRightPage
 {
-    [HarmonyPatch(nameof(Panel_FirstAid), nameof(Panel_FirstAid.HasBadAffliction))]
-    private static class HasCustomBadAffliction
-    {
-        private static void Postfix(Panel_FirstAid __instance, ref bool __result)
-        {
-            if (__result) return;
-            
-            var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            __result = customAfflictions.Any(affliction => !affliction.HasBuff() && !affliction.HasRisk());
-        }
-    }
-    
-    [HarmonyPatch(nameof(Panel_FirstAid), nameof(Panel_FirstAid.HasRiskAffliction))]
-    private static class HasCustomRiskAffliction
-    {
-        private static void Postfix(Panel_FirstAid __instance, ref bool __result)
-        {
-            if (__result) return;
-            
-            var customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            if (!customAfflictions.Any(affliction => !affliction.HasBuff() && !affliction.HasRisk()))
-            {
-                __result = customAfflictions.Any(affliction => affliction.HasRisk());
-            }
-        }
-    }
-    
-    [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshPaperDoll))]
-    private static class RefreshPaperDollCustomAffliction
-    {
-        private static void Postfix(Panel_FirstAid __instance)
-        {
-            var afflictionManager = AfflictionManager.GetAfflictionManagerInstance();
-            if (afflictionManager == null || afflictionManager.m_Afflictions.Count == 0) return;
-
-            var panelClothing = InterfaceManager.GetPanel<Panel_Clothing>();
-            
-            var flag = false;
-            for (var i = 0; i < afflictionManager.m_Afflictions.Count; i++)
-            {
-                if (!afflictionManager.GetAfflictionByIndex(i).HasBuff())
-                {
-                    flag = true;
-                }
-            }
-            
-            switch (flag)
-            {
-                case true:
-                {
-                    Utils.SetActive(__instance.m_PaperDollMale, PlayerManager.m_VoicePersona == VoicePersona.Male);
-                    Utils.SetActive(__instance.m_PaperDollFemale, PlayerManager.m_VoicePersona == VoicePersona.Female);
-                
-                    if (!panelClothing.IsEnabled()) return;
-                    panelClothing.Enable(false);
-                    break;
-                }
-                case false:
-                {
-                    Utils.SetActive(__instance.m_PaperDollMale, false);
-                    Utils.SetActive(__instance.m_PaperDollFemale, false);
-                
-                    if (panelClothing.IsEnabled()) return;
-                    panelClothing.Enable(true);
-                    panelClothing.ShowPaperDollOnly();
-                    break;
-                }
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshScrollList))]
-    private static class RefreshScrollListOverride
-    {
-        private static bool Prefix(Panel_FirstAid __instance)
-        {
-            bool hasSelectedButton = __instance.m_SelectedAffButton != null;
-            AfflictionType selectedType = hasSelectedButton ? __instance.m_SelectedAffButton.m_AfflictionType : AfflictionType.BloodLoss;
-            AfflictionBodyArea selectedArea = hasSelectedButton ? __instance.m_SelectedAffButton.m_AfflictionLocation : AfflictionBodyArea.ArmLeft;
-
-            __instance.m_ScrollListEffects.CleanUp();
-            __instance.ClearAfflictionsAtLocationArray();
-            Panel_Affliction.GetAllAfflictions(__instance.m_ScrollListAfflictions);
-
-            foreach (var uiSprite in __instance.m_BodyIconList)
-            {
-                uiSprite.gameObject.SetActive(false);
-            }
-
-            List<CustomAffliction> customAfflictions = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions;
-            int totalAfflictions = __instance.m_ScrollListAfflictions.Count + customAfflictions.Count;
-
-            __instance.m_ScrollListEffects.CreateList(totalAfflictions);
-            AfflictionType lastAfflictionType = AfflictionType.BloodLoss;
-            int count = 0;
-
-            for (int i = 0; i < totalAfflictions; i++)
-            {
-                var afflictionButton = __instance.m_ScrollListEffects.m_ScrollObjects[i].transform.GetChild(0).GetComponent<AfflictionButton>();
-                if (afflictionButton == null) continue;
-
-                if (i < __instance.m_ScrollListAfflictions.Count)
-                {
-                    Affliction affliction = __instance.m_ScrollListAfflictions[i];
-                    ProcessAffliction(__instance, affliction, afflictionButton, ref lastAfflictionType, ref count, hasSelectedButton, selectedType, selectedArea);
-                }
-                else
-                {
-                    CustomAffliction customAffliction = customAfflictions[i - __instance.m_ScrollListAfflictions.Count];
-                    ProcessCustomAffliction(__instance, customAffliction, afflictionButton, ref lastAfflictionType, ref count, hasSelectedButton, selectedType, selectedArea);
-                }
-            }
-
-            return false;
-        }
-
-        private static void ProcessAffliction(Panel_FirstAid instance, Affliction affliction, AfflictionButton component, ref AfflictionType lastAfflictionType, ref int count, bool hasSelectedButton, AfflictionType selectedType, AfflictionBodyArea selectedArea)
-        {
-            int location = (int)affliction.m_Location;
-            instance.AddAfflictionAtLocation(location, affliction);
-            instance.m_BodyIconList[location].gameObject.SetActive(true);
-
-            if (affliction.m_AfflictionType != lastAfflictionType) count = 0;
-
-            string text = Affliction.LocalizedNameFromAfflictionType(affliction.m_AfflictionType, count);
-            string text2 = Affliction.SpriteNameFromAfflictionType(affliction.m_AfflictionType);
-            component.SetCauseAndEffect(affliction.m_Cause, affliction.m_AfflictionType, affliction.m_Location, count, text, text2);
-            count++;
-            lastAfflictionType = affliction.m_AfflictionType;
-
-            bool isSelected = hasSelectedButton && affliction.m_AfflictionType == selectedType && affliction.m_Location == selectedArea;
-            component.SetSelected(isSelected);
-            instance.UpdateBodyIconColors(component, isSelected, location);
-        }
-
-        private static void ProcessCustomAffliction(Panel_FirstAid instance, CustomAffliction customAffliction, AfflictionButton component, ref AfflictionType lastAfflictionType, ref int count, bool hasSelectedButton, AfflictionType selectedType, AfflictionBodyArea selectedArea)
-        {
-            int location = (int)customAffliction.m_Location;
-            AddCustomAfflictionAtLocation(instance, location, customAffliction);
-            instance.m_BodyIconList[location].gameObject.SetActive(true);
-
-            AfflictionType afflictionType = AfflictionType.Generic;
-            if (afflictionType != lastAfflictionType) count = 0;
-
-            string text = customAffliction.m_Name;
-            string text2 = customAffliction.m_SpriteName;
-            component.SetCauseAndEffect(customAffliction.m_CauseText, afflictionType, customAffliction.m_Location, count, text, text2);
-            count++;
-            lastAfflictionType = afflictionType;
-
-            bool isSelected = hasSelectedButton && afflictionType == selectedType && customAffliction.m_Location == selectedArea;
-            component.SetSelected(isSelected);
-            instance.UpdateBodyIconColors(component, isSelected, location);
-        }
-        
-        private static void AddCustomAfflictionAtLocation(Panel_FirstAid instance, int bodyIconIndex, CustomAffliction customAffliction)
-        {
-            Panel_FirstAid.AfflictionsAtLocation afflictionsAtLocation = instance.m_AfflictionsAtLocationArray[bodyIconIndex];
-            if (afflictionsAtLocation == null)
-            {
-                afflictionsAtLocation = new Panel_FirstAid.AfflictionsAtLocation(customAffliction.m_Location);
-                instance.m_AfflictionsAtLocationArray[bodyIconIndex] = afflictionsAtLocation;
-            }
-            afflictionsAtLocation.AddAffliction(AfflictionType.Generic); //adding this fixes index out of bounds error
-        }
-    }
-
-
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshRightPage))]
     private static class RefreshRightPagePatch
     {
-        public static bool Prefix(Panel_FirstAid __instance)
+        private static bool Prefix(Panel_FirstAid __instance)
         {
             if (!__instance.m_SelectedAffButton) return true;
             if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) return true;
@@ -365,10 +197,10 @@ internal static class PanelFirstAidPatches
                     uiLabel.text = string.Concat(uiLabel.text, " (", index, "/", count, ")");
                 }
 
-                var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(affliction);
+                var interfaceDuration = AfflictionManager.TryGetInterface<IDuration>(affliction);
 
                 num = (int)affliction.m_Location;
-                num4 = affliction.HasDuration() ? Mathf.CeilToInt(InterfaceDuration.GetTimeRemaining()) : 0;
+                num4 = affliction.HasDuration() ? Mathf.CeilToInt(interfaceDuration.GetTimeRemaining()) : 0;
                 
                 break;
             }
@@ -396,16 +228,6 @@ internal static class PanelFirstAidPatches
             }
             else
                 Utils.SetActive(__instance.m_DurationWidgetParentObj, active: false);
-        }
-    }
-
-    [HarmonyPatch(nameof(Panel_FirstAid), nameof(Panel_FirstAid.UpdateBodyIconColors))]
-    private static class OverrideUpdateBodyIconColors
-    {
-        private static void Postfix(Panel_FirstAid __instance, AfflictionButton afflictionButton, bool isButtonSelected, int bodyIconIndex)
-        {
-            if (afflictionButton.m_AfflictionType != AfflictionType.Generic) return;
-            __instance.m_BodyIconList[bodyIconIndex].spriteName = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(afflictionButton.m_Index).HasBuff() ? __instance.m_BodyIconSpriteNameBuff : __instance.m_BodyIconSpriteNameAffliction;
         }
     }
 }

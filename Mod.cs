@@ -38,33 +38,6 @@ internal sealed class Mod : MelonMod
                 UnityEngine.Object.Instantiate(CustomAtlas, GameManager.GetVpFPSPlayer().transform);
                 UnityEngine.Object.DontDestroyOnLoad(CustomAtlas);
                 customAtlas = CustomAtlas.AddComponent<UIAtlas>();
-                
-                var customTexture = ImageUtilities.GetImage("AfflictionComponent.Resources.Lambda.png");
-                if (customTexture != null)
-                {
-                    // Create a new UISpriteData for our custom sprite
-                    var spriteData = new UISpriteData
-                    {
-                        name = "CustomSprite",
-                        x = 0,
-                        y = 0,
-                        width = customTexture.width,
-                        height = customTexture.height
-                    };
-
-                    // Add the sprite data to the atlas
-                    customAtlas.spriteList.Add(spriteData);
-                    customAtlas.material = new Material(Shader.Find("Unlit/Transparent Colored"))
-                    {
-                        mainTexture = customTexture
-                    };
-
-                    Debug.Log("Custom UISprite added to HUD");
-                }
-                else
-                {
-                    Debug.LogError("Failed to load custom texture");
-                }
             }
         }
     }
@@ -77,7 +50,7 @@ internal sealed class Mod : MelonMod
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingDescription",
                 "GAMEPLAY_AfflictionTestingBuffDescriptionNoHeal",
-                "CustomSprite",
+                "AfflictionComponent.Resources.Lambda.png",
                 AfflictionBodyArea.Chest,
                 true)
             {
@@ -99,20 +72,20 @@ internal sealed class Mod : MelonMod
             };
             
             //testAfflictionRisk.Start();
-                
-            var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff",
+
+            /*var testAfflictionBuff = new TestAffliction("GAMEPLAY_AfflictionTestingBuff",
                 "GAMEPLAY_AfflictionTestingCause",
                 "GAMEPLAY_AfflictionTestingBuffDescription",
                 null,
-                "CustomSprite",
+                "AfflictionComponent.Resources.Aperture.png",
                 AfflictionBodyArea.Stomach,
                 true)
             {
                 Buff = true,
                 Duration = 2f
-            };
+            };*/
             
-            testAfflictionBuff.Start();
+            // testAfflictionBuff.Start();
         }
     }
     

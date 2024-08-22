@@ -1,5 +1,6 @@
 ﻿using AfflictionComponent.Enums;
 using AfflictionComponent.Interfaces;
+using AfflictionComponent.Utilities;
 using Newtonsoft.Json;
 
 namespace AfflictionComponent.Components;
@@ -48,6 +49,8 @@ public abstract class CustomAffliction
                 if (iRemedies != null) iRemedies.RemedyItems = iRemedies.AltRemedyItems = [];
             }
         }
+
+        if (m_CustomSprite) AtlasUtilities.AddCustomSpriteToAtlas(m_SpriteName);
     }
     
     public void ApplyRemedy(FirstAidItem fai)
