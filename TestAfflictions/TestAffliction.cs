@@ -48,9 +48,8 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
                 Cure();
             }
         }
-            
         
-        if (Buff) //can't call the sealed method anymore so.. this'll have to do. Idk of a better solution here
+        if (Buff) // Can't call the sealed method anymore so... this'll have to do. IDK of a better solution here
             Duration = EndTime - GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused();
         
     }

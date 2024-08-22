@@ -152,7 +152,7 @@ internal static class PanelFirstAidPatches
             if (afflictionType != lastAfflictionType) count = 0;
 
             string text = customAffliction.m_Name;
-            string text2 = customAffliction.GetSpriteName();
+            string text2 = customAffliction.m_SpriteName;
             component.SetCauseAndEffect(customAffliction.m_CauseText, afflictionType, customAffliction.m_Location, count, text, text2);
             count++;
             lastAfflictionType = afflictionType;

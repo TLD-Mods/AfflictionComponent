@@ -1,4 +1,5 @@
-﻿using AfflictionComponent.Interfaces;
+﻿using AfflictionComponent.Enums;
+using AfflictionComponent.Interfaces;
 using Newtonsoft.Json;
 
 namespace AfflictionComponent.Components;
@@ -6,23 +7,15 @@ namespace AfflictionComponent.Components;
 public abstract class CustomAffliction
 {
     public string m_CauseText;
+    public bool m_CustomSprite;
     public string m_Description;
     public string? m_DescriptionNoHeal;
     public AfflictionBodyArea m_Location;
     public string m_Name;
     [JsonProperty]
-    private string m_SpriteName;
+    public string m_SpriteName;
 
-    // Interface fields
-    /**
-    public readonly IBuff InterfaceBuff = new IBuffImpl();
-    public readonly IDuration InterfaceDuration = new IDurationImpl();
-    public readonly IRemedies InterfaceRemedies = new IRemediesImpl();
-    public readonly IRisk InterfaceRisk = new IRiskImpl();  
-    public readonly IInstance InterfaceInstance = new IInstanceImpl();
-    **/
-
-    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location)
+    protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location, bool customSprite = false)
     {
         m_CauseText = Localization.Get(causeText); 
         m_Description = Localization.Get(description);
@@ -61,16 +54,16 @@ public abstract class CustomAffliction
     {
         if (!ApplyRemedyCondition()) return;
 
-        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
-        if (InterfaceRemedies is null) return;
+        var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if (interfaceRemedies is null) return;
 
-        UpdateRemedyItems(InterfaceRemedies, fai.name);
-        UpdateAltRemedyItems(InterfaceRemedies, fai.name);
+        UpdateRemedyItems(interfaceRemedies, fai.name);
+        UpdateAltRemedyItems(interfaceRemedies, fai.name);
 
-        if (!NeedsRemedy() && InterfaceRemedies.InstantHeal) // If you've taken all the remedy items, and it's set to cure after taking them, cure the affliction.
+        if (!NeedsRemedy() && interfaceRemedies.InstantHeal) // If you've taken all the remedy items, and it's set to cure after taking them, cure the affliction.
             Cure();
         else
-            if (InterfaceRemedies != null) InterfaceRemedies.CureSymptoms(); // Otherwise, just cure the symptoms (this can be empty and do nothing)
+            if (interfaceRemedies != null) interfaceRemedies.CureSymptoms(); // Otherwise, just cure the symptoms (this can be empty and do nothing)
     }
 
     /// <summary>
@@ -97,34 +90,33 @@ public abstract class CustomAffliction
         if (item == "GEAR_BottlePainKillers") return value > 1 ? value / 2 : value;
         return value;
     }
-    
-    public string GetSpriteName() => m_SpriteName;
 
     public bool HasBuff()
     {
-        var InterfaceBuff = AfflictionManager.TryGetInterface<IBuff>(this);
-        return InterfaceBuff is not null ? InterfaceBuff.Buff : false;
+        var interfaceBuff = AfflictionManager.TryGetInterface<IBuff>(this);
+        return interfaceBuff is not null ? interfaceBuff.Buff : false;
     }
+    
     public bool HasDuration()
     {
-        var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
-        return InterfaceDuration is not null ? InterfaceDuration.Duration > 0 : false;
-    }
-
-    public bool HasRisk()
-    {
-        var InterfaceRisk = AfflictionManager.TryGetInterface<IRisk>(this);
-        return InterfaceRisk is not null ? InterfaceRisk.Risk : false;
+        var interfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
+        return interfaceDuration is not null ? interfaceDuration.Duration > 0 : false;
     }
 
     public bool HasRemedies(bool alt = false)
     {
-        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
-        if(InterfaceRemedies == null) return false;
+        var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if (interfaceRemedies == null) return false;
 
-        return alt ? InterfaceRemedies.AltRemedyItems != null && InterfaceRemedies.AltRemedyItems.Length > 0 : InterfaceRemedies.RemedyItems != null && InterfaceRemedies.RemedyItems.Length > 0;
+        return alt ? interfaceRemedies.AltRemedyItems != null && interfaceRemedies.AltRemedyItems.Length > 0 : interfaceRemedies.RemedyItems != null && interfaceRemedies.RemedyItems.Length > 0;
     }
 
+    public bool HasRisk()
+    {
+        var interfaceRisk = AfflictionManager.TryGetInterface<IRisk>(this);
+        return interfaceRisk is not null ? interfaceRisk.Risk : false;
+    }
+    
     /// <summary>
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
     /// </summary>
@@ -198,8 +190,8 @@ public abstract class CustomAffliction
         if (InterfaceInstance is not null)
         {
             CustomAffliction? existingAff = null;
-            if (InterfaceInstance.type == Resources.InstanceType.Single) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name).ElementAt(0) : null;
-            else if (InterfaceInstance.type == Resources.InstanceType.SingleLocation) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name && aff.m_Location == m_Location) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name && aff.m_Location == m_Location).ElementAt(0) : null;
+            if (InterfaceInstance.Type == InstanceType.Single) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name).ElementAt(0) : null;
+            else if (InterfaceInstance.Type == InstanceType.SingleLocation) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name && aff.m_Location == m_Location) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name && aff.m_Location == m_Location).ElementAt(0) : null;
             if (existingAff != null)
             {
                 InterfaceInstance.OnFoundExistingInstance(existingAff);

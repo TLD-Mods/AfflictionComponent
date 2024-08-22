@@ -20,7 +20,7 @@ public class VanillaOverrides
         __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, ItemLiquidVolume.Zero, foodPoisoningComponent.GetRestAmountRemaining(), foodPoisoningComponent.m_NumHoursRestForCure);
         num = (int)Panel_Affliction.GetAfflictionLocation(AfflictionType.FoodPoisioning, selectedAfflictionIndex);
 
-        num4 = 0; //for compliance
+        num4 = 0; // For compliance
     }
 
     public static void DysenteryMethod(Panel_FirstAid __instance, int selectedAfflictionIndex, out int num, out int num4)
@@ -40,7 +40,7 @@ public class VanillaOverrides
         __instance.SetItemsNeeded(remedySprites, remedyComplete, remedyNumRequired, altRemedySprites, altRemedyComplete, altRemedyNumRequired, dysenteryComponent.GetWaterAmountRemaining(), dysenteryComponent.GetRestAmountRemaining(), dysenteryComponent.m_NumHoursRestForCure);
         num = (int)Panel_Affliction.GetAfflictionLocation(AfflictionType.Dysentery, selectedAfflictionIndex);
 
-        //for compliance
+        // For compliance
         num4 = 0;
     }
 }

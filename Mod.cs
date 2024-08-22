@@ -39,7 +39,7 @@ internal sealed class Mod : MelonMod
                 UnityEngine.Object.DontDestroyOnLoad(CustomAtlas);
                 customAtlas = CustomAtlas.AddComponent<UIAtlas>();
                 
-                var customTexture = ImageUtilities.GetImage("AfflictionComponent", "Lambda", "png");
+                var customTexture = ImageUtilities.GetImage("AfflictionComponent.Resources.Lambda.png");
                 if (customTexture != null)
                 {
                     // Create a new UISpriteData for our custom sprite

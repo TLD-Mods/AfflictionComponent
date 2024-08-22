@@ -1,11 +1,11 @@
 ﻿using AfflictionComponent.Components;
-using AfflictionComponent.Resources;
+using AfflictionComponent.Enums;
 
-namespace AfflictionComponent.Interfaces
+namespace AfflictionComponent.Interfaces;
+
+public interface IInstance
 {
-    public interface IInstance
-    {
-        public InstanceType type { get; set; }
-        public void OnFoundExistingInstance(CustomAffliction aff);
-    }
+    public InstanceType Type { get; set; }
+    
+    public void OnFoundExistingInstance(CustomAffliction aff);
 }

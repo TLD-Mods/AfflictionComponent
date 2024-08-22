@@ -20,16 +20,9 @@ public class AfflictionManager : MonoBehaviour
         return (count > 1, count, afflictionsOfType.IndexOf(currentAffliction) + 1);
     }
     
-    public static AfflictionManager GetAfflictionManagerInstance() => Mod.afflictionManager;
-
-    public int GetCustomAfflictionCount() => m_Afflictions.Count;
-
     [HideFromIl2Cpp]
     public CustomAffliction GetAfflictionByIndex(int index) => m_Afflictions[index];
-
-    [HideFromIl2Cpp]
-    public List<CustomAffliction> GetAfflictionsByBodyArea(AfflictionBodyArea bodyArea) => m_Afflictions.Where(customAffliction => customAffliction.m_Location == bodyArea).ToList();
-
+    
     /// <summary>
     /// Returns the colour based on the affliction.
     /// </summary>
@@ -42,6 +35,11 @@ public class AfflictionManager : MonoBehaviour
         "Bad" => InterfaceManager.m_FirstAidRedColor,
         _ => throw new ArgumentException("Invalid affliction type", nameof(afflictionType))
     };
+    
+    public static AfflictionManager GetAfflictionManagerInstance() => Mod.afflictionManager;
+
+    [HideFromIl2Cpp]
+    public List<CustomAffliction> GetAfflictionsByBodyArea(AfflictionBodyArea bodyArea) => m_Afflictions.Where(customAffliction => customAffliction.m_Location == bodyArea).ToList();
 
     [HideFromIl2Cpp]
     public List<CustomAffliction> GetCustomAfflictionListCurable()
@@ -55,19 +53,27 @@ public class AfflictionManager : MonoBehaviour
     [HideFromIl2Cpp] // So mod authors can check if the player has at least one CustomAffliction of their own type.
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(typeName.IsInstanceOfType);
 
+    private void LoadData()
+    {
+        AfflictionManagerSaveDataProxy? sdp = Mod.sdm?.Load();
+
+        if (sdp != null)
+            m_Afflictions = sdp.AfflictionList;
+        else
+            Mod.Logger.Log("Loaded data is null, creating new", ComplexLogger.FlaggedLoggingLevel.Debug);
+    }
+    
     [HideFromIl2Cpp]
     public void Remove(CustomAffliction customAffliction) => m_Afflictions.Remove(customAffliction);
 
+    public void Start() => LoadData();
+    
     internal static T? TryGetInterface<T>(object obj) where T : class
     {
         if (obj is T interfaceInstance) return interfaceInstance;
         return null;
     }
     
-    public void Start()
-    {
-        LoadData();
-    }
     public void Update()
     {
         if (GameManager.m_IsPaused || GameManager.s_IsGameplaySuspended) return;
@@ -83,27 +89,13 @@ public class AfflictionManager : MonoBehaviour
 
             if (customAffliction.HasDuration())
             {
-                var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(customAffliction);
-                if (InterfaceDuration != null && InterfaceDuration.IsDurationUp())
+                var interfaceDuration = TryGetInterface<IDuration>(customAffliction);
+                if (interfaceDuration != null && interfaceDuration.IsDurationUp())
                 {
                     Mod.Logger.Log("Duration is up! Curing affliction", ComplexLogger.FlaggedLoggingLevel.Debug);
                     customAffliction.Cure();
                 }
             }
-        }
-    }
-
-    private void LoadData()
-    {
-        AfflictionManagerSaveDataProxy? sdp = Mod.sdm?.Load();
-
-        if(sdp != null)
-        {
-            m_Afflictions = sdp.AfflictionList;
-        }
-        else
-        {
-            Mod.Logger.Log("Loaded data is null, creating new", ComplexLogger.FlaggedLoggingLevel.Debug);
         }
     }
 }

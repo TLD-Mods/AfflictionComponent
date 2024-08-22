@@ -48,7 +48,7 @@ internal static class PanelAfflictionPatches
                 }
             }   
 
-            if (AfflictionManager.GetAfflictionManagerInstance().GetCustomAfflictionCount() > 0)
+            if (AfflictionManager.GetAfflictionManagerInstance().m_Afflictions.Count > 0)
             {
                 int finalCounter = vanillaAfflictionCount <= moddedAfflictionCount ? combinedCount - 1 : combinedCount;
               
@@ -66,7 +66,7 @@ internal static class PanelAfflictionPatches
                                 componentInChildren.m_SpriteEffect.atlas = Mod.customAtlas;
                             }
 
-                            componentInChildren.m_SpriteEffect.spriteName = panelAfflictionList[j - vanillaAfflictionCount].GetSpriteName();
+                            componentInChildren.m_SpriteEffect.spriteName = panelAfflictionList[j - vanillaAfflictionCount].m_SpriteName;
                         }
                     }
                 }

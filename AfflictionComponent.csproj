@@ -68,6 +68,8 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="Resources\Localization.json" />
+	  <None Remove="Resources\Lambda.png" />
+	  <EmbeddedResource Include="Resources\Lambda.png" />
 	</ItemGroup>
 
 	<!-- This is a build event. It will copy your dll to the currently defined TheLongDarkPath's Mods folder -->

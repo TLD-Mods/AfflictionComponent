@@ -2,67 +2,61 @@
 
 namespace AfflictionComponent.Utilities;
 
-public class ImageUtilities
+public static class ImageUtilities
 {
     /// <summary>
-	/// Loads and converts a raw image
-	/// </summary>
-	/// <param name="FolderName">The name of the folder, without parents eg: "TEMPLATE". See: <see cref="MelonLoader.Utils.MelonEnvironment.ModsDirectory"/></param>
-	/// <param name="FileName">The name of the image, without extension or foldername</param>
-	/// <param name="ext">The extension of the file eg: "jpg". This is provided to allow extension methods to define this parameter</param>
-	/// <returns>The image if all related functions work, otherwise null</returns>
-	public static Texture2D? GetImage(string FolderName, string FileName, string ext)
-	{
-		byte[]? file = null;
-		string AbsoluteFileName = Path.Combine(MelonLoader.Utils.MelonEnvironment.ModsDirectory, FolderName, $"{FileName}.{ext}");
+    /// Loads and converts an embedded resource image
+    /// </summary>
+    /// <param name="resourceName">The full name of the embedded resource</param>
+    /// <returns>The image if all related functions work, otherwise null</returns>
+    public static Texture2D? GetImage(string resourceName)
+    {
+        byte[]? resourceData = null;
+        Mod.Logger.Log("GetImage", FlaggedLoggingLevel.Debug, LoggingSubType.IntraSeparator);
 
-		Mod.Logger.Log("GetImage", FlaggedLoggingLevel.Debug, LoggingSubType.IntraSeparator);
-		if (!File.Exists(AbsoluteFileName))
-		{
-			Mod.Logger.Log($"The file requested was not found {AbsoluteFileName}", FlaggedLoggingLevel.Error);
-			return null;
-		}
+        try
+        {
+            Assembly? assembly = Assembly.GetExecutingAssembly();
+            using (Stream? stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                {
+                    Mod.Logger.Log($"The embedded resource was not found: {resourceName}", FlaggedLoggingLevel.Error);
+                    return null;
+                }
 
-		Texture2D texture = new(4096, 4096, TextureFormat.RGBA32, false) { name = FileName };
+                resourceData = new byte[stream.Length];
+                stream.Read(resourceData, 0, (int)stream.Length);
+            }
+        }
+        catch (Exception e)
+        {
+            Mod.Logger.Log($"Attempting to load embedded resource failed", FlaggedLoggingLevel.Exception, e);
+            return null;
+        }
 
-		try
-		{
-			file = File.ReadAllBytes(AbsoluteFileName);
+        if (resourceData == null)
+        {
+            Mod.Logger.Log($"Failed to read embedded resource data: {resourceName}", FlaggedLoggingLevel.Warning);
+            return null;
+        }
 
-			if (file == null)
-			{
-				Mod.Logger.Log($"Attempting to ReadAllBytes failed for image {FileName}.{ext}", FlaggedLoggingLevel.Warning);
-				return null;
-			}
-		}
-		catch (DirectoryNotFoundException dnfe)
-		{
-			Mod.Logger.Log($"Directory was not found {FolderName}", FlaggedLoggingLevel.Exception, dnfe);
-		}
-		catch (FileNotFoundException fnfe)
-		{
-			Mod.Logger.Log($"File was not found {FileName}", FlaggedLoggingLevel.Exception, fnfe);
-		}
-		catch (Exception e)
-		{
-			Mod.Logger.Log($"Attempting to load requested file failed", FlaggedLoggingLevel.Exception, e);
-		}
+        Texture2D texture = new(4096, 4096, TextureFormat.RGBA32, false) { name = Path.GetFileNameWithoutExtension(resourceName) };
 
-		if (ImageConversion.LoadImage(texture, file))
-		{
-			Mod.Logger.Log($"Successfully loaded file {FileName}", FlaggedLoggingLevel.Debug);
-			texture.DontUnload();
+        if (ImageConversion.LoadImage(texture, resourceData))
+        {
+            Mod.Logger.Log($"Successfully loaded embedded resource: {resourceName}", FlaggedLoggingLevel.Debug);
+            texture.DontUnload();
+            return texture;
+        }
 
-			return texture;
-		}
-
-		texture.LoadRawTextureData(file);
-		texture.Apply();
-		texture.DontUnload();
-		Mod.Logger.Log($"Successfully loaded file {FileName}", FlaggedLoggingLevel.Debug);
-		Mod.Logger.Log(FlaggedLoggingLevel.Debug, LoggingSubType.Separator);
-		return texture ?? null;
-	}
+        texture.LoadRawTextureData(resourceData);
+        texture.Apply();
+        texture.DontUnload();
+        Mod.Logger.Log($"Successfully loaded embedded resource: {resourceName}", FlaggedLoggingLevel.Debug);
+        Mod.Logger.Log(FlaggedLoggingLevel.Debug, LoggingSubType.Separator);
+        return texture;
+    }
 }
 
 public static class Extensions
