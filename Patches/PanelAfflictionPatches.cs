@@ -59,7 +59,15 @@ internal static class PanelAfflictionPatches
                     {
                         __instance.m_CoverflowAfflictions.Add(componentInChildren);
 
-                        componentInChildren.m_SpriteEffect.spriteName = panelAfflictionList[j - vanillaAfflictionCount].GetSpriteName();
+                        for (int i = 0; i < panelAfflictionList.Count; i++)
+                        {
+                            if (panelAfflictionList[i].m_CustomSprite)
+                            {
+                                componentInChildren.m_SpriteEffect.atlas = Mod.customAtlas;
+                            }
+
+                            componentInChildren.m_SpriteEffect.spriteName = panelAfflictionList[j - vanillaAfflictionCount].GetSpriteName();
+                        }
                     }
                 }
             }

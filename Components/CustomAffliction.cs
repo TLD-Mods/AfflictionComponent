@@ -30,6 +30,7 @@ public abstract class CustomAffliction
         m_Location = location;
         m_Name = Localization.Get(name);
         m_SpriteName = spriteName;
+        m_CustomSprite = customSprite;
         
         // Check for implemented interfaces here, and then change certain conditionals.
         var iRisk = AfflictionManager.TryGetInterface<IRisk>(this);
