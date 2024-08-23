@@ -32,8 +32,7 @@ public abstract class CustomAffliction
         var iRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (iRemedies != null)
         {
-            
-            if(iRemedies.AltRemedyItems is not null && iRemedies.RemedyItems is not null)
+            if (iRemedies.AltRemedyItems is not null && iRemedies.RemedyItems is not null)
             {
                 if (iRemedies.AltRemedyItems.Length > 0 && iRemedies.RemedyItems.Length == 0) // You can't have alternate remedy items if the main remedy items is blank.
                 {
@@ -78,8 +77,8 @@ public abstract class CustomAffliction
     
     public void Cure(bool displayHealed = true)
     {
-        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
-        if (InterfaceRemedies != null) InterfaceRemedies.OnCure();
+        var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if (interfaceRemedies != null) interfaceRemedies.OnCure();
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         if (HasBuff()) displayHealed = false;
         if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
@@ -126,11 +125,11 @@ public abstract class CustomAffliction
     /// <returns></returns>
     public bool NeedsRemedy()
     {
-        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
-        if (InterfaceRemedies == null) return false;
+        var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if (interfaceRemedies == null) return false;
 
-        var remedyItems = InterfaceRemedies.RemedyItems;
-        var altRemedyItems = InterfaceRemedies.AltRemedyItems;
+        var remedyItems = interfaceRemedies.RemedyItems;
+        var altRemedyItems = interfaceRemedies.AltRemedyItems;
 
         if (remedyItems == null && altRemedyItems == null) return false;
         if (remedyItems == null) remedyItems = [];
@@ -151,27 +150,28 @@ public abstract class CustomAffliction
     /// <returns></returns>
     public bool RequiresRemedyItem(FirstAidItem fai)
     {
-        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
-        if (InterfaceRemedies == null) return false;
-        return InterfaceRemedies.RemedyItems.Length > 0 && InterfaceRemedies.RemedyItems.Concat(InterfaceRemedies.AltRemedyItems).Any(item => item.Item1 == fai.m_GearItem.name);
+        var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        if (interfaceRemedies == null) return false;
+        return interfaceRemedies.RemedyItems.Length > 0 && interfaceRemedies.RemedyItems.Concat(interfaceRemedies.AltRemedyItems).Any(item => item.Item1 == fai.m_GearItem.name);
     }
+    
     /// <summary>
     /// Resets the entire affliction back to its default, including remedy items and the duration.
     /// </summary>
     public void ResetAffliction(bool resetRemedies = true)
     {
-        var InterfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
-        var InterfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
+        var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
+        var interfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
 
-        if (resetRemedies && InterfaceRemedies != null)
+        if (resetRemedies && interfaceRemedies != null)
         {
-            if (InterfaceRemedies.RemedyItems.Length > 0) ResetRemedyItems(InterfaceRemedies);
-            if (InterfaceRemedies.AltRemedyItems.Length > 0) ResetAltRemedyItems(InterfaceRemedies);
+            if (interfaceRemedies.RemedyItems.Length > 0) ResetRemedyItems(interfaceRemedies);
+            if (interfaceRemedies.AltRemedyItems.Length > 0) ResetAltRemedyItems(interfaceRemedies);
         }
 
-        if (InterfaceDuration == null) return;
+        if (interfaceDuration == null) return;
 
-        InterfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + InterfaceDuration.Duration;
+        interfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + interfaceDuration.Duration;
     }
     
     public static void ResetAltRemedyItems(IRemedies iRemedies) => iRemedies.AltRemedyItems = iRemedies.AltRemedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, GetResetValue(item.Item1, item.Item2)) : item).ToArray();

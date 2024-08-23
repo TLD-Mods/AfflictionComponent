@@ -5,7 +5,7 @@ namespace AfflictionComponent.Patches.PlayerDamageEventPatches;
 internal static class SpawnDamageEvent
 {
     // TODO: This is my logic of thinking, but seems to be hitting a null reference somewhere.
-    [HarmonyPatch(typeof(PlayerDamageEvent), nameof(PlayerDamageEvent.SpawnDamageEvent))]
+    /*[HarmonyPatch(typeof(PlayerDamageEvent), nameof(PlayerDamageEvent.SpawnDamageEvent))]
     private static class Test1
     {
         private static void Postfix(PlayerDamageEvent __instance, string damageEventName, string damageEventType, string iconName, Color tint, bool fadeout, float displayTime, float fadeoutTime)
@@ -26,5 +26,5 @@ internal static class SpawnDamageEvent
                 }
             }
         }
-    }
+    }*/
 }

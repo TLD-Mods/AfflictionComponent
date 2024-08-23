@@ -17,7 +17,7 @@ internal static class RefreshPaperDoll
             var flag = false;
             for (var i = 0; i < afflictionManager.m_Afflictions.Count; i++)
             {
-                if (!afflictionManager.GetAfflictionByIndex(i).HasBuff())
+                if (!afflictionManager.GetAfflictionByIndex(i).HasBuff()) // TODO: This doesn't seem to be behaving properly. If I have one custom buff affliction, then vanilla risk or bad afflictions - it doesn't hide the paperdoll.
                 {
                     flag = true;
                 }

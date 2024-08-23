@@ -7,5 +7,5 @@ public interface IInstance
 {
     public InstanceType Type { get; set; }
     
-    public void OnFoundExistingInstance(CustomAffliction aff);
+    public void OnFoundExistingInstance(CustomAffliction customAffliction);
 }

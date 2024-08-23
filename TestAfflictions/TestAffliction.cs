@@ -11,6 +11,10 @@ internal class TestAffliction : CustomAffliction, IBuff, IRiskPercentage, IDurat
     private float m_LastUpdateTime;
  
     public bool Buff { get; set; }
+    public bool BuffCold { get; set; }
+    public bool BuffFatigue { get; set; }
+    public bool BuffHunger { get; set; }
+    public bool BuffThirst { get; set; }
     public float Duration { get; set; }
     public float EndTime { get; set; }
     public bool Risk { get; set; }
