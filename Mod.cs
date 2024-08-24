@@ -44,7 +44,7 @@ internal sealed class Mod : MelonMod
     {
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
-            /*var testAffliction = new TestAffliction("Testing Affliction",
+            var testAffliction = new TestAffliction("Testing Affliction",
                 "Testing Cause",
                 "Testing Description",
                 null,
@@ -57,9 +57,9 @@ internal sealed class Mod : MelonMod
                 InstantHeal = true
             };
 
-            testAffliction.Start();*/
+            testAffliction.Start();
 
-            /*var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
+            var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
                 "Testing Cause",
                 "Testing Risk Description",
                 null,
@@ -70,9 +70,9 @@ internal sealed class Mod : MelonMod
                 InstantHeal = true
             };
             
-            testAfflictionRisk.Start();*/
+            testAfflictionRisk.Start();
             
-            var testAfflictionBuff = new TestAffliction("Testing Buff 1",
+            /*var testAfflictionBuff = new TestAffliction("Testing Buff 1",
                 "Testing Cause",
                 "Testing Buff Description 1",
                 null,
@@ -85,7 +85,7 @@ internal sealed class Mod : MelonMod
                 BuffCold = true
             };
             
-            testAfflictionBuff.Start(); 
+            testAfflictionBuff.Start();*/
         }
     }
 }
