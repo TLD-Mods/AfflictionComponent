@@ -9,12 +9,21 @@ internal static class DoShowBuffNotification
     {
         private static void Postfix(Panel_HUD __instance, Panel_HUD.BuffNotification buffNotification)
         {
-            if (AfflictionManager.GetAfflictionManagerInstance().m_Afflictions.Any(customAffliction => buffNotification.m_BuffNameLocID == customAffliction.m_Name && customAffliction.m_CustomSprite))
+            var customAffliction = AfflictionManager.GetAfflictionManagerInstance().m_Afflictions.FirstOrDefault(a => buffNotification.m_BuffNameLocID == a.m_Name && a.m_CustomSprite);
+            if (customAffliction != null)
             {
-                __instance.m_BuffSprite.atlas = Mod.customAtlas;
+                for (var i = 0; i < Mod.allCustomAtlas.transform.childCount; i++)
+                {
+                    if ($"CustomAtlas{customAffliction.m_SpriteName}(Clone)" == Mod.allCustomAtlas.transform.GetChild(i).name)
+                    {
+                        __instance.m_BuffSprite.atlas = Mod.allCustomAtlas.transform.GetChild(i).GetComponent<UIAtlas>();
+                        break;
+                    }
+                }
+
                 return;
             }
-
+            
             __instance.m_BuffSprite.atlas = __instance.m_StruggleBar.atlas;
         }
     }

@@ -12,6 +12,7 @@ internal sealed class Mod : MelonMod
     internal static SaveDataManager sdm = new();
 
     internal static UIAtlas customAtlas;
+    internal static GameObject allCustomAtlas;
 
     public override void OnSceneWasInitialized(int buildIndex, string sceneName)
     {
@@ -32,10 +33,9 @@ internal sealed class Mod : MelonMod
                 UnityEngine.Object.DontDestroyOnLoad(AfflictionManager);
                 afflictionManager = AfflictionManager.AddComponent<AfflictionManager>();
                 
-                GameObject CustomAtlas = new() { name = "CustomAtlas", layer = vp_Layer.Default };
-                UnityEngine.Object.Instantiate(CustomAtlas, GameManager.GetVpFPSPlayer().transform);
-                UnityEngine.Object.DontDestroyOnLoad(CustomAtlas);
-                customAtlas = CustomAtlas.AddComponent<UIAtlas>();
+                allCustomAtlas = new() { name = "CustomAtlas's", layer = vp_Layer.Default };
+                UnityEngine.Object.Instantiate(allCustomAtlas, GameManager.GetVpFPSPlayer().transform);
+                UnityEngine.Object.DontDestroyOnLoad(allCustomAtlas);
             }
         }
     }
@@ -59,7 +59,7 @@ internal sealed class Mod : MelonMod
 
             testAffliction.Start();
 
-            var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
+            /*var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
                 "Testing Cause",
                 "Testing Risk Description",
                 null,
@@ -70,9 +70,9 @@ internal sealed class Mod : MelonMod
                 InstantHeal = true
             };
             
-            testAfflictionRisk.Start();
+            testAfflictionRisk.Start();*/
             
-            /*var testAfflictionBuff = new TestAffliction("Testing Buff 1",
+            var testAfflictionBuff = new TestAffliction("Testing Buff 1",
                 "Testing Cause",
                 "Testing Buff Description 1",
                 null,
@@ -85,7 +85,7 @@ internal sealed class Mod : MelonMod
                 BuffCold = true
             };
             
-            testAfflictionBuff.Start();*/
+            testAfflictionBuff.Start();
         }
     }
 }

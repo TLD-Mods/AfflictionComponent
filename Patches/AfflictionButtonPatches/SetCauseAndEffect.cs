@@ -17,7 +17,12 @@ internal static class SetCauseAndEffect
 
             // This is here so if the affliction is already applied to the player, it needs to be loaded again as Start() wasn't called.
             AtlasUtilities.AddCustomSpriteToAtlas(customAffliction.m_SpriteName);
-            __instance.m_SpriteEffect.atlas = Mod.customAtlas;
+            
+            // Not sure if this works or not, as the UIAtlas component isn't being attached at all.
+            for (var i = 0; i < Mod.allCustomAtlas.transform.childCount; i++)
+            {
+                if ($"CustomAtlas{spriteName}(Clone)" == Mod.allCustomAtlas.transform.GetChild(i).name) __instance.m_SpriteEffect.atlas = Mod.allCustomAtlas.transform.GetChild(i).GetComponent<UIAtlas>();
+            }
         }
     }
 }

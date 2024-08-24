@@ -2,14 +2,17 @@
 
 internal static class AtlasUtilities
 {
-    // TODO: Somehow figure out a way to dynamically space the images in the atlas if multiple are added.
     internal static void AddCustomSpriteToAtlas(string spriteName)
     {
-        foreach (var uiSpriteData in Mod.customAtlas.spriteList)
+        for (var i = 0; i < Mod.allCustomAtlas.transform.childCount; i++)
         {
-            if (uiSpriteData.name == spriteName) return;
+            if ($"CustomAtlas{spriteName}(Clone)" == Mod.allCustomAtlas.transform.GetChild(i).name) return;
         }
-     
+        
+        GameObject customAtlas = new() { name = $"CustomAtlas{spriteName}", layer = vp_Layer.Default };
+        UnityEngine.Object.Instantiate(customAtlas, Mod.allCustomAtlas.transform);
+        var customUIAtlas = customAtlas.AddComponent<UIAtlas>(); // TODO: This isn't adding the component to the game object for some reason?
+        
         var customImage = ImageUtilities.GetImage(spriteName);
         if (customImage == null) return;
         
@@ -21,9 +24,9 @@ internal static class AtlasUtilities
             width = customImage.width,
             height = customImage.height
         };
-        
-        Mod.customAtlas.spriteList.Add(spriteData);
-        Mod.customAtlas.material = new Material(Shader.Find("Unlit/Transparent Colored"))
+
+        customUIAtlas.spriteList.Add(spriteData);
+        customUIAtlas.material = new Material(Shader.Find("Unlit/Transparent Colored"))
         {
             mainTexture = customImage
         };
