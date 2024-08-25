@@ -208,5 +208,15 @@ testAffliction.Start();
 > [!IMPORTANT]
 > The reason there is a `.Resources` in the path is due to the image being nested under a `Resources` folder.
 
+## Installation
+
+* Install MelonLoader by downloading and running [MelonLoader.Installer.exe](https://github.com/HerpDerpinstine/MelonLoader/releases/latest/download/MelonLoader.Installer.exe)
+* Install the following dependencies in your mods folder: 
+
+- [ModData](https://github.com/dommrogers/ModData/releases/latest)
+- [ComplexLogger](https://github.com/Arkhorse/Complex-Logger/releases/latest)
+
+* Install the latest release and drop it in your mods folder
+
 > [!NOTE]
 > This modification is not officially a part of The Long Dark and is not affiliated with Hinterland Studio Inc or its affiliates.
