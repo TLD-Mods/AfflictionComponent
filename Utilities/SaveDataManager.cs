@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ModData;
-using Il2Cpp;
-using AfflictionComponent.Components;
+﻿using AfflictionComponent.Components;
 using Newtonsoft.Json;
 
 namespace AfflictionComponent.Utilities
