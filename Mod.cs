@@ -42,6 +42,7 @@ internal sealed class Mod : MelonMod
 
     public override void OnUpdate()
     {
+
         if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Delete))
         {
             var testAffliction = new TestAffliction("Testing Affliction",
@@ -57,7 +58,7 @@ internal sealed class Mod : MelonMod
                 InstantHeal = true
             };
 
-            testAffliction.Start();
+            //testAffliction.Start();
 
             /*var testAfflictionRisk = new TestAffliction("GAMEPLAY_AfflictionTestingRisk",
                 "Testing Cause",
@@ -85,7 +86,7 @@ internal sealed class Mod : MelonMod
                 BuffCold = true
             };
             
-            testAfflictionBuff.Start();
+            //testAfflictionBuff.Start();
         }
     }
 }
