@@ -79,9 +79,9 @@ public abstract class CustomAffliction
     {
         var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (interfaceRemedies != null) interfaceRemedies.OnCure();
+        if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
         if (HasBuff()) displayHealed = false;
-        if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
 

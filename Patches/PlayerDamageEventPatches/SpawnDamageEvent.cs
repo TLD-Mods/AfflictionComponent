@@ -4,7 +4,6 @@ namespace AfflictionComponent.Patches.PlayerDamageEventPatches;
 
 internal static class SpawnDamageEvent
 {
-    // TODO: This basically works, however if a custom affliction is last to show up with a custom icon - then it's blank for some reason.
     [HarmonyPatch(typeof(PlayerDamageEvent), nameof(PlayerDamageEvent.SpawnDamageEvent))]
     private static class PlayerDamageEventPatch
     {
