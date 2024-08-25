@@ -4,7 +4,6 @@ namespace AfflictionComponent.Patches.PanelFirstAidPatches;
 
 internal static class RefreshScrollList
 {
-    // TODO: Seems to be an issue when new afflictions are added with their sprites. I will need to investigate more.
     [HarmonyPatch(typeof(Panel_FirstAid), nameof(Panel_FirstAid.RefreshScrollList))]
     private static class RefreshScrollListOverride
     {

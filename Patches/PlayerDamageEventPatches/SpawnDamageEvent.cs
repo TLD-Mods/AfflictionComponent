@@ -17,10 +17,9 @@ internal static class SpawnDamageEvent
 
             if (customAffliction != null)
             {
-                // Not sure if this works or not, as the UIAtlas component isn't being attached at all.
                 for (var i = 0; i < Mod.allCustomAtlas.transform.childCount; i++)
                 {
-                    if ($"CustomAtlas{customAffliction.m_SpriteName}(Clone)" == Mod.allCustomAtlas.transform.GetChild(i).name) __instance.m_Icon.atlas = Mod.allCustomAtlas.transform.GetChild(i).GetComponent<UIAtlas>();
+                    if ($"CustomAtlas{customAffliction.m_SpriteName}(Clone)" == Mod.allCustomAtlas.transform.GetChild(i).name) damageEvent.m_Icon.atlas = Mod.allCustomAtlas.transform.GetChild(i).GetComponent<UIAtlas>();
                 }
 
                 damageEvent.m_Icon.spriteName = iconName;

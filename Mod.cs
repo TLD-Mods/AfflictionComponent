@@ -52,8 +52,8 @@ internal sealed class Mod : MelonMod
                 AfflictionBodyArea.Chest,
                 true)
             {
-                AltRemedyItems = [Tuple.Create("GEAR_HeavyBandage", 1, 1)],
-                RemedyItems = [],
+                AltRemedyItems = [],
+                RemedyItems = [Tuple.Create("GEAR_HeavyBandage", 1, 1)],
                 InstantHeal = true
             };
 

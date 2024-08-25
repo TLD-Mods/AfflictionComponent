@@ -11,7 +11,7 @@ internal static class AtlasUtilities
         
         GameObject customAtlas = new() { name = $"CustomAtlas{spriteName}", layer = vp_Layer.Default };
         GameObject iCustomAtlas = UnityEngine.Object.Instantiate(customAtlas, Mod.allCustomAtlas.transform);
-        var customUIAtlas = iCustomAtlas.AddComponent<UIAtlas>(); // TODO: This isn't adding the component to the game object for some reason?
+        var customUIAtlas = iCustomAtlas.AddComponent<UIAtlas>();
 
         var customImage = ImageUtilities.GetImage(spriteName);
         if (customImage == null) return;

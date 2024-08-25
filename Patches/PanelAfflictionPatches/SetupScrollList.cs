@@ -4,7 +4,6 @@ namespace AfflictionComponent.Patches.PanelAfflictionPatches;
 
 internal static class SetupScrollList
 {
-    // TODO: Fix another out of range index error that is happening here, not sure what is causing it yet.
     [HarmonyPatch(typeof(Panel_Affliction), nameof(Panel_Affliction.SetupScrollList))]
     private static class SetupCustomAfflictionOnScrollList
     {
@@ -48,23 +47,31 @@ internal static class SetupScrollList
 
             if (AfflictionManager.GetAfflictionManagerInstance().m_Afflictions.Count > 0)
             {
-                int finalCounter = vanillaAfflictionCount <= moddedAfflictionCount ? combinedCount - 1 : combinedCount;
-              
-                for (int j = vanillaAfflictionCount; j <= finalCounter; j++)
+                int finalCounter = combinedCount;
+    
+                for (int j = vanillaAfflictionCount; j < finalCounter; j++)
                 {
                     AfflictionCoverflow componentInChildren = Utils.GetComponentInChildren<AfflictionCoverflow>(__instance.m_ScrollList.m_ScrollObjects[j]);
                     if (componentInChildren != null)
                     {
                         __instance.m_CoverflowAfflictions.Add(componentInChildren);
 
-                        for (int i = 0; i < GlobalFields.panelAfflictionList.Count; i++)
+                        int customIndex = j - vanillaAfflictionCount;
+                        if (customIndex < GlobalFields.panelAfflictionList.Count)
                         {
-                            if (GlobalFields.panelAfflictionList[i].m_CustomSprite)
+                            var customAffliction = GlobalFields.panelAfflictionList[customIndex];
+                            if (customAffliction.m_CustomSprite)
                             {
-                                componentInChildren.m_SpriteEffect.atlas = Mod.customAtlas;
+                                for (var l = 0; l < Mod.allCustomAtlas.transform.childCount; l++)
+                                {
+                                    if ($"CustomAtlas{customAffliction.m_SpriteName}(Clone)" == Mod.allCustomAtlas.transform.GetChild(l).name)
+                                    {
+                                        componentInChildren.m_SpriteEffect.atlas = Mod.allCustomAtlas.transform.GetChild(l).GetComponent<UIAtlas>();
+                                        break;
+                                    }
+                                }
                             }
-
-                            componentInChildren.m_SpriteEffect.spriteName = GlobalFields.panelAfflictionList[j - vanillaAfflictionCount].m_SpriteName;
+                            componentInChildren.m_SpriteEffect.spriteName = customAffliction.m_SpriteName;
                         }
                     }
                 }
