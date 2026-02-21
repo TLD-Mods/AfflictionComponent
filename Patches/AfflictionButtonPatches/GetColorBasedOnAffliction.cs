@@ -11,7 +11,7 @@ internal static class GetColorBasedOnAffliction
         {
             if (m_AfflictionType != AfflictionType.Generic) return;
 
-            var customAffliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(__instance.m_Index);
+            if (!AfflictionManager.GetAfflictionManagerInstance().TryGetAfflictionByIndex(__instance.m_Index, out var customAffliction) || customAffliction == null) return;
             var color = Color.white;
             
             if (isHovering)

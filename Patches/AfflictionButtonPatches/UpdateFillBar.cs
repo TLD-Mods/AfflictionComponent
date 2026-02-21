@@ -14,7 +14,7 @@ internal static class UpdateFillBar
         {
             if (__instance.m_AfflictionType != AfflictionType.Generic) return;
 
-            var customAffliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(__instance.GetAfflictionIndex());
+            if (!AfflictionManager.GetAfflictionManagerInstance().TryGetAfflictionByIndex(__instance.GetAfflictionIndex(), out var customAffliction) || customAffliction == null) return;
             
             var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(customAffliction);
             if (riskPercentage != null && riskPercentage.Risk)

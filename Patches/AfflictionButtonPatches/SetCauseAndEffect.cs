@@ -14,7 +14,7 @@ internal static class SetCauseAndEffect
             
             if (__instance.m_AfflictionType != AfflictionType.Generic) return;
             
-            var customAffliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(__instance.GetAfflictionIndex());
+            if (!AfflictionManager.GetAfflictionManagerInstance().TryGetAfflictionByIndex(__instance.GetAfflictionIndex(), out var customAffliction) || customAffliction == null) return;
             if (!customAffliction.m_CustomSprite)
             {
                 __instance.m_SpriteEffect.atlas = __instance.m_FillSpriteAfflictionBar.atlas;

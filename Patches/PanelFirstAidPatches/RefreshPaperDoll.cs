@@ -17,7 +17,9 @@ internal static class RefreshPaperDoll
             var flag = false;
             for (var i = 0; i < afflictionManager.m_Afflictions.Count; i++)
             {
-                if (!afflictionManager.GetAfflictionByIndex(i).HasBuff())
+                if (!afflictionManager.TryGetAfflictionByIndex(i, out var affliction) || affliction == null) continue;
+
+                if (!affliction.HasBuff())
                 {
                     flag = true;
                 }

@@ -11,7 +11,9 @@ internal static class SetColor
         {
             if (__instance.m_AfflictionType != AfflictionType.Generic) return;
             
-            var colorBasedOnCustomAffliction = AfflictionManager.GetAfflictionColour(AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(__instance.GetAfflictionIndex()).GetAfflictionType());
+            if (!AfflictionManager.GetAfflictionManagerInstance().TryGetAfflictionByIndex(__instance.GetAfflictionIndex(), out var customAffliction) || customAffliction == null) return;
+
+            var colorBasedOnCustomAffliction = AfflictionManager.GetAfflictionColour(customAffliction.GetAfflictionType());
             __instance.m_SpriteEffect.color = colorBasedOnCustomAffliction;
             __instance.m_LabelEffect.color = colorBasedOnCustomAffliction;
             __instance.m_LabelCause.color = isSelected ? __instance.m_CauseColorHover : __instance.m_CauseColor;

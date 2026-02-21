@@ -87,14 +87,10 @@ internal static class RefreshRightPage
 
                 // This handles the out of index range error I was getting in the console.
                 CustomAffliction affliction;
-                try
+                if (!AfflictionManager.GetAfflictionManagerInstance().TryGetAfflictionByIndex(selectedAfflictionIndex, out affliction) || affliction == null)
                 {
-                    affliction = AfflictionManager.GetAfflictionManagerInstance().GetAfflictionByIndex(selectedAfflictionIndex);
-                }
-                catch (ArgumentOutOfRangeException e) 
-                {
-                    Mod.Logger.Log(e.Message, ComplexLogger.FlaggedLoggingLevel.Error);
-                    return; 
+                    __instance.HideRightPage();
+                    return;
                 }
                 
                 __instance.m_LabelAfflictionName.text = affliction.m_Name;

@@ -52,6 +52,8 @@ internal static class RefreshScrollList
         private static void ProcessAffliction(Panel_FirstAid instance, Affliction affliction, AfflictionButton component, ref AfflictionType lastAfflictionType, ref int count, bool hasSelectedButton, AfflictionType selectedType, AfflictionBodyArea selectedArea)
         {
             int location = (int)affliction.m_Location;
+            if (!IsValidBodyIconIndex(instance, location)) return;
+            
             instance.AddAfflictionAtLocation(location, affliction);
             instance.m_BodyIconList[location].gameObject.SetActive(true);
 
@@ -71,7 +73,8 @@ internal static class RefreshScrollList
         private static void ProcessCustomAffliction(Panel_FirstAid instance, CustomAffliction customAffliction, AfflictionButton component, ref AfflictionType lastAfflictionType, ref int count, bool hasSelectedButton, AfflictionType selectedType, AfflictionBodyArea selectedArea)
         {
             int location = (int)customAffliction.m_Location;
-            AddCustomAfflictionAtLocation(instance, location, customAffliction);
+            if (!IsValidBodyIconIndex(instance, location)) return;
+
             instance.m_BodyIconList[location].gameObject.SetActive(true);
 
             AfflictionType afflictionType = AfflictionType.Generic;
@@ -88,15 +91,11 @@ internal static class RefreshScrollList
             instance.UpdateBodyIconColors(component, isSelected, location);
         }
         
-        private static void AddCustomAfflictionAtLocation(Panel_FirstAid instance, int bodyIconIndex, CustomAffliction customAffliction)
+        private static bool IsValidBodyIconIndex(Panel_FirstAid instance, int bodyIconIndex)
         {
-            Panel_FirstAid.AfflictionsAtLocation afflictionsAtLocation = instance.m_AfflictionsAtLocationArray[bodyIconIndex];
-            if (afflictionsAtLocation == null)
-            {
-                afflictionsAtLocation = new Panel_FirstAid.AfflictionsAtLocation(customAffliction.m_Location);
-                instance.m_AfflictionsAtLocationArray[bodyIconIndex] = afflictionsAtLocation;
-            }
-            afflictionsAtLocation.AddAffliction(AfflictionType.Generic); // Adding this fixes index out of bounds error
+            return bodyIconIndex >= 0
+                   && bodyIconIndex < instance.m_BodyIconList.Count
+                   && bodyIconIndex < instance.m_AfflictionsAtLocationArray.Length;
         }
     }
 }

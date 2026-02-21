@@ -19,6 +19,19 @@ public class AfflictionManager : MonoBehaviour
         
         return (count > 1, count, afflictionsOfType.IndexOf(currentAffliction) + 1);
     }
+
+    [HideFromIl2Cpp]
+    public bool TryGetAfflictionByIndex(int index, out CustomAffliction? customAffliction)
+    {
+        if (index < 0 || index >= m_Afflictions.Count)
+        {
+            customAffliction = null;
+            return false;
+        }
+
+        customAffliction = m_Afflictions[index];
+        return customAffliction != null;
+    }
     
     [HideFromIl2Cpp]
     public CustomAffliction GetAfflictionByIndex(int index) => m_Afflictions[index];
