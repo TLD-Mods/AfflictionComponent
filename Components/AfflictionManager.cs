@@ -109,6 +109,14 @@ public class AfflictionManager : MonoBehaviour
                     customAffliction.Cure();
                 }
             }
+
+            if (customAffliction.HasLimp())
+            {
+                bool left = customAffliction.m_Location == AfflictionBodyArea.LegLeft || customAffliction.m_Location == AfflictionBodyArea.FootLeft ? true : false;
+                bool right = customAffliction.m_Location == AfflictionBodyArea.LegRight || customAffliction.m_Location == AfflictionBodyArea.FootRight ? true : false;
+
+                GameManager.GetPlayerAnimationComponent().SetLimp(left, right);   
+            }
         }
     }
 }

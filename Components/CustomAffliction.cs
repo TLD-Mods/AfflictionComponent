@@ -119,6 +119,12 @@ public abstract class CustomAffliction
         return interfaceRisk is not null ? interfaceRisk.Risk : false;
     }
     
+    public bool HasLimp()
+    {
+        var interfaceLimp = AfflictionManager.TryGetInterface<ILimp>(this);
+        return interfaceLimp is not null ? interfaceLimp.IsActive : false;
+    }
+
     /// <summary>
     /// Checks to see if the affliction needs any remedy items to be taken or not. 
     /// </summary>
