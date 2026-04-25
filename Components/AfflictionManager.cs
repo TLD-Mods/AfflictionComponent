@@ -66,6 +66,8 @@ public class AfflictionManager : MonoBehaviour
     [HideFromIl2Cpp] // So mod authors can check if the player has at least one CustomAffliction of their own type.
     public bool HasAfflictionOfType(Type typeName) => m_Afflictions.Any(typeName.IsInstanceOfType);
 
+    public List<CustomAffliction> GetAfflictionsOfType(Type typeName) => m_Afflictions.Where(typeName.IsInstanceOfType).ToList();
+
     private void LoadData()
     {
         AfflictionManagerSaveDataProxy? sdp = Mod.sdm?.Load();
