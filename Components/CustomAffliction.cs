@@ -122,7 +122,7 @@ public abstract class CustomAffliction
     public bool HasLimp()
     {
         var interfaceLimp = AfflictionManager.TryGetInterface<ILimp>(this);
-        return interfaceLimp is not null ? interfaceLimp.IsActive : false;
+        return interfaceLimp is not null ? interfaceLimp.IsLimping : false;
     }
 
     /// <summary>

@@ -8,6 +8,6 @@ namespace AfflictionComponent.Interfaces
 {
     public interface ILimp
     {
-        public bool IsActive { get; set; }
+        public bool IsLimping { get; set; }
     }
 }
