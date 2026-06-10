@@ -15,7 +15,29 @@ internal static class UpdateFillBar
             if (__instance.m_AfflictionType != AfflictionType.Generic) return;
 
             if (!AfflictionManager.GetAfflictionManagerInstance().TryGetAfflictionByIndex(__instance.GetAfflictionIndex(), out var customAffliction) || customAffliction == null) return;
-            
+
+            var progressBar = AfflictionManager.TryGetInterface<IAfflictionProgressBar>(customAffliction);
+            if (progressBar != null)
+            {
+                var progressValue = Mathf.Clamp01(progressBar.ProgressBar);
+                var num = progressBar.InvertProgressBar ? 1f - progressValue : progressValue;
+
+                if (customAffliction.HasBuff())
+                {
+                    Utils.SetActive(__instance.m_AnimatorBuffBar.gameObject, num > 0f);
+                    __instance.m_FillSpriteBuffBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num);
+                    __instance.m_SizeModifierBuffBar.localScale = new Vector3(num, 1f, 1f);
+                }
+                else
+                {
+                    Utils.SetActive(__instance.m_AnimatorAfflictionBar.gameObject, num > 0f);
+                    __instance.m_FillSpriteAfflictionBar.fillAmount = Mathf.Lerp(__instance.m_FillSpriteOffset, 1f - __instance.m_FillSpriteOffset, num);
+                    __instance.m_SizeModifierAfflictionBar.localScale = new Vector3(num, 1f, 1f);
+                }
+
+                return;
+            }
+
             var riskPercentage = AfflictionManager.TryGetInterface<IRiskPercentage>(customAffliction);
             if (riskPercentage != null && riskPercentage.Risk)
             {

@@ -5,9 +5,9 @@ internal static class BuildInfo
     // Main
     public const string Name = "AfflictionComponent";
     public const string Description = null!;
-    public const string Author = "Fuar, Deadman";
+    public const string Author = "Fuar, Deadman, EtherSystem";
     public const string Copyright = "Copyright © 2024";
-    public const string Version = "1.2.0";
+    public const string Version = "1.3.0";
     public const string AssemblyVersion = $"{Version}.0";
     //public const string MelonLoaderVersion = "0.7.2";
     public const string GUIName = "Affliction Component";
