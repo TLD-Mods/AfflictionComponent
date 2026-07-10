@@ -13,6 +13,7 @@ internal sealed class Mod : MelonMod
 
     internal static UIAtlas customAtlas;
     internal static GameObject allCustomAtlas;
+    internal static GameObject customRightSidePanelObject;
 
     public override void OnSceneWasInitialized(int buildIndex, string sceneName)
     {

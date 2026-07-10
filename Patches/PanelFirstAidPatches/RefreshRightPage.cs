@@ -2,6 +2,7 @@
 using AfflictionComponent.Interfaces;
 using AfflictionComponent.Utilities;
 using Il2CppTLD.IntBackedUnit;
+using Unity.VisualScripting;
 
 namespace AfflictionComponent.Patches.PanelFirstAidPatches;
 
@@ -13,16 +14,22 @@ internal static class RefreshRightPage
         private static bool Prefix(Panel_FirstAid __instance)
         {
             if (!__instance.m_SelectedAffButton) return true;
-            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) return true;
-
+            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
+            {
+                DisableCustomRightSidePanelObject();
+                return true;
+            }
             return false;
         }
 
         private static void Postfix(Panel_FirstAid __instance)
         {
             if (!__instance.m_SelectedAffButton) return;
-            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic) return;
-
+            if (__instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.FoodPoisioning && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Dysentery && __instance.m_SelectedAffButton.m_AfflictionType != AfflictionType.Generic)
+            {
+                DisableCustomRightSidePanelObject();
+                return;
+            }
             // Generic UI crap, some of it we probably don't even need for this override.
             foreach (var firstAidKitButton in __instance.m_FakButtons)
             {
@@ -74,11 +81,13 @@ internal static class RefreshRightPage
             {
                 case AfflictionType.Dysentery:
                     {
+                        DisableCustomRightSidePanelObject();
                         VanillaOverrides.DysenteryMethod(__instance, selectedAfflictionIndex, out num, out num4); // This runs the vanilla code, IA will patch this method and override it to call custom code.
                         break;
                     }
                 case AfflictionType.FoodPoisioning:
                     {
+                        DisableCustomRightSidePanelObject();
                         VanillaOverrides.FoodPoisoningMethod(__instance, selectedAfflictionIndex, out num, out num4); // This runs the vanilla code, IA will patch this method and override it to call custom code.
                         break;
                     }
@@ -108,6 +117,7 @@ internal static class RefreshRightPage
                     var interfaceRestTreatment = AfflictionManager.TryGetInterface<IRestTreatment>(affliction);
                     var interfaceDoseTreatment = AfflictionManager.TryGetInterface<IDoseTreatment>(affliction);
                     var interfaceSpecialTreatment = AfflictionManager.TryGetInterface<ISpecialTreatment>(affliction);
+                    var interfaceCustomPanelObject = AfflictionManager.TryGetInterface<ICustomRightSidePanelObject>(affliction);
 
                     if ((affliction.HasRemedies() && interfaceRemedies != null) || interfaceRestTreatment != null)
                     {
@@ -222,6 +232,8 @@ internal static class RefreshRightPage
                     num = (int)affliction.m_Location;
                     num4 = affliction.HasDuration() && interfaceDuration != null ? Mathf.CeilToInt(interfaceDuration.GetTimeRemaining()) : 0;
 
+                    EnableCustomRightSidePanelObject(__instance, interfaceCustomPanelObject);
+
                     break;
             }
 
@@ -262,5 +274,61 @@ internal static class RefreshRightPage
             panel.m_LabelDosesRemaining.text = Mathf.Max(0, doseTreatment.DosesRemaining).ToString();
             panel.m_LabelDosesRequired.text = Mathf.Max(0, doseTreatment.DosesRequired).ToString();
         }
+
+        private static void EnableCustomRightSidePanelObject(Panel_FirstAid panel, ICustomRightSidePanelObject? customObject)
+        {
+            //if object already exists, just modify it
+
+            GameObject customObjInstance = Mod.customRightSidePanelObject;
+
+            if(customObjInstance != null)
+            {
+
+                if (customObject != null)
+                {
+
+                    GameObject background = customObjInstance.transform.GetChild(0).gameObject;
+                    if (customObject.PanelBackground) background.SetActive(true);
+                    else background.SetActive(false);
+
+                    GameObject labelText = customObjInstance.transform.GetChild(1).gameObject;
+                    labelText.name = "Painkillers Label";
+                    UILabel label = labelText.GetComponent<UILabel>();
+                    label.text = customObject.PanelLabel;
+                    label.mText = customObject.PanelLabel;
+
+                    GameObject centerContents = customObjInstance.transform.GetChild(2).GetChild(0).GetChild(0).gameObject;
+
+                    GameObject icon = centerContents.transform.GetChild(0).gameObject;
+                    UISprite iconSprite = icon.GetComponent<UISprite>();
+                    iconSprite.spriteName = customObject.PanelIcon;
+                    iconSprite.color = customObject.PanelTextColour.ToColor();
+
+                    GameObject text = centerContents.transform.GetChild(1).gameObject;
+                    UILabel textLabel = text.GetComponent<UILabel>();
+                    textLabel.text = customObject.PanelText;
+                    textLabel.mText = customObject.PanelText;
+                    textLabel.color = customObject.PanelTextColour.ToColor();
+
+                    if(!customObjInstance.active) customObjInstance.SetActive(true);
+
+                }
+                else customObjInstance.SetActive(false);
+            }
+            else
+            {
+                Mod.Logger.Log("Unable to find custom right side panel object", ComplexLogger.FlaggedLoggingLevel.Error);
+                return;
+            }
+        }
+
+        private static void DisableCustomRightSidePanelObject()
+        {
+            if (Mod.customRightSidePanelObject != null && Mod.customRightSidePanelObject.active)
+            {
+                Mod.customRightSidePanelObject.SetActive(false);
+            }
+        }
+
     }
 }
