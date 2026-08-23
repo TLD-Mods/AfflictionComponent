@@ -18,17 +18,17 @@ public abstract class CustomAffliction
 
     protected CustomAffliction(string name, string causeText, string description, string? descriptionNoHeal, string spriteName, AfflictionBodyArea location, bool customSprite = false)
     {
-        m_CauseText = Localization.Get(causeText); 
+        m_CauseText = Localization.Get(causeText);
         m_Description = Localization.Get(description);
         m_DescriptionNoHeal = Localization.Get(descriptionNoHeal);
         m_Location = location;
         m_Name = Localization.Get(name);
         m_SpriteName = spriteName;
         m_CustomSprite = customSprite;
-            
+
         // Check for implemented interfaces here, and then change certain conditionals.
         var iRisk = AfflictionManager.TryGetInterface<IRisk>(this);
-            
+
         var iRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (iRemedies != null)
         {
@@ -41,7 +41,7 @@ public abstract class CustomAffliction
                 }
             }
         }
-        
+
         var iBuff = AfflictionManager.TryGetInterface<IBuff>(this);
         if (iBuff != null)
         {
@@ -52,7 +52,7 @@ public abstract class CustomAffliction
             }
         }
     }
-    
+
     public void ApplyRemedy(FirstAidItem fai)
     {
         if (!ApplyRemedyCondition()) return;
@@ -74,14 +74,19 @@ public abstract class CustomAffliction
     /// </summary>
     /// <returns></returns>
     protected virtual bool ApplyRemedyCondition() => true;
-    
+
     public void Cure(bool displayHealed = true)
     {
         var interfaceRemedies = AfflictionManager.TryGetInterface<IRemedies>(this);
         if (interfaceRemedies != null) interfaceRemedies.OnCure();
-        if (displayHealed) PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
+
+        if (displayHealed)
+        {
+            if (HasBuff()) InterfaceManager.GetPanel<Panel_HUD>().ShowBuffLossNotification(m_Name, "GAMEPLAY_BuffLossHeader", m_SpriteName);
+            else PlayerDamageEvent.SpawnAfflictionEvent(m_Name, "GAMEPLAY_Healed", m_SpriteName, AfflictionManager.GetAfflictionColour("Buff"));
+        }
+
         AfflictionManager.GetAfflictionManagerInstance().Remove(this);
-        if (HasBuff()) displayHealed = false;
         InterfaceManager.GetPanel<Panel_FirstAid>().UpdateDueToAfflictionHealed();
     }
 
@@ -98,7 +103,7 @@ public abstract class CustomAffliction
         var interfaceBuff = AfflictionManager.TryGetInterface<IBuff>(this);
         return interfaceBuff is not null ? interfaceBuff.Buff : false;
     }
-    
+
     public bool HasDuration()
     {
         var interfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
@@ -118,7 +123,7 @@ public abstract class CustomAffliction
         var interfaceRisk = AfflictionManager.TryGetInterface<IRisk>(this);
         return interfaceRisk is not null ? interfaceRisk.Risk : false;
     }
-    
+
     public bool HasLimp()
     {
         var interfaceLimp = AfflictionManager.TryGetInterface<ILimp>(this);
@@ -160,7 +165,7 @@ public abstract class CustomAffliction
         if (interfaceRemedies == null) return false;
         return interfaceRemedies.RemedyItems.Length > 0 && interfaceRemedies.RemedyItems.Concat(interfaceRemedies.AltRemedyItems).Any(item => item.Item1 == fai.m_GearItem.name);
     }
-    
+
     /// <summary>
     /// Resets the entire affliction back to its default, including remedy items and the duration.
     /// </summary>
@@ -179,7 +184,7 @@ public abstract class CustomAffliction
 
         interfaceDuration.EndTime = GameManager.GetTimeOfDayComponent().GetHoursPlayedNotPaused() + interfaceDuration.Duration;
     }
-    
+
     public static void ResetAltRemedyItems(IRemedies iRemedies) => iRemedies.AltRemedyItems = iRemedies.AltRemedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, GetResetValue(item.Item1, item.Item2)) : item).ToArray();
 
     /// <summary>
@@ -187,13 +192,13 @@ public abstract class CustomAffliction
     /// </summary>
     /// <param name="iRemedies"></param>
     public static void ResetRemedyItems(IRemedies iRemedies) => iRemedies.RemedyItems = iRemedies.RemedyItems.Select(item => item.Item3 == 0 ? new Tuple<string, int, int>(item.Item1, item.Item2, GetResetValue(item.Item1, item.Item2)) : item).ToArray();
-    
+
     public void Start()
     {
         if (GameManager.GetPlayerManagerComponent().m_God) return;
 
         if (m_CustomSprite) AtlasUtilities.AddCustomSpriteToAtlas(m_SpriteName);
-        
+
         var interfaceInstance = AfflictionManager.TryGetInterface<IInstance>(this);
         var interfaceDuration = AfflictionManager.TryGetInterface<IDuration>(this);
 
@@ -201,10 +206,10 @@ public abstract class CustomAffliction
         if (interfaceInstance is not null)
         {
             CustomAffliction? existingAff = null;
-            
+
             if (interfaceInstance.Type == InstanceType.Single) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name).ElementAt(0) : null;
             else if (interfaceInstance.Type == InstanceType.SingleLocation) existingAff = Mod.afflictionManager.m_Afflictions.Any(aff => aff.m_Name == m_Name && aff.m_Location == m_Location) ? Mod.afflictionManager.m_Afflictions.Where(aff => aff.m_Name == m_Name && aff.m_Location == m_Location).ElementAt(0) : null;
-            
+
             if (existingAff != null)
             {
                 interfaceInstance.OnFoundExistingInstance(existingAff);
@@ -223,6 +228,6 @@ public abstract class CustomAffliction
     }
 
     private static void UpdateAltRemedyItems(IRemedies iRemedies, string itemName) => iRemedies.AltRemedyItems = iRemedies.AltRemedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
-    
+
     private static void UpdateRemedyItems(IRemedies iRemedies, string itemName) => iRemedies.RemedyItems = iRemedies.RemedyItems.Select(item => item.Item1 == itemName ? new Tuple<string, int, int>(item.Item1, item.Item2, item.Item3 - 1) : item).ToArray();
 }

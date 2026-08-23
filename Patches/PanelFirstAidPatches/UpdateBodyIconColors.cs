@@ -14,6 +14,7 @@ internal static class UpdateBodyIconColors
             if (!AfflictionManager.GetAfflictionManagerInstance().TryGetAfflictionByIndex(afflictionButton.m_Index, out var customAffliction) || customAffliction == null) return;
 
             __instance.m_BodyIconList[bodyIconIndex].spriteName = customAffliction.HasBuff() ? __instance.m_BodyIconSpriteNameBuff : __instance.m_BodyIconSpriteNameAffliction;
+            if (customAffliction.HasBuff()) __instance.m_BodyIconList[bodyIconIndex].color = InterfaceManager.m_FirstAidBuffColor;
         }
     }
 }
