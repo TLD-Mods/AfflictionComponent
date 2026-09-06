@@ -1,4 +1,5 @@
 ﻿using AfflictionComponent.Components;
+using AfflictionComponent.Utilities;
 
 namespace AfflictionComponent.Patches.PanelAfflictionPatches;
 
@@ -23,6 +24,11 @@ internal static class SetupScrollList
             __instance.m_ScrollList.CleanUp();
             __instance.m_ScrollList.CreateList(combinedCount);
 
+            // Scroll list objects are pooled, so a slot that once showed a custom sprite is still on that
+            // single sprite atlas. Every slot goes back to the base atlas before it is filled, and only a
+            // custom sprite entry is moved off it again.
+            var baseAtlas = AtlasUtilities.GetBaseCoverflowAtlas(__instance);
+
             if (afflictionList != null) {
 
                 __instance.m_Afflictions = afflictionList;
@@ -33,6 +39,7 @@ internal static class SetupScrollList
                     if (!(componentInChildren == null))
                     {
                         __instance.m_CoverflowAfflictions.Add(componentInChildren);
+                        AtlasUtilities.ResetToBaseAtlas(componentInChildren.m_SpriteEffect, baseAtlas);
                         if (__instance.m_Afflictions[i].IsValid())
                         {
                             componentInChildren.SetAffliction(__instance.m_Afflictions[i]);
@@ -55,6 +62,7 @@ internal static class SetupScrollList
                     if (componentInChildren != null)
                     {
                         __instance.m_CoverflowAfflictions.Add(componentInChildren);
+                        AtlasUtilities.ResetToBaseAtlas(componentInChildren.m_SpriteEffect, baseAtlas);
 
                         int customIndex = j - vanillaAfflictionCount;
                         if (customIndex < GlobalFields.panelAfflictionList.Count)
